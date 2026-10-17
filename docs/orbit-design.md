@@ -62,3 +62,16 @@ The combined filter/view row and larger original center robot are also checked
 at narrow width:
 
 ![Narrow Orbit fixture](images/orbit-narrow-qt-fixture.png)
+
+## Crossed paths preview
+
+![Actual Qt source recording with synthetic inventory](images/orbit-crossed-qt-fixture.gif)
+
+[MP4 recording](images/orbit-crossed-qt-fixture.mp4). The secondary ellipse rocks
++/-45 degrees over 20 seconds, with alternating task dots following each rail.
+State labels now carry small accent-colored icons. Reduced/Off or stale sources
+freeze orbital motion. The original shared robot and work detail actions remain.
+
+This deterministic software Qt recording demonstrates geometry and layout, not
+installed-shell performance or live provider activity. Native acceptance remains
+with the Omarchy testing agent.

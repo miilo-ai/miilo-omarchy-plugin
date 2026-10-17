@@ -34,3 +34,12 @@ shared equation/seam and renderer regressions passed. Native gates are unchanged
 Readability update: shared asset has the original center robot at 93 dp, explicit
 task counts and one combined filter/view row. Actual Qt 900/360 px renders and
 selection checks passed. Matching wide/narrow fixture previews are committed.
+
+## Crossed ellipse checkpoint
+
+Pinned widget source e5cf719: rocking crossed ellipse, task dots on both paths,
+discreet state icons and a reproducible full-cycle recording. Widget checks pass:
+official syntax, 36 Linux scenarios, geometry/motion/bounds/detail-selection tests,
+54 original portrait comparisons, actual Qt desktop and narrow renders.
+GIF/MP4 use synthetic inventory and controlled source time. Native shell FPS,
+lifecycle, host fonts, scaling and installed interaction remain unqualified.
