@@ -75,3 +75,16 @@ Node controller checks are not QML execution; make check-native is still require
 
 See [chat-native.md](chat-native.md) for the tested helper boundary and pending
 graphical/native work. This does not replace the observation acceptance checklist.
+
+## Robot personality checkpoint
+
+Shared widget source now includes original focused/error/attention expressions,
+brief decorative winks and saved Calm/Expressive, Full/Reduced/Off and pace
+controls in widget setup. No Omi design or animation pack is included.
+Portable official OWL syntax, Linux evaluator and controlled-time draw tests pass.
+Native agent: verify the new options through the actual dashboard, persist across
+shell restart, check all states in light/dark at smallest supported size, and
+measure many-agent performance. Off must freeze robot drawing; Reduced removes
+body/glance/wink/drifting Z movement but retains blinks. Manual settings currently
+do not automatically follow OS reduced motion. Completion/recovery one-shots
+remain planned; do not treat decorative winks as provider event receipts.
