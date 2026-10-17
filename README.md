@@ -58,12 +58,26 @@ Update the checked native UI, back up the installed bar plugin, and reopen it:
 bash tools/dev-relaunch.sh
 # Rebuild/install miilo-owl and miilo-local too (needed for older installed binaries):
 bash tools/dev-relaunch.sh --rebuild
+# First shared user-configuration migration (keeps original files):
+bash tools/dev-relaunch.sh --rebuild --migrate-config
+# Full coordinated tests, then rebuild/migrate/relaunch only if they pass:
+bash tools/qualify-user-config.sh --install
 ```
 
 Requires sibling `miilo-owl-widgets` and `miilo-cli` checkouts, Cargo registry/Git
 access for rebuilds, and normal user access to the plugin directory and desktop
 socket. `--dry-run` prints the plan; `--no-restart` installs without restarting or
 enabling the shell plugin. Checks/version mismatches stop before installation.
+
+For private SDK dependencies, the workflows use Git's CLI authentication. When
+the sibling SDK checkout uses GitHub SSH, its SSH URL is applied to the pinned
+HTTPS dependency through process-scoped Git configuration. Global Git settings
+and dependency pins remain unchanged.
+
+Rebuilds install both `miilo` and `miilo-local`. The opt-in `--migrate-config`
+initializes `~/.miilo/` after installation and before relaunch; ordinary updates
+do not migrate settings. Quit older Miilo clients before migration. Existing
+collector configuration paths and service state are preserved.
 The updater backs up the existing bar and any replaced binaries under
 `$XDG_STATE_HOME/miilo/plugin-backups` (default `~/.local/state/miilo/plugin-backups`).
 It leaves session/connection data and legacy dashboard/desktop plugins alone.

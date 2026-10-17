@@ -12,6 +12,10 @@ Item {
     property bool expanded: false
     property var configureLocal: null
     property var interactionTheme: null
+    readonly property string miiloHome: Quickshell.env("MIILO_HOME") || Quickshell.env("HOME") + "/.miilo"
+    property bool configurationReady: false
+    property bool sharedConfiguration: false
+    property string configurationError: ""
     property string widgetPath: Quickshell.env("MIILO_WIDGET_PATH") || decodeURIComponent(String(Qt.resolvedUrl("../../assets/70-miilo-fleet.owl")).replace(/^file:\/\//, ""))
     readonly property alias widget: widget
     // Theme muted colors often target borders; lift text to readable contrast.
@@ -37,6 +41,26 @@ Item {
     property var owlPalette: readablePalette("")
     function closeDetails() { widget.closeScreen() }
     FileView {
+        path: root.miiloHome + "/config.json"
+        printErrors: false
+        onLoaded: {
+            try {
+                if (!root.miiloHome.startsWith("/")) throw new Error("MIILO_HOME must be absolute")
+                var config = JSON.parse(text())
+                if (config.schemaVersion !== 1) throw new Error("Unsupported Miilo configuration")
+                root.sharedConfiguration = true
+            } catch (error) {
+                root.configurationError = "Invalid Miilo configuration. Run miilo config check."
+            }
+            root.configurationReady = true
+        }
+        onLoadFailed: function(error) {
+            if (!root.miiloHome.startsWith("/") || error !== FileViewError.FileNotFound)
+                root.configurationError = "Cannot read Miilo configuration. Run miilo config check."
+            root.configurationReady = true
+        }
+    }
+    FileView {
         path: Quickshell.env("MIILO_THEME_FILE") || (Quickshell.env("HOME") + "/.local/state/omarchy/current/theme/colors.toml")
         watchChanges: true
         printErrors: false
@@ -52,15 +76,16 @@ Item {
         }
         sansFamily: root.hostFontFamily
         monoFamily: "monospace"
-        stateDir: (Quickshell.env("XDG_STATE_HOME") || home + "/.local/state") + "/miilo/widgets"
+        stateDir: root.sharedConfiguration ? root.miiloHome + "/preferences"
+            : (Quickshell.env("XDG_STATE_HOME") || home + "/.local/state") + "/miilo/widgets"
     }
     Rectangle { anchors.fill: parent; color: widget.ink("background") }
     Owl.OwlWidget {
         id: widget
         anchors.fill: parent
         anchors.margins: 12
-        path: root.widgetPath
-        errorDir: host.stateDir + "/errors"
+        path: root.configurationReady && !root.configurationError ? root.widgetPath : ""
+        errorDir: (Quickshell.env("XDG_STATE_HOME") || host.home + "/.local/state") + "/miilo/widgets/errors"
         host: host
         typography.family: root.hostFontFamily
         palette: root.owlPalette
@@ -94,8 +119,8 @@ Item {
     TypeText {
         typography: widget.typography
         anchors.fill: widget
-        visible: !!widget.error
-        text: widget.error
+        visible: !!root.configurationError || !!widget.error
+        text: root.configurationError || widget.error
         color: widget.ink("red")
         wrapMode: Text.Wrap
     }

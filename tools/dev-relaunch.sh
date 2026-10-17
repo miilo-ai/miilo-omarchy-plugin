@@ -5,13 +5,15 @@ workspace="$(dirname -- "$root")"
 rebuild=false
 dry_run=false
 restart=true
+migrate_config=false
 for option in "$@"; do
     case "$option" in
         --rebuild) rebuild=true ;;
         --dry-run) dry_run=true ;;
         --no-restart) restart=false ;;
+        --migrate-config) migrate_config=true ;;
         --help|-h)
-            echo 'Usage: bash tools/dev-relaunch.sh [--rebuild] [--dry-run] [--no-restart]'
+            echo 'Usage: bash tools/dev-relaunch.sh [--rebuild] [--migrate-config] [--dry-run] [--no-restart]'
             exit 0 ;;
         *) echo "Unknown option: $option" >&2; exit 2 ;;
     esac
@@ -24,18 +26,22 @@ export PATH="/usr/lib/qt6/bin:$HOME/.local/bin:$PATH"
 export OMARCHY_PATH="${OMARCHY_PATH:-/usr/share/omarchy}"
 helper="$HOME/.local/bin/miilo-owl"
 local_binary="$HOME/.local/bin/miilo-local"
+cli_binary="$HOME/.local/bin/miilo"
 if "$rebuild"; then
+    source "$root/tools/cargo-auth.sh"
     run cargo build --locked --manifest-path "$workspace/miilo-owl-widgets/helper/Cargo.toml" \
         --target-dir "$workspace/miilo-owl-widgets/helper/target" --bin miilo-owl -j 2
     run cargo build --locked --manifest-path "$workspace/miilo-cli/Cargo.toml" \
-        --target-dir "$workspace/miilo-cli/target" -p miilo-cli --bin miilo-local -j 2
+        --target-dir "$workspace/miilo-cli/target" -p miilo-cli --bin miilo --bin miilo-local -j 2
     helper="$workspace/miilo-owl-widgets/helper/target/debug/miilo-owl"
     local_binary="$workspace/miilo-cli/target/debug/miilo-local"
+    cli_binary="$workspace/miilo-cli/target/debug/miilo"
 fi
 run make -C "$root" check-native check-typography
 install_args=(--helper "$helper" --local "$local_binary")
-if "$rebuild"; then install_args+=(--install-binaries); fi
+if "$rebuild"; then install_args+=(--install-binaries --cli "$cli_binary"); fi
 run "$python_bin" "$root/tools/install-dev-plugin.py" "${install_args[@]}"
+if "$migrate_config"; then run "$HOME/.local/bin/miilo" config migrate; fi
 if "$restart"; then
     run omarchy restart shell
     run omarchy-shell shell rescanPlugins

@@ -34,6 +34,8 @@ def install(args):
     cli_manifest = tomllib.loads((root.parent / 'miilo-cli/Cargo.toml').read_text())
     version(args.helper, 'miilo-owl ' + helper_manifest['package']['version'])
     version(args.local, 'miilo-local ' + cli_manifest['workspace']['package']['version'])
+    if args.cli:
+        version(args.cli, 'miilo ' + cli_manifest['workspace']['package']['version'])
     target = args.plugin_dir
     if target.is_symlink() or (target / '.git').exists():
         raise ValueError('Installed plugin is a symlink/Git checkout; reconcile that checkout before replacing it')
@@ -63,6 +65,8 @@ def install(args):
     if target.exists():
         shutil.copytree(target, backup / 'io.miilo.bar', symlinks=True)
     binaries = [('miilo-owl', args.helper), ('miilo-local', args.local)]
+    if args.cli:
+        binaries.append(('miilo', args.cli))
     if args.install_binaries:
         for name, _ in binaries:
             existing = args.bin_dir / name
@@ -97,6 +101,7 @@ def main():
     parser.add_argument('--state-dir', type=Path, default=Path(os.environ.get('XDG_STATE_HOME', home / '.local/state')) / 'miilo/plugin-backups')
     parser.add_argument('--helper', type=Path, required=True)
     parser.add_argument('--local', type=Path, required=True)
+    parser.add_argument('--cli', type=Path)
     parser.add_argument('--install-binaries', action='store_true')
     try:
         install(parser.parse_args())

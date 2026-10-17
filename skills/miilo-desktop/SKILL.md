@@ -43,6 +43,13 @@ installed versions differ from the source manifests:
 bash tools/dev-relaunch.sh --rebuild
 ```
 
+The rebuild installs both CLI executables. For explicitly requested shared
+user-configuration setup, add `--migrate-config`; it copies existing preferences
+and connections into `~/.miilo/` (or absolute `MIILO_HOME`) before relaunch,
+preserves originals and existing collector configuration paths, and never restarts
+the collector. Do not add migration to ordinary update requests. Stop old clients
+writing settings before migration; only updated clients understand the new store.
+
 QML/OWL UI-only updates need no Rust rebuild when binaries already match. The
 wrapper runs native package/lint and offscreen typography checks, verifies binary
 versions, backs up the current native plugin/binaries, installs the canonical UI,

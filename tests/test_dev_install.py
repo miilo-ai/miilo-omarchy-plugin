@@ -24,7 +24,8 @@ class DevInstall(unittest.TestCase):
         (self.base / 'connections.json').write_text('untouched fixture configuration')
         self.args = types.SimpleNamespace(plugin_dir=target, bin_dir=self.base / 'bin',
             state_dir=self.base / 'state', install_binaries=True,
-            helper=self.binary('miilo-owl', '1.4.0'), local=self.binary('miilo-local', '0.2.0'))
+            helper=self.binary('miilo-owl', '1.4.0'), local=self.binary('miilo-local', '0.2.0'),
+            cli=self.binary('miilo', '0.2.0'))
 
     def binary(self, name, version):
         path = self.base / name
@@ -44,6 +45,7 @@ class DevInstall(unittest.TestCase):
         self.assertIn('legacy UI', (backups[0] / 'io.miilo.bar/LocalImport.qml').read_text())
         self.assertTrue(json.loads((backups[0] / 'installed.json').read_text())['files'])
         self.assertEqual((self.args.bin_dir / 'miilo-local').read_bytes(), self.args.local.read_bytes())
+        self.assertEqual((self.args.bin_dir / 'miilo').read_bytes(), self.args.cli.read_bytes())
 
     def test_stale_binary_stops_before_touching_plugin(self):
         self.args.helper = self.binary('miilo-owl', '1.3.0')
