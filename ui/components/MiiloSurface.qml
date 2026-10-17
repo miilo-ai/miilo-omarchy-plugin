@@ -18,6 +18,15 @@ Item {
     property string configurationError: ""
     property string widgetPath: Quickshell.env("MIILO_WIDGET_PATH") || decodeURIComponent(String(Qt.resolvedUrl("../../assets/70-miilo-fleet.owl")).replace(/^file:\/\//, ""))
     readonly property alias widget: widget
+    readonly property bool quietFleet: {
+        var generation = widget.generation;
+        if (!widget.instance || !widget.program) return true;
+        function value(name) {
+            var slot = widget.program.globals.findIndex(g => g.name === name);
+            return slot < 0 ? "" : widget.instance.read(slot);
+        }
+        return String(value("observatoryView")) !== "orbit" && !value("selectedWork") && !value("selectedActor") && !value("expandedSystem") && !value("setupOpen") && !value("query");
+    }
     // Theme muted colors often target borders; lift text to readable contrast.
     function readablePalette(toml) {
         var p = OwlJs.themeFromToml(toml)

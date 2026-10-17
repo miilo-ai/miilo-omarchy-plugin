@@ -8,9 +8,10 @@ FloatingWindow {
     title: "Miilo"
     property real textScale: 1
     property string textFamily: Qt.application.font.family
-    // Initial floating size only; the compositor owns the actual viewport.
-    implicitWidth: screen ? Math.round(screen.width * 0.65) : 0
-    implicitHeight: screen ? Math.round(screen.height * 0.8) : 0
+    readonly property bool compactFleet: surface.quietFleet && !importer.visible
+    // Desired size follows navigation; the compositor owns the actual viewport.
+    implicitWidth: compactFleet ? Math.min(420, screen ? screen.width - 32 : 420) : screen ? Math.min(960, Math.round(screen.width * 0.65)) : 640
+    implicitHeight: compactFleet ? Math.min(320, screen ? screen.height - 32 : 320) : screen ? Math.min(720, Math.round(screen.height * 0.8)) : 520
     property alias surface: surface
     property alias importer: importer
     property int importedCount: 0
@@ -31,7 +32,7 @@ FloatingWindow {
             GridLayout {
                 id: headerContent
                 anchors { left: parent.left; right: parent.right; top: parent.top; margins: 8 }
-                columns: width < 480 * root.interactionTheme.typography.effectiveScale ? 1 : 2
+                columns: root.compactFleet || width >= 480 * root.interactionTheme.typography.effectiveScale ? 2 : 1
                 TypeText {
                 typography: root.interactionTheme.typography
                 role: "title"

@@ -76,3 +76,7 @@ freeze orbital motion. The original shared robot and work detail actions remain.
 This deterministic software Qt recording demonstrates geometry and layout, not
 installed-shell performance or live provider activity. Native acceptance remains
 with the Omarchy testing agent.
+
+## Quiet navigation
+
+Quiet starts with the compact robot fleet. Select a robot for its system task list, then select a task for evidence and supported actions. Use Back to return to the fleet. The native window requests a compact size for the fleet and a larger viewport for task inspection; actual placement and resizing belong to the compositor.
