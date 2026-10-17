@@ -1,7 +1,46 @@
 --- a/70-miilo-fleet.owl
 +++ b/70-miilo-fleet.owl
-@@ -83,6 +83,9 @@
-   let actor = find(actors, a => a._key == selectedActor)
+@@ -51,6 +51,7 @@
+   state searchEditing = false
+   state expandedSystem = ""
+   state providerLimit = 5
++  state showInactiveSessions = false persist
+   state renameOpen = false
+   state selectedWork = ""
+   state selectedActor = ""
+@@ -67,10 +68,20 @@
+   let configured = data != null && data.configured
+   let snap = data == null ? null : data.snapshot
+   let allProviders = snap == null ? [] : (snap.providers ?? [])
+-  let effectiveSystem = any(allProviders, p => p.id == system) ? system : ""
+-  let provs = allProviders.filter(p => effectiveSystem == "" || p.id == effectiveSystem)
+-  let works = (snap.workItems ?? []).filter(w => effectiveSystem == "" || w.providerId == effectiveSystem)
+-  let actors = (snap.actors ?? []).filter(a => effectiveSystem == "" || a.providerId == effectiveSystem)
++  let allActors = snap.actors ?? []
++  let allWorks = snap.workItems ?? []
++  // Transcript-backed sessions are inferred observations, not persistent factories.
++  let localSessionIds = allActors.filter(a => get(get(a.extensions ?? {}, "dev.miilo.session", {}), "runtimeStatusAuthoritative", true) == false).map(a => a.providerId)
++  let activeActors = allActors.filter(a => contains(["working", "running", "reviewing", "blocked", "failed", "error"], a.status) && !contains(["offline", "unreachable", "unknown"], a.health ?? ""))
++  let activeActorKeys = activeActors.map(a => a._key)
++  let activeProviderIds = activeActors.map(a => a.providerId) + allWorks.filter(w => (w.attention ?? "none") != "none" || w.lifecycle == "failed").map(w => w.providerId)
++  let inactiveSessionCount = len(allProviders.filter(p => contains(localSessionIds, p.id) && !contains(activeProviderIds, p.id)))
++  let selectableProviders = allProviders.filter(p => showInactiveSessions || !contains(localSessionIds, p.id) || contains(activeProviderIds, p.id))
++  let effectiveSystem = any(selectableProviders, p => p.id == system) ? system : ""
++  let provs = selectableProviders.filter(p => effectiveSystem == "" || p.id == effectiveSystem).sortBy(p => contains(activeProviderIds, p.id) ? 0 : 1)
++  let visibleProviderIds = provs.map(p => p.id)
++  let works = allWorks.filter(w => contains(visibleProviderIds, w.providerId))
++  let actors = allActors.filter(a => contains(visibleProviderIds, a.providerId)).sortBy(a => contains(activeActorKeys, a._key) ? 0 : 1)
+   let attention = (snap.attention ?? []).filter(a => effectiveSystem == "" || a.providerId == effectiveSystem)
+   let attempts = snap.attempts ?? []
+   let evidence = snap.evidence ?? []
+@@ -79,10 +90,13 @@
+   let live = works.filter(w => contains(["active", "waiting", "failed", "queued"], w.lifecycle))
+   let needle = lower(trim(query))
+   let searched = works.filter(w => contains(lower("${w.title} ${w.summary ?? ""} ${w.phase} ${get(find(allProviders, p => p.id == w.providerId), "name", "")}"), needle))
+-  let focused = find(works, w => w._key == selectedWork)
+-  let actor = find(actors, a => a._key == selectedActor)
++  let focused = find(allWorks, w => w._key == selectedWork)
++  let actor = find(allActors, a => a._key == selectedActor)
    let receipt = reply == "" || reply == "pending" ? null : parseJson(reply)
    let issueCount = len(data.errors ?? [])
 +  let toolbarHeight = linux ? 34 : 44
@@ -10,7 +49,7 @@
    let phases = ["planning", "implementing", "verifying", "reviewing", "promoting"]
    on reply { requestPending = value == "pending"; refresh() }
    onTap: screen()
-@@ -106,7 +109,7 @@
+@@ -106,7 +120,7 @@
      Row {
        gap: 4
        align: center
@@ -19,7 +58,7 @@
          Canvas {
            width: 24
            height: 24
-@@ -118,16 +121,16 @@
+@@ -118,16 +132,16 @@
            }
          }
        }
@@ -42,7 +81,7 @@
      }
    }
  
-@@ -138,8 +141,8 @@
+@@ -138,8 +152,8 @@
          gap: 4
          align: center
          if !leftHanded { Spacer { weight: 1 } }
@@ -53,7 +92,23 @@
          ToolbarControls { }
          if leftHanded { Spacer { weight: 1 } }
        }
-@@ -172,23 +175,6 @@
+@@ -150,11 +164,14 @@
+     if issueCount > 0 {
+       Text { text: "${issueCount} endpoint(s) unavailable"; style: small; color: red; maxLines: 1 }
+     }
++    if focused == null && actor == null && inactiveSessionCount > 0 {
++      Button { text: showInactiveSessions ? "Hide inactive sessions" : "Show inactive sessions (${inactiveSessionCount})"; onTap: { showInactiveSessions = !showInactiveSessions; pageSize = 5 } }
++    }
+     if systemsOpen && len(allProviders) > 1 {
+       Flow {
+         gap: 5
+         Button { text: "All systems"; color: effectiveSystem == "" ? accent : muted; onTap: { system = ""; systemsOpen = false; pageSize = 5; agentLimit = 5; selectedWork = ""; selectedActor = ""; proposed = ""; reply = requestPending ? reply : "" } }
+-        for p in allProviders key p.id {
++        for p in selectableProviders key p.id {
+           Button { text: p.name; color: effectiveSystem == p.id ? accent : muted; onTap: { system = p.id; systemsOpen = false; pageSize = 5; agentLimit = 5; selectedWork = ""; selectedActor = ""; proposed = ""; reply = requestPending ? reply : "" } }
+         }
+       }
+@@ -172,23 +189,6 @@
      }
    }
  
@@ -77,7 +132,7 @@
    component WorkRows(list, showSystem = false) {
      for w in list.take(pageSize) key w._key {
        Column {
-@@ -214,18 +200,57 @@
+@@ -214,18 +214,57 @@
      }
    }
  
@@ -142,7 +197,7 @@
          } else if a.kind == "file" || a.kind == "change_set" {
            Text { text: "Diff not supplied"; style: small; color: muted }
          }
-@@ -238,14 +263,19 @@
+@@ -238,14 +277,19 @@
    component WorkDetail() {
      if focused != null {
        Spacer { height: 1; fill: width; background: alpha(muted, 0.2) }
@@ -165,7 +220,7 @@
            for a in (focused.actions ?? []).filter(a => a._supported) key a._key {
              Button { text: a.label; color: accent; onTap: { proposed = a._key; proposalRevision = focused._revisionKey; proposalWork = focused._key; reply = requestPending ? reply : "" } }
            }
-@@ -276,11 +306,25 @@
+@@ -276,11 +320,25 @@
        }
        Column {
          gap: 6
@@ -193,7 +248,7 @@
            if (e._missingArtifactCount ?? 0) > 0 { Text { text: "${e._missingArtifactCount} referenced artifacts unavailable"; style: small; color: muted } }
          }
          if len(taskEvidence) > pageSize { Button { text: "More evidence"; onTap: pageSize = pageSize + 5 } }
-@@ -314,14 +358,14 @@
+@@ -314,14 +372,14 @@
              onSubmit: { query = trim(value); pageSize = 5; searchEditing = false }
            }
          }
@@ -211,7 +266,7 @@
            Text { text: "×"; width: 30; fontSize: 22; align: center; color: muted }
          } }
          if !leftHanded && configured { ToolbarControls { } }
-@@ -369,9 +413,9 @@
+@@ -369,9 +427,9 @@
        let clock = motion ? time * robotSpeed : 0
        let unavailable = contains(["offline", "unreachable", "disconnected"], agent.status) || contains(["offline", "unreachable", "unknown"], agent.health)
        let owned = works.filter(w => contains(w._actorKeys ?? [], agent._key ?? ""))
@@ -223,7 +278,7 @@
        let wistful = expressive && !unavailable && blocked && (clock + max(slot, 0) * 3.7) % 23 < 2.5
        let cx = width / 2
        let cy = height * (anchored ? 0.5 : 0.48)
-@@ -470,19 +514,18 @@
+@@ -470,19 +528,18 @@
    }
  
    // Deterministic atom planes: the robot occupies an always-open nucleus.
@@ -246,7 +301,7 @@
          let phase = max(slot, 0) * 2.399963229728653
          let sweep = sin(clock * 2 * pi / 30 + phase) * 0.17
          let planes = [0, 1].map(lane => {
-@@ -549,17 +592,18 @@
+@@ -549,17 +606,18 @@
        Box {
          fill: true
          align: center
@@ -268,7 +323,7 @@
        if offline {
          circle(7, 7, 4.5, stroke: ink, width: 1)
          line(3, 11, 11, 3, stroke: ink, width: 1)
-@@ -567,13 +611,17 @@
+@@ -567,13 +625,17 @@
          line(3.5, 3.5, 10.5, 10.5, stroke: ink, width: 1.3)
          line(3.5, 10.5, 10.5, 3.5, stroke: ink, width: 1.3)
        } else if attention != "none" {
@@ -289,7 +344,7 @@
          circle(6, 6, 3.5, stroke: ink, width: 1)
          line(8.5, 8.5, 12, 12, stroke: ink, width: 1.2)
        } else {
-@@ -589,50 +637,50 @@
+@@ -589,50 +651,50 @@
      Row {
        fill: width
        gap: 6
@@ -358,7 +413,7 @@
          }
        }
        if len(items) > 8 { Button { text: "+${len(items) - 8} ${len(items) == 9 ? "task" : "tasks"} · inspect system"; onTap: { observatoryView = "quiet"; expandedSystem = provider.id; workflowActor = ""; pageSize = 12 } } }
-@@ -641,12 +689,14 @@
+@@ -641,12 +703,14 @@
    component OrbitView(list) {
      let systems = provs.filter(p => !needsOnly || any(list, w => w.providerId == p.id))
      let page = min(orbitPage, max(0, ceil(len(systems) / 6) - 1))
@@ -377,7 +432,7 @@
        }
      }
      if len(systems) == 0 { Text { text: needsOnly ? "Nothing needs you" : "No systems to display"; style: small; color: muted } }
-@@ -662,6 +712,81 @@
+@@ -662,6 +726,81 @@
      Text { text: "Motion reflects observed activity. Select work to inspect it."; fontSize: 10; color: muted; maxLines: 2 }
    }
  
@@ -459,7 +514,7 @@
    let tileActors = (previewRobots ? actors.take(1) : actors) + (previewRobots ? [
      {_key: "preview-resting", providerId: "", name: "Preview sleep", status: "resting", health: "healthy", _preview: true},
      {_key: "preview-working", providerId: "", name: "Preview working", status: "working", health: "healthy", _preview: true}
-@@ -756,25 +881,6 @@
+@@ -756,25 +895,6 @@
        Text { text: "miilo.tech"; width: 64; height: 12; fontSize: 9; color: alpha(muted, 0.65); align: end; maxLines: 1 }
      }
    }
@@ -485,7 +540,7 @@
    screen {
      title: "miilo"
      Column {
-@@ -810,37 +916,10 @@
+@@ -810,37 +930,10 @@
            if !needsOnly && len(matches) > 0 { AgentRows { list: matches } }
            WorkRows { list: visible; showSystem: true }
            if len(visible) == 0 && (needsOnly || len(matches) == 0) { Text { text: "No matches"; style: small; color: muted } }
