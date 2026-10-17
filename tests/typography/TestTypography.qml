@@ -2,6 +2,7 @@ import QtQuick
 import QtTest
 import "../../ui/components" as Miilo
 import "../../vendor/owl" as Owl
+import "../../ui/components/onboarding" as Crew
 
 Item {
     width: 900; height: 800
@@ -24,6 +25,7 @@ Item {
         node: ({kind:"Text", p:{text:"A multiline answer with fallback glyphs: العربية 日本語. Text must wrap and remain readable.", style:"body"},h:{},a:{},c:[]})
     }
     Miilo.TypeText { id: plain; typography: typeSystem; width: 240; text: "<b>Evidence stays literal</b>" }
+    Crew.RobotPortrait { id: portrait; width: 64; height: 64; motion: "reduced"; active: true }
     TestCase {
         name: "MiiloTypography"
         when: true
@@ -49,19 +51,19 @@ Item {
             tryVerify(() => review.width <= scroll.availableWidth - 32);
             verify(review.contentItem.paintedWidth <= review.contentItem.width + 1);
         }
-        function test_setup_paths_reflow_and_availability_is_explicit() {
-            importer.width = 900;
+        function test_crew_paths_expand_and_availability_is_explicit() {
             var path = findChild(importer,"setupPath"); verify(path);
-            tryVerify(() => path.parent.inlinePath);
+            verify(!path.text.includes("/tmp/long/path"));
+            var row = path.parent.parent.parent;
+            row.expanded = true;
+            tryVerify(() => path.text.includes("/tmp/long/path"));
             compare(path.color, theme.pathText);
-            importer.width = 320;
-            tryVerify(() => !path.parent.inlinePath);
+            importer.width = 320; typeSystem.textScale = 2;
+            tryVerify(() => path.paintedWidth <= path.width + 1);
             importer.controller.agents = [{name:"Unsupported agent",locations:["/tmp/config"],observationSupported:false}];
             var status = findChild(importer,"setupStatus"); verify(status);
             compare(status.available, false);
             compare(findChild(importer,"reviewButton").enabled, false);
-            path = findChild(importer,"setupPath");
-            compare(path.color, palette.ink("muted"));
         }
         function test_unavailable_session_is_disabled_for_mouse_and_keyboard() {
             importer.controller.selected = [];
@@ -72,6 +74,16 @@ Item {
             compare(list.currentItem.enabled, false);
             list.forceActiveFocus(); keyClick(Qt.Key_Space);
             compare(importer.controller.selected.length,0);
+        }
+        function test_portrait_reduced_off_and_hidden_stop_clock() {
+            portrait.motion = "reduced";
+            var initial = portrait.clock; wait(60); compare(portrait.clock, initial);
+            portrait.motion = "full"; wait(80); verify(portrait.clock > initial);
+            portrait.motion = "off";
+            initial = portrait.clock; wait(60); compare(portrait.clock, initial);
+            portrait.active = false; portrait.motion = "full";
+            initial = portrait.clock; wait(60); compare(portrait.clock, initial);
+            portrait.motion = "reduced"; portrait.active = true;
         }
         function test_roles_and_plain_text() {
             compare(typeSystem.size("title"),16); compare(typeSystem.size("body"),13);
@@ -110,6 +122,11 @@ Item {
             var list = findChild(importer,"sessionList"); verify(list);
             tryVerify(() => list.currentItem !== null);
             tryVerify(() => list.currentItem.implicitHeight > 64);
+            var content = list.currentItem.contentItem;
+            for (var i = 0; i < content.children.length; i++) {
+                var label = content.children[i];
+                verify(label.x + label.width <= content.width + 1);
+            }
         }
     }
 }

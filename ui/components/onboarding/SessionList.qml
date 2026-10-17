@@ -45,7 +45,7 @@ ListView {
         readonly property bool cursor: view.activeFocus && view.currentIndex === index
         checked: modelData.header ? groupSessions.length > 0 && groupSessions.every(s => controller.selected.indexOf(s.kind + ":" + s.id) >= 0) : controller.selected.indexOf(modelData.session.kind + ":" + modelData.session.id) >= 0
         onClicked: { view.currentIndex = index; view.forceActiveFocus(); controller.activateRow(view.currentIndex); }
-        implicitHeight: Math.max(view.theme.typography.touchTarget, contentItem.implicitHeight + 16)
+        implicitHeight: Math.max(modelData.header ? 52 : view.theme.typography.touchTarget, contentItem.implicitHeight + 16)
         background: Rectangle {
             color: choice.down ? view.theme.pressedFill : choice.cursor ? view.theme.focusFill : choice.checked || choice.partial ? view.theme.selectedFill : choice.hovered ? view.theme.hoverFill : choice.modelData.header ? view.widget.ink("lighter_background") : "transparent"
             Rectangle { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; width: 3; height: 24; visible: choice.cursor; color: view.theme.accent }
@@ -87,11 +87,24 @@ ListView {
             available: false
             ink: view.widget.ink("muted")
         }
+        RobotPortrait {
+            widget: view.widget
+            agentKey: "group-" + choice.modelData.name
+            visible: choice.modelData.header
+            anchors.left: parent.left
+            anchors.leftMargin: 38
+            anchors.verticalCenter: parent.verticalCenter
+            width: 32
+            height: 32
+            ink: view.widget.ink("foreground")
+            accent: view.widget.ink("accent")
+            motion: "off"
+        }
         contentItem: Column {
-            leftPadding: 42
+            leftPadding: choice.modelData.header ? 82 : 42
             spacing: 3
             Miilo.TypeText { typography: view.theme.typography;
-                width: parent.width - (choice.modelData.header ? 76 : 32)
+                width: Math.max(0, parent.width - parent.leftPadding - (choice.modelData.header ? 44 : 0))
                 text: choice.modelData.header ? (controller.collapsed[choice.modelData.name] ? "▸ " : "▾ ") + choice.modelData.name + " (" + choice.modelData.count + ")" : choice.modelData.session.name || "Unnamed session"
                 wrapMode: Text.Wrap
                 color: !choice.selectable ? view.widget.ink("muted") : choice.cursor ? view.theme.focusText : view.theme.foreground
@@ -99,7 +112,7 @@ ListView {
             }
             Miilo.TypeText { typography: view.theme.typography;
                 visible: !choice.modelData.header
-                width: parent.width - 32
+                width: Math.max(0, parent.width - parent.leftPadding)
                 text: choice.modelData.header ? "" : choice.modelData.session.kind + " · " + (choice.modelData.session.cwd || choice.modelData.session.id) + (choice.modelData.session.observable ? "" : " · import not available yet")
                 wrapMode: Text.WrapAnywhere
                 color: view.widget.ink("muted")

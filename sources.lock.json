@@ -1,11 +1,11 @@
 {
   "repository": "https://github.com/EdyVision/miilo-owl-widgets",
-  "revision": "dfc04105b298a17d4cd6c724009423796da142fc",
+  "revision": "5f94bf3e753a4ca4eda59e4cdbbd993e1751be24",
   "files": [
     {
       "source": "70-miilo-fleet.owl",
       "path": "assets/70-miilo-fleet.owl",
-      "sha256": "b24dfa78dede559458a26e0b3307164cc1697a8068036b956943f9506ee2d86b",
+      "sha256": "77feb9d43ff1e2fde0d27ade3b993931f3b093fba7e20c1dc042d6e0f56086c6",
       "patches": []
     },
     {
@@ -23,7 +23,7 @@
     {
       "source": "desktop/runtime/OwlCanvas.qml",
       "path": "vendor/owl/OwlCanvas.qml",
-      "sha256": "e2f05af133ec6eab6c5cb643780516496ee2dc3530a955470665222e2b5f6e5c",
+      "sha256": "7d21e813fa00974b95c67bf6a0c4cdfb76156d6e7e7a883dd4996dd460b7ece7",
       "patches": []
     },
     {
@@ -71,7 +71,7 @@
     {
       "source": "desktop/runtime/UPSTREAM.md",
       "path": "vendor/owl/UPSTREAM.md",
-      "sha256": "bf137fa1d0330a25d1351e6a4150ef2333c952e4255b817a7a35b3dccef92c71",
+      "sha256": "d3028177dbb53123466f6e74d0231bd84c5ced49f82ab96f067d71502c07c89c",
       "patches": [
         "patches/typography.patch"
       ]
@@ -89,20 +89,26 @@
       "patches": []
     },
     {
+      "source": "desktop/RobotProgram.js",
+      "path": "assets/RobotProgram.js",
+      "sha256": "6af8640c6b07fe5e3bfd1efc81545650eb2c15f5c7dc662ca3a4b319e361471f",
+      "patches": []
+    },
+    {
       "source": "desktop/runtime/MiiloTypeScale.js",
       "path": "vendor/owl/MiiloTypeScale.js",
+      "sha256": "8988b781ad2b3128e5bf526a66f15a8e2a71043d46f306cef6568d365ad52f2f",
       "patches": [
         "patches/typography.patch"
-      ],
-      "sha256": "8988b781ad2b3128e5bf526a66f15a8e2a71043d46f306cef6568d365ad52f2f"
+      ]
     },
     {
       "source": "desktop/runtime/MiiloTypography.qml",
       "path": "vendor/owl/MiiloTypography.qml",
+      "sha256": "1ce763192ff5a13a1034afef54e3b74a464a492fdfa7203c5d7c227f735911ab",
       "patches": [
         "patches/typography.patch"
-      ],
-      "sha256": "1ce763192ff5a13a1034afef54e3b74a464a492fdfa7203c5d7c227f735911ab"
+      ]
     }
   ],
   "authoredUiOrigin": {
@@ -111,7 +117,9 @@
     "changes": [
       "Separate shell/components/vendor/assets.",
       "Split onboarding controller, command adapter, views and controls.",
-      "Qualify Commons.Color for Qt 6.12."
+      "Qualify Commons.Color for Qt 6.12.",
+      "Original robot welcome crew, compact expandable agent rows and robot group markers; Orbit asset pin.",
+      "Replace simplified portrait with exact generated shared Bot program; native adapter contains no robot geometry."
     ]
   }
 }

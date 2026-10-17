@@ -45,19 +45,13 @@ FocusScope {
             x: 16; y: 16
             width: Math.max(0, pageScroll.availableWidth - 32)
             spacing: 12
-            TypeText { typography: root.theme.typography;
-                Layout.fillWidth: true
-                text: flow.mode === "invite" ? "I found your local agent setups" : flow.mode === "importing" ? "Importing selected sessions…" : flow.mode === "group" ? "Define an agent group" : "Import local agents"
-                color: root.widget.ink("foreground")
-                role: "title"
-                wrapMode: Text.WordWrap
-            }
-            TypeText { typography: root.theme.typography;
-                Layout.fillWidth: true
-                text: flow.mode === "invite" ? (flow.agents.some(a => a.observationSupported === true) ? "Would you like to import them into Miilo?" : "These setups were found, but importing them is not available yet.") : flow.mode === "importing" ? "Starting local observation and saving your Miilo connection." : flow.mode === "group" ? "Match projects within a folder. * matches any text; ? matches one character." : "↑/↓ navigate · Space selects · Enter folds groups · Ctrl+G adds a group"
-                color: root.widget.ink("foreground")
-                role: "body"
-                wrapMode: Text.WordWrap
+            Onboarding.CrewHeader {
+                widget: root.widget
+                theme: root.theme
+                active: root.active && root.visible
+                failed: !!flow.error
+                title: flow.mode === "invite" ? "Your local crew" : flow.mode === "importing" ? "Connecting your crew" : flow.mode === "group" ? "Define an agent group" : "Choose your sessions"
+                subtitle: flow.mode === "invite" ? (flow.agents.some(a => a.observationSupported === true) ? "Choose which sessions Miilo observes." : "Setups detected. Observation is not available for these agents yet.") : flow.mode === "importing" ? "Saving your selection and starting local observation." : flow.mode === "group" ? "Match projects within a folder. * matches any text; ? matches one character." : "Space selects · Enter folds groups · Ctrl+G adds a group"
             }
             Onboarding.AgentInvitation { visible: flow.mode === "invite"; Layout.fillWidth: true; controller: flow; widget: root.widget; theme: root.theme }
             GridLayout {
