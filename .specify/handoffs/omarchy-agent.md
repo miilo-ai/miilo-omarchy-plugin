@@ -88,3 +88,23 @@ measure many-agent performance. Off must freeze robot drawing; Reduced removes
 body/glance/wink/drifting Z movement but retains blinks. Manual settings currently
 do not automatically follow OS reduced motion. Completion/recovery one-shots
 remain planned; do not treat decorative winks as provider event receipts.
+
+## Lossless compression checkpoint — COMPRESS-001
+
+Use the matching widget helper source checkpoint c5cf3e2 or its subsequently
+qualified release. Its remote JSON transport negotiates gzip/Brotli/zstd and
+keeps the 2,000,000-byte decoded cap. No OWL renderer/provider engine is copied
+into this plugin. Existing source provenance stays pinned to unchanged assets.
+
+The native CLI now exposes local `archive export`, `archive inspect`, and
+`archive restore`, plus raw streaming compress/decompress commands. Test with
+an explicitly created synthetic file in a disposable directory. Verify exact
+restore, refuse existing outputs, and verify damaged bundles fail. Do not use
+real transcripts without the owner's explicit file selection. Do not silently
+enroll restored data. Compression is not encryption or context compaction.
+
+Source/socket tests passed on macOS and ARM64 Linux/musl. Native agent should
+verify the actually installed helper connects to an eligible compressed CE
+response, with existing action/session behavior preserved. SSE/voice stay
+uncompressed; ordinary UI and onboarding semantics are unchanged. Physical
+Android/Omarchy performance and installed release artifacts remain native gates.
