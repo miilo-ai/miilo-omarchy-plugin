@@ -54,7 +54,7 @@ Item {
         function test_crew_paths_expand_and_availability_is_explicit() {
             var path = findChild(importer,"setupPath"); verify(path);
             verify(!path.text.includes("/tmp/long/path"));
-            var row = path.parent.parent.parent;
+            var row = findChild(importer,"setupRow"); verify(row);
             row.expanded = true;
             tryVerify(() => path.text.includes("/tmp/long/path"));
             compare(path.color, theme.pathText);
@@ -127,6 +127,37 @@ Item {
                 var label = content.children[i];
                 verify(label.x + label.width <= content.width + 1);
             }
+        }
+        function test_setup_labels_center_on_robot_and_status_icon() {
+            importer.width = 900;
+            var row = findChild(importer,"setupRow"); verify(row);
+            row.expanded = false;
+            var robot = findChild(row,"setupRobot"), name = findChild(row,"setupName");
+            var status = findChild(row,"setupStatus"), label = findChild(row,"setupStatusLabel");
+            tryVerify(() => Math.abs(robot.mapToItem(row,0,robot.height/2).y - name.mapToItem(row,0,name.height/2).y) < 1);
+            verify(Math.abs(status.mapToItem(row,0,status.height/2).y - label.mapToItem(row,0,label.height/2).y) < 1);
+            compare(row.topPadding, 4.8);
+        }
+        function test_group_rows_have_centered_robots_right_checks_and_indented_sessions() {
+            importer.width = 900;
+            importer.controller.mode = "review";
+            importer.controller.selected = [];
+            importer.controller.grouped = [{name:"Codex",sessions:[{kind:"codex",id:"one",name:"A session",cwd:"/tmp/project",observable:true}]}];
+            importer.controller.collapsed = ({});
+            importer.controller.rebuildRows();
+            var list = findChild(importer,"sessionList"); list.currentIndex = 0;
+            tryVerify(() => list.currentItem && list.currentItem.modelData.header && list.currentItem.width > 0);
+            var header = list.currentItem, robot = findChild(header,"groupRobot");
+            var title = findChild(header,"sessionTitle"), check = findChild(header,"sessionCheckbox");
+            tryVerify(() => Math.abs(robot.mapToItem(header,0,robot.height/2).y - title.mapToItem(header,0,title.height/2).y) < 1);
+            compare(check.width,16); compare(check.height,16);
+            verify(check.x > header.width/2); verify(!title.text.includes("▾") && !title.text.includes("▸"));
+            var headerTextX = title.mapToItem(list,0,0).x;
+            mouseClick(header,header.width-18,header.height/2);
+            compare(importer.controller.selected.length,1);
+            list.currentIndex = 1;
+            tryVerify(() => list.currentItem && !list.currentItem.modelData.header);
+            verify(findChild(list.currentItem,"sessionTitle").mapToItem(list,0,0).x > headerTextX);
         }
     }
 }

@@ -45,28 +45,21 @@ ListView {
         readonly property bool cursor: view.activeFocus && view.currentIndex === index
         checked: modelData.header ? groupSessions.length > 0 && groupSessions.every(s => controller.selected.indexOf(s.kind + ":" + s.id) >= 0) : controller.selected.indexOf(modelData.session.kind + ":" + modelData.session.id) >= 0
         onClicked: { view.currentIndex = index; view.forceActiveFocus(); controller.activateRow(view.currentIndex); }
-        implicitHeight: Math.max(modelData.header ? 52 : view.theme.typography.touchTarget, contentItem.implicitHeight + 16)
+        leftPadding: modelData.header ? 8 : 64
+        rightPadding: 36
+        topPadding: 6.4; bottomPadding: 6.4
+        implicitHeight: Math.max(modelData.header ? 42 : view.theme.typography.touchTarget, contentItem.implicitHeight + topPadding + bottomPadding)
         background: Rectangle {
             color: choice.down ? view.theme.pressedFill : choice.cursor ? view.theme.focusFill : choice.checked || choice.partial ? view.theme.selectedFill : choice.hovered ? view.theme.hoverFill : choice.modelData.header ? view.widget.ink("lighter_background") : "transparent"
             Rectangle { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; width: 3; height: 24; visible: choice.cursor; color: view.theme.accent }
         }
-        ToolButton {
-            id: foldButton
-            visible: choice.modelData.header
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            text: controller.collapsed[choice.modelData.name] ? "+" : "−"
-            Accessible.name: "Expand or collapse " + choice.modelData.name
-            focusPolicy: Qt.NoFocus
-            contentItem: Miilo.TypeText { typography: view.theme.typography; text: foldButton.text; color: view.widget.ink("foreground"); horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
-            background: Rectangle { color: view.widget.ink(foldButton.hovered ? "selection" : "lighter_background") }
-            onClicked: controller.collapseGroup(choice.modelData.group)
-        }
         Rectangle {
-            x: 10
+            objectName: "sessionCheckbox"
+            anchors.right: parent.right
+            anchors.rightMargin: 10
             anchors.verticalCenter: parent.verticalCenter
-            width: 20
-            height: 20
+            width: 16
+            height: 16
             visible: choice.selectable
             radius: 0
             color: "transparent"
@@ -74,49 +67,58 @@ ListView {
             border.color: view.widget.ink(choice.modelData.header || choice.modelData.session.observable ? "foreground" : "muted")
             Rectangle {
                 anchors.centerIn: parent
-                width: 10
-                height: choice.partial ? 2 : 10
+                width: 8
+                height: choice.partial ? 2 : 8
                 visible: choice.checked || choice.partial
                 color: view.theme.accent
             }
         }
         Miilo.AvailabilityIcon {
-            x: 8
+            anchors.right: parent.right
+            anchors.rightMargin: 10
             anchors.verticalCenter: parent.verticalCenter
+            size: 16
             visible: !choice.selectable
             available: false
             ink: view.widget.ink("muted")
         }
-        RobotPortrait {
-            widget: view.widget
-            agentKey: "group-" + choice.modelData.name
-            visible: choice.modelData.header
-            anchors.left: parent.left
-            anchors.leftMargin: 38
-            anchors.verticalCenter: parent.verticalCenter
-            width: 32
-            height: 32
-            ink: view.widget.ink("foreground")
-            accent: view.widget.ink("accent")
-            motion: "off"
-        }
-        contentItem: Column {
-            leftPadding: choice.modelData.header ? 82 : 42
-            spacing: 3
-            Miilo.TypeText { typography: view.theme.typography;
-                width: Math.max(0, parent.width - parent.leftPadding - (choice.modelData.header ? 44 : 0))
-                text: choice.modelData.header ? (controller.collapsed[choice.modelData.name] ? "▸ " : "▾ ") + choice.modelData.name + " (" + choice.modelData.count + ")" : choice.modelData.session.name || "Unnamed session"
-                wrapMode: Text.Wrap
-                color: !choice.selectable ? view.widget.ink("muted") : choice.cursor ? view.theme.focusText : view.theme.foreground
-                role: "body"
+        contentItem: RowLayout {
+            spacing: 8
+            RobotPortrait {
+                objectName: "groupRobot"
+                widget: view.widget
+                agentKey: "group-" + choice.modelData.name
+                visible: choice.modelData.header
+                Layout.preferredWidth: 32; Layout.preferredHeight: 32
+                Layout.alignment: Qt.AlignVCenter
+                ink: view.widget.ink("foreground")
+                accent: view.widget.ink("accent")
+                motion: "off"
             }
-            Miilo.TypeText { typography: view.theme.typography;
-                visible: !choice.modelData.header
-                width: Math.max(0, parent.width - parent.leftPadding)
-                text: choice.modelData.header ? "" : choice.modelData.session.kind + " · " + (choice.modelData.session.cwd || choice.modelData.session.id) + (choice.modelData.session.observable ? "" : " · import not available yet")
-                wrapMode: Text.WrapAnywhere
-                color: view.widget.ink("muted")
-                role: "small"
+            ColumnLayout {
+                Layout.fillWidth: true
+                Layout.minimumWidth: 0
+                Layout.alignment: Qt.AlignVCenter
+                spacing: 2
+                Miilo.TypeText {
+                    objectName: "sessionTitle"
+                    typography: view.theme.typography
+                    Layout.fillWidth: true; Layout.minimumWidth: 0
+                    text: choice.modelData.header ? choice.modelData.name + " (" + choice.modelData.count + ")" : choice.modelData.session.name || "Unnamed session"
+                    wrapMode: Text.Wrap
+                    verticalAlignment: Text.AlignVCenter
+                    color: !choice.selectable ? view.widget.ink("muted") : choice.cursor ? view.theme.focusText : view.theme.foreground
+                    role: "body"
+                }
+                Miilo.TypeText {
+                    typography: view.theme.typography
+                    visible: !choice.modelData.header
+                    Layout.fillWidth: true; Layout.minimumWidth: 0
+                    text: choice.modelData.header ? "" : choice.modelData.session.kind + " · " + (choice.modelData.session.cwd || choice.modelData.session.id) + (choice.modelData.session.observable ? "" : " · import not available yet")
+                    wrapMode: Text.WrapAnywhere
+                    color: view.widget.ink("muted")
+                    role: "small"
+                }
             }
         }
     }
