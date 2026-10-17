@@ -10,6 +10,10 @@ Do not delete legacy widgets or user configuration during this migration.
 Record native evidence honestly; portable source checks cannot prove shell load.
 Do not publish, change visibility or submit to the marketplace without owner approval.
 
+Work on succinct `feat/<topic>`, `fix/<topic>` or `chore/<topic>` branches.
+Keep new implementation and testing commits off `main`; preserve other agents'
+work and reconcile branches deliberately when integration is requested.
+
 For local build/update/relaunch work, read `skills/miilo-desktop/SKILL.md` and use
 `tools/dev-relaunch.sh`. This workflow preserves the canonical native layout;
 the legacy widgets installer does not install the native crew UI. The skill

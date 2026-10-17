@@ -136,7 +136,8 @@ Item {
             var status = findChild(row,"setupStatus"), label = findChild(row,"setupStatusLabel");
             tryVerify(() => Math.abs(robot.mapToItem(row,0,robot.height/2).y - name.mapToItem(row,0,name.height/2).y) < 1);
             verify(Math.abs(status.mapToItem(row,0,status.height/2).y - label.mapToItem(row,0,label.height/2).y) < 1);
-            compare(row.topPadding, 4.8);
+            typeSystem.profile = "phone";
+            tryVerify(() => row.implicitHeight >= typeSystem.touchTarget);
         }
         function test_group_rows_have_centered_robots_right_checks_and_indented_sessions() {
             importer.width = 900;
