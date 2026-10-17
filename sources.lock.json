@@ -1,11 +1,11 @@
 {
   "repository": "https://github.com/EdyVision/miilo-owl-widgets",
-  "revision": "5f94bf3e753a4ca4eda59e4cdbbd993e1751be24",
+  "revision": "68e7f641d1911da744fc28ce1601feb5a8ca4240",
   "files": [
     {
       "source": "70-miilo-fleet.owl",
       "path": "assets/70-miilo-fleet.owl",
-      "sha256": "77feb9d43ff1e2fde0d27ade3b993931f3b093fba7e20c1dc042d6e0f56086c6",
+      "sha256": "b632acf62788034237a221f087247edd7ff6b64bcc7da7f2368b64ac97607c34",
       "patches": []
     },
     {
@@ -30,9 +30,7 @@
       "source": "desktop/runtime/OwlHost.qml",
       "path": "vendor/owl/OwlHost.qml",
       "sha256": "ac4d0cfa508fa8e58d6115fd907d31d146fe1033717090d73d9649b6109673c8",
-      "patches": [
-        "patches/typography.patch"
-      ]
+      "patches": []
     },
     {
       "source": "desktop/runtime/OwlLayout.js",
@@ -44,9 +42,7 @@
       "source": "desktop/runtime/OwlNode.qml",
       "path": "vendor/owl/OwlNode.qml",
       "sha256": "f4f85e5b206fc7d3bfea8b2069ffc03b9f1804a13484d8f2425961879755a661",
-      "patches": [
-        "patches/typography.patch"
-      ]
+      "patches": []
     },
     {
       "source": "desktop/runtime/OwlSource.qml",
@@ -64,17 +60,13 @@
       "source": "desktop/runtime/OwlWidget.qml",
       "path": "vendor/owl/OwlWidget.qml",
       "sha256": "81a614b6e3943cb08854435ada11b819d6e2db43c969769f5659720fde3e9b9b",
-      "patches": [
-        "patches/typography.patch"
-      ]
+      "patches": []
     },
     {
       "source": "desktop/runtime/UPSTREAM.md",
       "path": "vendor/owl/UPSTREAM.md",
       "sha256": "d3028177dbb53123466f6e74d0231bd84c5ced49f82ab96f067d71502c07c89c",
-      "patches": [
-        "patches/typography.patch"
-      ]
+      "patches": []
     },
     {
       "source": "desktop/runtime/owl-source",
@@ -91,24 +83,20 @@
     {
       "source": "desktop/RobotProgram.js",
       "path": "assets/RobotProgram.js",
-      "sha256": "6af8640c6b07fe5e3bfd1efc81545650eb2c15f5c7dc662ca3a4b319e361471f",
+      "sha256": "c313a2ad156e7312da63edaca119a635370d18bfc7bf321f42cae1dfbbac8998",
       "patches": []
     },
     {
       "source": "desktop/runtime/MiiloTypeScale.js",
       "path": "vendor/owl/MiiloTypeScale.js",
       "sha256": "8988b781ad2b3128e5bf526a66f15a8e2a71043d46f306cef6568d365ad52f2f",
-      "patches": [
-        "patches/typography.patch"
-      ]
+      "patches": []
     },
     {
       "source": "desktop/runtime/MiiloTypography.qml",
       "path": "vendor/owl/MiiloTypography.qml",
       "sha256": "1ce763192ff5a13a1034afef54e3b74a464a492fdfa7203c5d7c227f735911ab",
-      "patches": [
-        "patches/typography.patch"
-      ]
+      "patches": []
     }
   ],
   "authoredUiOrigin": {

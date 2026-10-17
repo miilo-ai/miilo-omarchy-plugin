@@ -24,8 +24,8 @@ This executes actual QML and a row click, captures dark/expanded/narrow-light st
 and fails on QML warnings. A test-only Quickshell.env stub supplies a synthetic home;
 no real discovery, import, helper command or Omarchy shell starts.
 
-The shared widgets repo has tools/render-orbit.py for the actual OWL evaluator,
-layout and Canvas with synthetic inventory. That fixture validates native row
+This repository now has tools/render-orbit.py for its own pinned OWL asset,
+vendored evaluator, layout and Canvas with synthetic inventory. That fixture validates native row
 selection into details. It is not proof of host integration or platform performance.
 
 ## Remaining machine checks
@@ -67,8 +67,9 @@ at narrow width:
 
 ![Actual Qt source recording with synthetic inventory](images/orbit-crossed-qt-fixture.gif)
 
-[MP4 recording](images/orbit-crossed-qt-fixture.mp4). The secondary ellipse rocks
-+/-45 degrees over 20 seconds, with alternating task dots following each rail.
+[MP4 recording](images/orbit-crossed-qt-fixture.mp4). Both atom planes gently sweep around the centered original robot; their open
+nucleus stays clear. Stable system offsets, subtle neon and muted dormant rings
+match the approved motion study. Task dots stay on their assigned projected rail.
 State labels now carry small accent-colored icons. Reduced/Off or stale sources
 freeze orbital motion. The original shared robot and work detail actions remain.
 

@@ -38,12 +38,16 @@ def capture(name):
 def validate():
     try:
         capture('crew-dark.png')
-        QTest.mouseClick(window, Qt.LeftButton, Qt.NoModifier, QPoint(220, 115))
-        QTest.qWait(80)
         def descendants(item):
             yield item
             for child in item.childItems():
                 yield from descendants(child)
+        rows = [item for item in descendants(window.contentItem()) if item.property('expanded') is False]
+        assert rows, 'No expandable agent row rendered'
+        # Follow actual layout after typography changes; never click a stale pixel.
+        point = rows[0].mapToScene(rows[0].boundingRect().center())
+        QTest.mouseClick(window, Qt.LeftButton, Qt.NoModifier, QPoint(round(point.x()), round(point.y())))
+        QTest.qWait(80)
         capture('crew-expanded.png')
         expanded = [item for item in descendants(window.contentItem()) if item.property('expanded') is True]
         assert expanded, 'Click did not expand an agent row'

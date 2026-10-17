@@ -117,3 +117,10 @@ compact expandable agent rows and group portraits are implemented. Shared Orbit
 uses existing helper snapshots; no new CLI generation command is needed. Start
 with actual shell screenshots and close/open/focus, then measure frame cost.
 Local Qt fixtures are available via make render-design but are not shell acceptance.
+
+## Updated atom Orbit presentation
+
+See [atom-orbits.md](atom-orbits.md) for the synchronized projection, current
+native asset pin, expected visuals and machine acceptance checklist. The previous
++/-45 degree rocking preview is superseded. Existing native typography/setup/chat
+work is preserved; the plugin has its own isolated Orbit render fixture now.
