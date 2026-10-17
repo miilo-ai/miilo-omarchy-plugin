@@ -26,3 +26,7 @@ Original robot correction: the simplified QML character is removed. Portraits
 execute the pinned shared Bot program through the existing OWL evaluator/painter.
 Actual Qt dark/expanded/narrow-light renders and row click passed, including a
 saved-color fixture. Shared-source exact-frame parity has 54 passing comparisons.
+
+Smooth rail follow-up: the shared asset now uses one unwarped ellipse for the
+rail, work positions and light. Updated actual Qt fixture screenshot inspected;
+shared equation/seam and renderer regressions passed. Native gates are unchanged.
