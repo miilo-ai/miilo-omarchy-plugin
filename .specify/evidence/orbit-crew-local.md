@@ -43,3 +43,13 @@ official syntax, 36 Linux scenarios, geometry/motion/bounds/detail-selection tes
 54 original portrait comparisons, actual Qt desktop and narrow renders.
 GIF/MP4 use synthetic inventory and controlled source time. Native shell FPS,
 lifecycle, host fonts, scaling and installed interaction remain unqualified.
+
+## Electrical activity and state labels
+
+Pinned widget 8017401 adds occasional 180ms antenna-to-active-task arcs in
+Expressive/Full mode, with staggered timing and a secondary theme color.
+Resting, unavailable, degraded, Calm/Reduced/Off and attention-only systems
+suppress the effect. Icons and labels now align directly with a consistent gap.
+Generated renderer, architecture, official syntax and actual Qt desktop/narrow
+captures pass. GIF/MP4 refreshed from synthetic inventory; installed Omarchy
+performance/lifecycle and live acceptance remain separate pending gates.
