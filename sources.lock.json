@@ -5,7 +5,7 @@
     {
       "source": "70-miilo-fleet.owl",
       "path": "assets/70-miilo-fleet.owl",
-      "sha256": "f64592c946e2ab0870e2f0dcd065c2f67780c256d8db0a99cf640b1276ed3b2a",
+      "sha256": "7130c91d7a4ab75b05e957178926cc1fb245969ca3354235826ad9a3a7ab5253",
       "patches": [
         "patches/presentation-consistency.patch"
       ]

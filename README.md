@@ -75,6 +75,11 @@ Legacy `io.miilo.dashboard` / `io.miilo.desktop` installations are not removed.
 
 ## Develop
 
+Inactive local sessions are hidden from the fleet and system selector by default.
+Use **Show inactive sessions** to reveal them without changing enrollment. Sessions
+with observed activity or pending decisions remain visible; idle remote factories
+stay accessible. The setup enrollment picker retains its discovery inventory.
+
 Update the checked native UI, back up the installed bar plugin, and reopen it:
 
 ```sh
