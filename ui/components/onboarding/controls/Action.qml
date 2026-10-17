@@ -10,9 +10,10 @@ Button {
     Layout.preferredWidth: 180
     Layout.fillWidth: true
     id: control
-    implicitHeight: Math.max(context.theme.typography.touchTarget, contentItem.implicitHeight + 16)
+    implicitHeight: context.theme.typography.controlHeight(contentItem.implicitHeight, 8)
     horizontalPadding: 14
     flat: true
+    verticalPadding: 4
     focusPolicy: Qt.StrongFocus
     Keys.onReturnPressed: clicked()
     Keys.onEnterPressed: clicked()

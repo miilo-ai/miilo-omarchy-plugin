@@ -9,3 +9,11 @@
 - Public documentation describes this package and declared public dependencies only.
 - No internal project names, private topology, credentials, transcripts or machine paths.
 - Publication and marketplace submission require owner authorization.
+
+## Toolchain boundary
+
+No Python source or tooling dependency in this repository, including CI, installers,
+checks, tests and preview capture. Use Rust for application behavior, Node built-ins
+for portable development tooling, shell orchestration and native Qt for rendering.
+Run `node tools/check-no-python.cjs`; do not bypass it or replace acceptance with a
+static image. Historical evidence remains dated and is not rewritten as a new run.

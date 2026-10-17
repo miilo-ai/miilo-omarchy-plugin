@@ -93,7 +93,7 @@ It installs [miilo-desktop](skills/miilo-desktop/SKILL.md) in
 afterward. The skill handles routine requested rebuild/relaunch work when the
 session has the required access; it cannot bypass a managed sandbox.
 
-`make check` runs portable source checks with Python 3 (development only).
+`make check` runs portable source and installation checks with Node.js 22 or newer (development only). No npm packages are required. Preview capture uses native Qt 6 tools; shipped QML does not require Node.
 On Omarchy, run `make check-native` against the installed shell. See
 [the agent handoff](.specify/handoffs/omarchy-agent.md) and
 [marketplace registration](docs/marketplace.md).
@@ -127,3 +127,5 @@ credential storage lives in QML. Authored QML modules are limited to 200 lines.
 
 Native design candidate: [Quiet / Orbit and your local crew](docs/orbit-design.md).
 Existing work/consent rules remain unchanged; native qualification is still required.
+
+Development and preview tooling: [toolchain guide](docs/development-toolchain.md).

@@ -10,7 +10,8 @@ ComboBox {
     Layout.minimumWidth: 0
     Layout.preferredWidth: 180
     Layout.fillWidth: true
-    implicitHeight: Math.max(context.theme.typography.touchTarget, contentItem.implicitHeight + 16)
+    implicitHeight: context.theme.typography.controlHeight(contentItem.implicitHeight, 8)
+    verticalPadding: 4
     focusPolicy: Qt.StrongFocus
     leftPadding: 12
     rightPadding: 32
@@ -38,7 +39,8 @@ ComboBox {
         required property var modelData
         required property int index
         width: control.width
-        implicitHeight: Math.max(context.theme.typography.touchTarget, contentItem.implicitHeight + 16)
+        implicitHeight: context.theme.typography.controlHeight(contentItem.implicitHeight, 8)
+        topPadding: 4; bottomPadding: 4
         highlighted: control.highlightedIndex === index
         contentItem: Miilo.TypeText { typography: context.theme.typography;
             text: option.modelData

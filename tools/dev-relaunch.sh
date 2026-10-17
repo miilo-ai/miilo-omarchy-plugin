@@ -21,7 +21,7 @@ done
 run() {
     if "$dry_run"; then printf '%q ' "$@"; printf '\n'; else "$@"; fi
 }
-python_bin="${MIILO_PYTHON:-/usr/bin/python3}"
+node_bin="${MIILO_NODE:-node}"
 export PATH="/usr/lib/qt6/bin:$HOME/.local/bin:$PATH"
 export OMARCHY_PATH="${OMARCHY_PATH:-/usr/share/omarchy}"
 helper="$HOME/.local/bin/miilo-owl"
@@ -40,7 +40,7 @@ fi
 run make -C "$root" check-native check-typography
 install_args=(--helper "$helper" --local "$local_binary")
 if "$rebuild"; then install_args+=(--install-binaries --cli "$cli_binary"); fi
-run "$python_bin" "$root/tools/install-dev-plugin.py" "${install_args[@]}"
+run "$node_bin" "$root/tools/install-dev-plugin.cjs" "${install_args[@]}"
 if "$migrate_config"; then run "$HOME/.local/bin/miilo" config migrate; fi
 if "$restart"; then
     run omarchy restart shell

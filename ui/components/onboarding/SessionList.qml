@@ -47,8 +47,8 @@ ListView {
         onClicked: { view.currentIndex = index; view.forceActiveFocus(); controller.activateRow(view.currentIndex); }
         leftPadding: modelData.header ? 8 : 64
         rightPadding: 36
-        topPadding: 6.4; bottomPadding: 6.4
-        implicitHeight: Math.max(modelData.header ? 42 : view.theme.typography.touchTarget, contentItem.implicitHeight + topPadding + bottomPadding)
+        topPadding: 3.2; bottomPadding: 3.2
+        implicitHeight: view.theme.typography.controlHeight(contentItem.implicitHeight, topPadding + bottomPadding)
         background: Rectangle {
             color: choice.down ? view.theme.pressedFill : choice.cursor ? view.theme.focusFill : choice.checked || choice.partial ? view.theme.selectedFill : choice.hovered ? view.theme.hoverFill : choice.modelData.header ? view.widget.ink("lighter_background") : "transparent"
             Rectangle { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; width: 3; height: 24; visible: choice.cursor; color: view.theme.accent }

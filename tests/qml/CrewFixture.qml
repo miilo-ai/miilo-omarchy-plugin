@@ -11,7 +11,7 @@ Window {
  color: light ? "#faf5ee" : "#16151d"
  QtObject { id: fakeWidget; property int frame:0; property var instance: ({read:i => i === 0 ? Owl.fromJson([{key:"welcome",color:2}]) : "off"}); property var program: ({globals:[{name:"robotColors"},{name:"robotMotion"}]})
   property var palette: Owl.themeFromToml('background="' + root.color + '"\nforeground="' + (root.light?"#28232e":"#eeeaf4") + '"\naccent="#ac9cf5"\npurple="#ac9cf5"\nblue="#75abc9"\ngreen="#86b88c"\norange="#c8966a"\ncyan="#6dbab8"\nred="#d38896"')
-  function ink(n) { return ({foreground:root.light?"#28232e":"#eeeaf4",muted:root.light?"#65586b":"#b4aabb",accent:root.light?"#5e469e":"#ac9cf5",red:"#e07785",background:root.color.toString(),selection:"#6e6099"})[n] || "#a69cbb" }
+  function ink(n) { return ({foreground:root.light?"#28232e":"#eeeaf4",muted:root.light?"#65586b":"#b4aabb",accent:root.light?"#5e469e":"#ac9cf5",red:"#e07785",background:root.color.toString(),lighter_background:root.light?"#eee7e3":"#24222d",selection:"#6e6099"})[n] || "#a69cbb" }
  }
  QtObject { id: fakeController; property var agents: [
   {name:"Codex",observationSupported:true,locations:["/example/.codex","/example/Work"]},
@@ -24,7 +24,11 @@ Window {
   Crew.AgentInvitation { controller:fakeController; widget:fakeWidget; theme:nativeTheme }
   Text { Layout.fillWidth:true; text:"Only selected sessions are observed. Credentials stay in place."; color:fakeWidget.ink("muted"); font.pixelSize:12; wrapMode:Text.WordWrap }
   RowLayout {
-   Controls.Action { context:controlContext; text:"Review sessions" }
+   Controls.Field { objectName:"compactField"; context:controlContext; placeholderText:"Search sessions" }
+   Controls.Choice { objectName:"compactChoice"; context:controlContext; model:["All systems","Coding sessions"] }
+  }
+  RowLayout {
+   Controls.Action { objectName:"compactAction"; context:controlContext; text:"Review sessions" }
    Controls.Action { context:controlContext; text:"Not now" }
   }
  }

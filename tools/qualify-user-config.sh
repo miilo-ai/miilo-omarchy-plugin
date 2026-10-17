@@ -12,7 +12,7 @@ esac
 if (( $# > 1 )); then echo 'Too many arguments' >&2; exit 2; fi
 source "$root/tools/cargo-auth.sh"
 for repo in miilo-sdk miilo-cli miilo-owl-widgets; do
-    (cd "$workspace/$repo" && python3 tools/check_architecture.py && python3 tools/test_architecture.py)
+    node "$root/tools/check-architecture.cjs" "$workspace/$repo"
 done
 cargo test --locked --manifest-path "$workspace/miilo-sdk/rust/Cargo.toml" --test user_configuration -j 2
 cargo test --locked --manifest-path "$workspace/miilo-cli/Cargo.toml" --workspace -j 2

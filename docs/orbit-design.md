@@ -24,7 +24,7 @@ This executes actual QML and a row click, captures dark/expanded/narrow-light st
 and fails on QML warnings. A test-only Quickshell.env stub supplies a synthetic home;
 no real discovery, import, helper command or Omarchy shell starts.
 
-This repository now has tools/render-orbit.py for its own pinned OWL asset,
+This repository now has tools/render-orbit.cjs for its own pinned OWL asset,
 vendored evaluator, layout and Canvas with synthetic inventory. That fixture validates native row
 selection into details. It is not proof of host integration or platform performance.
 

@@ -46,8 +46,9 @@ FloatingWindow {
                 text: root.width < 480 ? "Local agents" : "Local agents · Ctrl+L"
                 focusPolicy: Qt.StrongFocus
                 Keys.onReturnPressed: clicked()
-                implicitHeight: Math.max(root.interactionTheme.typography.touchTarget, contentItem.implicitHeight + 16)
+                implicitHeight: root.interactionTheme.typography.controlHeight(contentItem.implicitHeight, 8)
                 horizontalPadding: 12
+                verticalPadding: 4
                 onClicked: importer.review()
                 enabled: !importer.busy
                 flat: true

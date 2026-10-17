@@ -5,8 +5,10 @@
     {
       "source": "70-miilo-fleet.owl",
       "path": "assets/70-miilo-fleet.owl",
-      "sha256": "b632acf62788034237a221f087247edd7ff6b64bcc7da7f2368b64ac97607c34",
-      "patches": []
+      "sha256": "f64592c946e2ab0870e2f0dcd065c2f67780c256d8db0a99cf640b1276ed3b2a",
+      "patches": [
+        "patches/presentation-consistency.patch"
+      ]
     },
     {
       "source": "desktop/runtime/LICENSE",
@@ -41,8 +43,10 @@
     {
       "source": "desktop/runtime/OwlNode.qml",
       "path": "vendor/owl/OwlNode.qml",
-      "sha256": "f4f85e5b206fc7d3bfea8b2069ffc03b9f1804a13484d8f2425961879755a661",
-      "patches": []
+      "sha256": "637b4e5dcfeddde07d0643020c1c812c5c985acceda15c34f0f25e3b00545279",
+      "patches": [
+        "patches/presentation-consistency.patch"
+      ]
     },
     {
       "source": "desktop/runtime/OwlSource.qml",
@@ -83,8 +87,10 @@
     {
       "source": "desktop/RobotProgram.js",
       "path": "assets/RobotProgram.js",
-      "sha256": "c313a2ad156e7312da63edaca119a635370d18bfc7bf321f42cae1dfbbac8998",
-      "patches": []
+      "sha256": "4693a31ee5f677b28f84153767549d953c8b6eef646fdd6479bf147e3032e420",
+      "patches": [
+        "patches/presentation-consistency.patch"
+      ]
     },
     {
       "source": "desktop/runtime/MiiloTypeScale.js",
@@ -95,8 +101,10 @@
     {
       "source": "desktop/runtime/MiiloTypography.qml",
       "path": "vendor/owl/MiiloTypography.qml",
-      "sha256": "1ce763192ff5a13a1034afef54e3b74a464a492fdfa7203c5d7c227f735911ab",
-      "patches": []
+      "sha256": "d3d91348172816549613194fecd620e8f1f415cec851b38156913f7e42ea1ba2",
+      "patches": [
+        "patches/presentation-consistency.patch"
+      ]
     }
   ],
   "authoredUiOrigin": {

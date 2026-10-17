@@ -124,3 +124,18 @@ See [atom-orbits.md](atom-orbits.md) for the synchronized projection, current
 native asset pin, expected visuals and machine acceptance checklist. The previous
 +/-45 degree rocking preview is superseded. Existing native typography/setup/chat
 work is preserved; the plugin has its own isolated Orbit render fixture now.
+
+## Python-free tooling follow-up — 2026-10-17
+
+Pull the coordinated tooling update before testing. Run `make check` with Node 22+,
+then the existing `make check-native check-typography` on Omarchy. The native
+installer is now tools/install-dev-plugin.cjs; dev-relaunch.sh selects Node via
+MIILO_NODE. Do not restore the removed installer or capture drivers.
+Use docs/development-toolchain.md for native Qt captures. Preserve shell
+lifecycle, actual-host typography, shared configuration and physical-phone gates.
+The portable Node installer tests exercise real temporary filesystem writes with
+inert version-only binaries; they do not qualify installed Omarchy behavior.
+
+## Approved density follow-up
+
+Pull main and review ../evidence/approved-density-2026-10-17.md. Check the 22px desktop rows, one-line truncation, half-height vertical control padding, outlined evidence/diffs and smooth static arc in the actual shell. Run make check-native and inspect increased text scale, focus, scrolling, narrow layouts and phone touch targets. Use disposable data; do not enroll sessions or invoke provider actions as part of presentation checks.

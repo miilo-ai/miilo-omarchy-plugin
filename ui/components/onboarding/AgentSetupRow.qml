@@ -16,8 +16,8 @@ ItemDelegate {
     readonly property var locations: agent.locations || []
     Layout.fillWidth: true
     Layout.minimumWidth: 0
-    implicitHeight: Math.max(theme.typography.touchTarget, contentItem.implicitHeight + topPadding + bottomPadding)
-    leftPadding: 8; rightPadding: 8; topPadding: 4.8; bottomPadding: 4.8
+    implicitHeight: theme.typography.controlHeight(contentItem.implicitHeight, topPadding + bottomPadding)
+    leftPadding: 8; rightPadding: 8; topPadding: 2.4; bottomPadding: 2.4
     activeFocusOnTab: true
     Accessible.name: agent.name + ". " + (supported ? "Sessions can be reviewed" : "Detected only") + ". " + (expanded ? "Hide locations" : "Show locations")
     onClicked: expanded = !expanded
