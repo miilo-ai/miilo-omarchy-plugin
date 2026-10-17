@@ -24,7 +24,7 @@ Item {
     function rebuildRows() {
         var result = [];
         grouped.forEach((g, index) => {
-            result.push({header:true, group:index, name:g.name, count:g.sessions.length});
+            result.push({header:true, group:index, name:g.name, label:g.rule ? g.name : g.name.replace(" / ", " · "), count:g.sessions.length});
             if (!collapsed[g.name]) g.sessions.forEach(s => result.push({header:false, group:index, session:s}));
         });
         rows = result;

@@ -26,6 +26,19 @@ Item {
     }
     Miilo.TypeText { id: plain; typography: typeSystem; width: 240; text: "<b>Evidence stays literal</b>" }
     Crew.RobotPortrait { id: portrait; width: 64; height: 64; motion: "reduced"; active: true }
+    Owl.OwlNode {
+        id: clickableTile
+        x: 650; y: 400; width: 200; height: 160
+        visible: false
+        widget: palette
+        property int tileClicks: 0
+        property int taskClicks: 0
+        node: ({kind:"Column",p:{width:200,height:160},a:{},
+            h:{onTap:()=>{clickableTile.tileClicks++}},c:[
+                {kind:"Row",p:{width:200,height:40},a:{},
+                    h:{onTap:()=>{clickableTile.taskClicks++}},c:[]}
+            ]})
+    }
     TestCase {
         name: "MiiloTypography"
         when: true
@@ -37,6 +50,16 @@ Item {
             importer.controller.agents = [{name:"Codex with a very long setup name", locations:["/tmp/long/path"], observationSupported:true}];
         }
         function cleanup() { console.log("TYPE_CASE", qtest_results.functionName, qtest_results.failed ? "FAILED" : "passed") }
+        function test_nested_tile_and_task_clicks() {
+            clickableTile.visible = true;
+            wait(50);
+            mouseClick(clickableTile,100,100);
+            compare(clickableTile.tileClicks,1);
+            mouseClick(clickableTile,100,20);
+            compare(clickableTile.taskClicks,1);
+            compare(clickableTile.tileClicks,1,"Task selection must not also navigate its parent tile");
+            clickableTile.visible = false;
+        }
         function test_desktop_and_phone_widths_data() {
             return [{tag:"desktop",profile:"desktop",scale:1,width:900},
                 {tag:"narrow",profile:"desktop",scale:1,width:320},

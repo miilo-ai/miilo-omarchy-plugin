@@ -104,7 +104,7 @@ ListView {
                     objectName: "sessionTitle"
                     typography: view.theme.typography
                     Layout.fillWidth: true; Layout.minimumWidth: 0
-                    text: choice.modelData.header ? choice.modelData.name + " (" + choice.modelData.count + ")" : choice.modelData.session.name || "Unnamed session"
+                    text: choice.modelData.header ? (choice.modelData.label || choice.modelData.name) + " (" + choice.modelData.count + ")" : choice.modelData.session.name || "Unnamed session"
                     wrapMode: Text.Wrap
                     verticalAlignment: Text.AlignVCenter
                     color: !choice.selectable ? view.widget.ink("muted") : choice.cursor ? view.theme.focusText : view.theme.foreground

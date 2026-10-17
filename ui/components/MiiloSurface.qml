@@ -48,6 +48,10 @@ Item {
         return p
     }
     property var owlPalette: readablePalette("")
+    onActiveChanged: if (active && widget.instance && widget.program) {
+        var slot = widget.program.globals.findIndex(g => g.name === "systemsOpen");
+        if (slot >= 0) widget.instance.setState(slot, false);
+    }
     function closeDetails() { widget.closeScreen() }
     FileView {
         path: root.miiloHome + "/config.json"

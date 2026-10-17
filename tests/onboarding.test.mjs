@@ -27,6 +27,22 @@ function controller() {
   return { state: context, calls };
 }
 
+test('automatic group labels separate agent and path without changing identity or custom names', () => {
+  const { state } = controller();
+  const original = 'codex / /fixture/project';
+  state.grouped = [
+    { name: original, rule: null, sessions: [{kind:'codex',id:'one'}] },
+    { name: 'My / /group', rule: {name:'My / /group'}, sessions: [] },
+  ];
+  state.collapsed = {[original]:true};
+  state.rebuildRows();
+  assert.equal(state.rows[0].label, 'codex · /fixture/project');
+  assert.equal(state.rows[0].name, original);
+  assert.equal(state.rows[1].label, 'My / /group');
+  assert.equal(state.rows.length, 2, 'collapse lookup still uses the canonical name');
+  assert.equal(state.grouped[0].name, original);
+});
+
 test('new group never opts into future enrollment and edit uses a separate draft', () => {
   const { state } = controller();
   state.editGroup(-1);
