@@ -1,0 +1,122 @@
+{
+  "repository": "https://github.com/EdyVision/miilo-owl-widgets",
+  "revision": "2f8b0cb655204f5de304323a9f9a1fc9bdc1ae7b",
+  "files": [
+    {
+      "source": "LICENSE",
+      "path": "LICENSE",
+      "sha256": "bc2ed798c89325ee276fba7a56f86be7dca75446beab17134d82f1815976e839",
+      "patches": []
+    },
+    {
+      "source": "70-miilo-fleet.owl",
+      "path": "desktop/70-miilo-fleet.owl",
+      "sha256": "bfb2fea04dede4124273d2f8c1ed0e2ac26b9d696b08437b7c3afb20839cf0b8",
+      "patches": []
+    },
+    {
+      "source": "desktop/Dashboard.qml",
+      "path": "desktop/Dashboard.qml",
+      "sha256": "be03039c661a3107e6d2bfa8a1de90f40759e634734eb1b9a0df1a5938a57878",
+      "patches": []
+    },
+    {
+      "source": "desktop/MiiloSurface.qml",
+      "path": "desktop/MiiloSurface.qml",
+      "sha256": "b01c8f40f6d489f373066e513aa9b408a273fa857d1b9774a20627e8923a5147",
+      "patches": []
+    },
+    {
+      "source": "desktop/LocalImport.qml",
+      "path": "desktop/LocalImport.qml",
+      "sha256": "37e6d73b532733c0db7bebbfe13e91b94a975ad21ab578a7cab00c3e7fd8207c",
+      "patches": []
+    },
+    {
+      "source": "desktop/InteractionTheme.qml",
+      "path": "desktop/InteractionTheme.qml",
+      "sha256": "64d2341055dd3e70b8fc6d415d1215c385b6b133613e4f339cb297f2fdf0fb07",
+      "patches": []
+    },
+    {
+      "source": "desktop/omarchy/BarWidget.qml",
+      "path": "desktop/omarchy/BarWidget.qml",
+      "sha256": "c2f678e722a41eaf66d606738e0a0c3e93445674ee4c599fd9ad77847796d419",
+      "patches": []
+    },
+    {
+      "source": "desktop/omarchy/Dashboard.qml",
+      "path": "desktop/omarchy/Dashboard.qml",
+      "sha256": "563826ce596ef55da093b8527ce6eecfe88f253d367ab51642f1885466534cef",
+      "patches": [
+        "Qualify Commons.Color for Qt 6.12 palette compatibility."
+      ]
+    },
+    {
+      "source": "desktop/runtime/LICENSE",
+      "path": "desktop/runtime/LICENSE",
+      "sha256": "a580274a4ee4c412391fe8bf50d32644a4d3b09c8fedf5469324c6e37b898a76",
+      "patches": []
+    },
+    {
+      "source": "desktop/runtime/Owl.js",
+      "path": "desktop/runtime/Owl.js",
+      "sha256": "502d8649d29e0c7ad552d40d95225f8fd21b4507938678c683fa3a7c5049dff4",
+      "patches": []
+    },
+    {
+      "source": "desktop/runtime/OwlCanvas.qml",
+      "path": "desktop/runtime/OwlCanvas.qml",
+      "sha256": "e2f05af133ec6eab6c5cb643780516496ee2dc3530a955470665222e2b5f6e5c",
+      "patches": []
+    },
+    {
+      "source": "desktop/runtime/OwlHost.qml",
+      "path": "desktop/runtime/OwlHost.qml",
+      "sha256": "0951f2156952807175f3a9b54d43d475d21a6511c89bef4849053fa30be734e5",
+      "patches": []
+    },
+    {
+      "source": "desktop/runtime/OwlLayout.js",
+      "path": "desktop/runtime/OwlLayout.js",
+      "sha256": "2ea034075e4e551687a93e6bad6784caf2ab45a8f764fc2d5794201d7dd1b682",
+      "patches": []
+    },
+    {
+      "source": "desktop/runtime/OwlNode.qml",
+      "path": "desktop/runtime/OwlNode.qml",
+      "sha256": "e9cacf3ed27a64a0cef0c445103739e3d9cf376753729d33355dcb3c1c0a842c",
+      "patches": []
+    },
+    {
+      "source": "desktop/runtime/OwlSource.qml",
+      "path": "desktop/runtime/OwlSource.qml",
+      "sha256": "af69818e64985a47eddbc5a8234edbcbf83ddba16c51b52abc2e19731164713e",
+      "patches": []
+    },
+    {
+      "source": "desktop/runtime/OwlTerminal.qml",
+      "path": "desktop/runtime/OwlTerminal.qml",
+      "sha256": "0811fea1b1fd28230549e6c112d12d90bfe6f9f669175b1c685a73ac63789c16",
+      "patches": []
+    },
+    {
+      "source": "desktop/runtime/OwlWidget.qml",
+      "path": "desktop/runtime/OwlWidget.qml",
+      "sha256": "e4fe901e142265053b6f22dd9f3f580eb631eecc7573c4d9373cad24c69480a0",
+      "patches": []
+    },
+    {
+      "source": "desktop/runtime/UPSTREAM.md",
+      "path": "desktop/runtime/UPSTREAM.md",
+      "sha256": "3033fe6bdba87eb52d90e281a8562a1453b29cfa384e01eac64e2c765da4d540",
+      "patches": []
+    },
+    {
+      "source": "desktop/runtime/owl-source",
+      "path": "desktop/runtime/owl-source",
+      "sha256": "4ee72f966412cefa95ba89676f7cb47b47c7a405620e0c1a76bc92c26ff82b9b",
+      "patches": []
+    }
+  ]
+}
