@@ -9,3 +9,8 @@ installer or implicit enrollment. Keep state/logs outside the plugin checkout.
 Do not delete legacy widgets or user configuration during this migration.
 Record native evidence honestly; portable source checks cannot prove shell load.
 Do not publish, change visibility or submit to the marketplace without owner approval.
+
+For local build/update/relaunch work, read `skills/miilo-desktop/SKILL.md` and use
+`tools/dev-relaunch.sh`. This workflow preserves the canonical native layout;
+the legacy widgets installer does not install the native crew UI. The skill
+does not override the active filesystem, network or desktop-socket permissions.

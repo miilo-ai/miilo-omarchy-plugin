@@ -6,6 +6,7 @@ check:
 	node --test tests/*.test.mjs
 	bash -n tools/check-native.sh
 	bash -n tools/test-typography.sh
+	bash -n tools/dev-relaunch.sh tools/install-dev-skill.sh
 
 check-typography:
 	bash tools/test-typography.sh

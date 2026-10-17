@@ -1,0 +1,4 @@
+interface:
+  display_name: "Miilo Desktop"
+  short_description: "Build, update, and relaunch Miilo on Omarchy"
+  default_prompt: "Use $miilo-desktop to update and relaunch my local Miilo desktop."

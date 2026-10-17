@@ -52,6 +52,33 @@ Legacy `io.miilo.dashboard` / `io.miilo.desktop` installations are not removed.
 
 ## Develop
 
+Update the checked native UI, back up the installed bar plugin, and reopen it:
+
+```sh
+bash tools/dev-relaunch.sh
+# Rebuild/install miilo-owl and miilo-local too (needed for older installed binaries):
+bash tools/dev-relaunch.sh --rebuild
+```
+
+Requires sibling `miilo-owl-widgets` and `miilo-cli` checkouts, Cargo registry/Git
+access for rebuilds, and normal user access to the plugin directory and desktop
+socket. `--dry-run` prints the plan; `--no-restart` installs without restarting or
+enabling the shell plugin. Checks/version mismatches stop before installation.
+The updater backs up the existing bar and any replaced binaries under
+`$XDG_STATE_HOME/miilo/plugin-backups` (default `~/.local/state/miilo/plugin-backups`).
+It leaves session/connection data and legacy dashboard/desktop plugins alone.
+
+Install the companion skill once for discovery outside this repository:
+
+```sh
+bash tools/install-dev-skill.sh
+```
+
+It installs [miilo-desktop](skills/miilo-desktop/SKILL.md) in
+`${CODEX_HOME:-$HOME/.codex}/skills`. Refresh skills/start a new agent session
+afterward. The skill handles routine requested rebuild/relaunch work when the
+session has the required access; it cannot bypass a managed sandbox.
+
 `make check` runs portable source checks with Python 3 (development only).
 On Omarchy, run `make check-native` against the installed shell. See
 [the agent handoff](.specify/handoffs/omarchy-agent.md) and
