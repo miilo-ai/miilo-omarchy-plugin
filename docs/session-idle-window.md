@@ -111,3 +111,27 @@ The native plugin commit containing this note includes the synchronized asset,
 provenance patch/hash, menu-collapse behavior, group-label display fix, regression
 tests and these findings. No push is part of this checkpoint. Unrelated generated
 CLI `tools/__pycache__/` files are excluded.
+
+## Mode-aware Back correction
+
+The user subsequently observed a return from the task list to Quiet after entering
+from Orbit. Earlier tests covered return only while the global view preference
+remained unchanged; they did not establish an explicit navigation origin.
+
+Inspection entry now records a separate non-persisted `inspectionView` for Orbit
+tile/overflow, Quiet robot, and compact actor entry. The task-list Back action
+restores that origin explicitly and clears the inspection state. Orbit entry
+shows “Back to Orbit”; returning retains the Orbit page. This context survives
+opening and closing an individual work detail. It is not a new saved preference.
+
+Validation: generated-renderer navigation tests cover both entry modes, nested
+work detail, overflow on the second Orbit page, and restoration even if the
+general view preference changes during inspection. Native asset regression tests,
+all 24 native Node tests, source hashes, 36 desktop scenarios and architecture
+checks passed. These checks do not replace the user's next installed-shell test.
+The correction is saved on the same feature branch. Widgets companion commit:
+`c02f6f8` — restore inspection entry mode on Back. The native commit containing
+this update synchronizes the generated asset, provenance and regression test.
+
+Install this UI-only correction with `bash tools/dev-relaunch.sh` from the native
+plugin repository. No Rust rebuild or collector restart is needed for navigation.

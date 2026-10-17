@@ -331,7 +331,13 @@
          circle(6, 6, 3.5, stroke: ink, width: 1)
          line(8.5, 8.5, 12, 12, stroke: ink, width: 1.2)
        } else {
-@@ -589,64 +647,67 @@
+@@ -584,69 +642,73 @@
+   }
+ 
+   state observatoryView = "quiet" persist
++  state inspectionView = ""
+   state orbitPage = 0
+   component WorkViewToolbar(count) {
      Row {
        fill: width
        gap: 6
@@ -367,7 +373,7 @@
 +      gap: 1
        background: alpha(accent, 0.035)
        radius: 12
-+      onTap: { expandedSystem = provider.id; workflowActor = ""; selectedActor = ""; selectedWork = ""; pageSize = 5; agentsOpen = false }
++      onTap: { inspectionView = "orbit"; expandedSystem = provider.id; workflowActor = ""; selectedActor = ""; selectedWork = ""; pageSize = 5; agentsOpen = false }
        Row {
          fill: width
          align: center
@@ -401,7 +407,7 @@
          }
        }
 -      if len(items) > 8 { Button { text: "+${len(items) - 8} ${len(items) == 9 ? "task" : "tasks"} · inspect system"; onTap: { observatoryView = "quiet"; expandedSystem = provider.id; workflowActor = ""; pageSize = 12 } } }
-+      if len(items) > 8 { Button { text: "+${len(items) - 8} ${len(items) == 9 ? "task" : "tasks"} · inspect system"; onTap: { expandedSystem = provider.id; workflowActor = ""; pageSize = 12 } } }
++      if len(items) > 8 { Button { text: "+${len(items) - 8} ${len(items) == 9 ? "task" : "tasks"} · inspect system"; onTap: { inspectionView = "orbit"; expandedSystem = provider.id; workflowActor = ""; pageSize = 12 } } }
      }
    }
    component OrbitView(list) {
@@ -422,7 +428,7 @@
        }
      }
      if len(systems) == 0 { Text { text: needsOnly ? "Nothing needs you" : "No systems to display"; style: small; color: muted } }
-@@ -662,6 +723,81 @@
+@@ -662,6 +724,81 @@
      Text { text: "Motion reflects observed activity. Select work to inspect it."; fontSize: 10; color: muted; maxLines: 2 }
    }
  
@@ -466,7 +472,7 @@
 +        Column {
 +          align: center
 +          gap: 2
-+          onTap: { expandedSystem = p.id; workflowActor = ""; selectedActor = ""; pageSize = 5; agentsOpen = false }
++          onTap: { inspectionView = "quiet"; expandedSystem = p.id; workflowActor = ""; selectedActor = ""; pageSize = 5; agentsOpen = false }
 +          QuietPortrait { provider: p; items: live.filter(w => w.providerId == p.id); s: screenWidth < 360 ? 72 : 88 }
 +          Text { text: replace(p.name, "-", " "); width: max(48, (screenWidth - 24 - (columns - 1) * 8) / columns); height: 28; align: center; fontSize: 10; maxLines: 2 }
 +        }
@@ -478,7 +484,7 @@
 +  component QuietSystemTasks(provider, list) {
 +    let team = actors.filter(a => a.providerId == provider.id)
 +    let tasks = list.filter(w => w.providerId == provider.id && (workflowActor == "" || contains(w._actorKeys ?? [], workflowActor)))
-+    Button { text: "← Systems"; onTap: { expandedSystem = ""; workflowActor = ""; agentsOpen = false } }
++    Button { text: inspectionView == "orbit" ? "← Back to Orbit" : "← Systems"; onTap: { observatoryView = inspectionView == "" ? observatoryView : inspectionView; inspectionView = ""; expandedSystem = ""; workflowActor = ""; agentsOpen = false } }
 +    Text { text: provider.name; style: body; maxLines: 2 }
 +    Flow {
 +      fill: width
@@ -504,7 +510,16 @@
    let tileActors = (previewRobots ? actors.take(1) : actors) + (previewRobots ? [
      {_key: "preview-resting", providerId: "", name: "Preview sleep", status: "resting", health: "healthy", _preview: true},
      {_key: "preview-working", providerId: "", name: "Preview working", status: "working", health: "healthy", _preview: true}
-@@ -756,25 +892,6 @@
+@@ -728,7 +865,7 @@
+           Column {
+             align: center
+             gap: 2
+-            onTap: { expandedSystem = a.providerId; workflowActor = (a._preview ?? false) ? "" : a._key; selectedActor = ""; selectedWork = ""; needsOnly = false; query = ""; pageSize = 5; screen() }
++            onTap: { inspectionView = observatoryView; expandedSystem = a.providerId; workflowActor = (a._preview ?? false) ? "" : a._key; selectedActor = ""; selectedWork = ""; needsOnly = false; query = ""; pageSize = 5; screen() }
+             Box {
+               width: robotSize + 10
+               height: robotSize
+@@ -756,25 +893,6 @@
        Text { text: "miilo.tech"; width: 64; height: 12; fontSize: 9; color: alpha(muted, 0.65); align: end; maxLines: 1 }
      }
    }
@@ -530,7 +545,7 @@
    screen {
      title: "miilo"
      Column {
-@@ -803,44 +920,19 @@
+@@ -803,44 +921,19 @@
          let actionable = works.filter(w => w.attention != "none" || any(attention, a => a._workKey == w._key))
          let visible = (needle == "" ? live : searched).filter(w => !needsOnly || any(actionable, a => a._key == w._key)).sortBy(w => any(actionable, a => a._key == w._key) ? 0 : w.lifecycle == "active" ? 1 : 2)
          WorkViewToolbar { count: len(actionable) }
