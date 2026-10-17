@@ -70,3 +70,8 @@ local to each component. Review the new hierarchy before porting older UI tests.
 Test group draft resets on each edit, click/keyboard selection, partial selection,
 Escape/focus return, async error recovery, invitation dismissal and close/reopen.
 Node controller checks are not QML execution; make check-native is still required.
+
+## Chat-first follow-up
+
+See [chat-native.md](chat-native.md) for the tested helper boundary and pending
+graphical/native work. This does not replace the observation acceptance checklist.
