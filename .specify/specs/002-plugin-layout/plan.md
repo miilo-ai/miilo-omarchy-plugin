@@ -1,6 +1,6 @@
 # Proposed presentation layout
 
-Status: proposed, not moved. Review before changing QML URLs/imports.
+Status: implemented; portable validation recorded. Native qualification pending.
 
 ```text
 manifest.json                 # marketplace discovery contract
@@ -20,7 +20,7 @@ Components use the helper command protocol; they do not parse transcripts, manag
 provider credentials or implement observation policy. The renderer remains an
 attributed vendor dependency, separate from authored UI. No backend lives here.
 
-Split the current 601-line LocalImport.qml into a small coordinator plus invitation,
+The former 601-line LocalImport.qml is split into a small coordinator plus invitation,
 session/group selection and group-editor views. Keep asynchronous helper process
 state in a clearly named onboarding controller, with its command boundary testable.
 Do not invent a second provider model or observation engine in QML.

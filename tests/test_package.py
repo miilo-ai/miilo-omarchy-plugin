@@ -15,7 +15,8 @@ class PackageSafety(unittest.TestCase):
         self.root = Path(self.temp.name)
         for item in ['manifest.json', 'sources.lock.json', 'LICENSE']:
             shutil.copy2(ROOT / item, self.root / item)
-        shutil.copytree(ROOT / 'desktop', self.root / 'desktop')
+        for directory in ['ui', 'vendor', 'assets']:
+            shutil.copytree(ROOT / directory, self.root / directory)
 
     def change_manifest(self, mutate):
         p = self.root / 'manifest.json'
@@ -34,22 +35,22 @@ class PackageSafety(unittest.TestCase):
             checker.check(self.root)
 
     def test_symlink_dependency_fails(self):
-        (self.root / 'desktop/secret').symlink_to('/tmp')
+        (self.root / 'vendor/secret').symlink_to('/tmp')
         with self.assertRaisesRegex(ValueError, 'Symlink'):
             checker.check(self.root)
 
     def test_unreviewed_vendor_drift_fails(self):
-        with (self.root / 'desktop/MiiloSurface.qml').open('a') as file:
+        with (self.root / 'vendor/owl/OwlWidget.qml').open('a') as file:
             file.write('\n// unexpected edit\n')
         with self.assertRaisesRegex(ValueError, 'Unreviewed source drift'):
             checker.check(self.root)
 
     def test_missing_license_fails(self):
-        (self.root / 'desktop/runtime/LICENSE').unlink()
+        (self.root / 'vendor/owl/LICENSE').unlink()
         with self.assertRaisesRegex(ValueError, 'Missing file'):
             checker.check(self.root)
 
     def test_untracked_runtime_file_fails(self):
-        (self.root / 'desktop/Hidden.qml').write_text('import QtQuick\nItem {}\n')
+        (self.root / 'vendor/Hidden.qml').write_text('import QtQuick\nItem {}\n')
         with self.assertRaisesRegex(ValueError, 'Unpinned runtime asset'):
             checker.check(self.root)

@@ -1,8 +1,8 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import "runtime" as Owl
-import "runtime/Owl.js" as OwlJs
+import "../../vendor/owl" as Owl
+import "../../vendor/owl/Owl.js" as OwlJs
 
 Item {
     id: root
@@ -10,7 +10,7 @@ Item {
     property bool expanded: false
     property var configureLocal: null
     property var interactionTheme: null
-    property string widgetPath: Quickshell.env("MIILO_WIDGET_PATH") || decodeURIComponent(String(Qt.resolvedUrl("70-miilo-fleet.owl")).replace(/^file:\/\//, ""))
+    property string widgetPath: Quickshell.env("MIILO_WIDGET_PATH") || decodeURIComponent(String(Qt.resolvedUrl("../../assets/70-miilo-fleet.owl")).replace(/^file:\/\//, ""))
     readonly property alias widget: widget
     // Theme muted colors often target borders; lift text to readable contrast.
     function readablePalette(toml) {

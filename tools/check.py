@@ -49,11 +49,11 @@ def check(root):
         digest = hashlib.sha256(safe_file(root, name).read_bytes()).hexdigest()
         if digest != record['sha256']:
             raise ValueError(f'Unreviewed source drift: {name}; update provenance intentionally')
-    for required in ['LICENSE', 'desktop/runtime/LICENSE', 'desktop/runtime/UPSTREAM.md', 'desktop/70-miilo-fleet.owl']:
+    for required in ['LICENSE', 'vendor/owl/LICENSE', 'vendor/owl/UPSTREAM.md', 'assets/70-miilo-fleet.owl']:
         safe_file(root, required)
         if required not in pinned:
             raise ValueError(f'Unpinned required asset: {required}')
-    for path in (root / 'desktop').rglob('*'):
+    for path in (root / 'vendor').rglob('*'):
         if not path.is_file():
             continue
         name = str(path.relative_to(root))
@@ -68,6 +68,16 @@ def check(root):
             imported = path.parent / item
             if not imported.exists() or not imported.resolve().is_relative_to(root.resolve()):
                 raise ValueError(f'Missing or escaped local import in {name}: {item}')
+    for path in (root / 'ui').rglob('*.qml'):
+        text = path.read_text()
+        if len(text.splitlines()) > 200:
+            raise ValueError(f'Authored QML exceeds 200 lines: {path.relative_to(root)}')
+        for item in re.findall(r'^import\s+"([^"]+)"|Qt\.resolvedUrl\("([^"]+)"\)', text, re.M):
+            imported = path.parent / (item[0] or item[1])
+            if not imported.exists() or not imported.resolve().is_relative_to(root.resolve()):
+                raise ValueError(f'Missing or escaped UI asset: {path.relative_to(root)}')
+        if re.search(r'[\"\'](?:quickshell|qs)[\"\']', text):
+            raise ValueError('Native UI must not launch a second shell')
     print('Manifest, local imports, source hashes, licenses and single-shell source checks passed.')
     print('Native Omarchy validation and QML runtime acceptance remain separate gates.')
 

@@ -8,4 +8,4 @@ test -d "$OMARCHY_PATH/shell"
 omarchy plugin validate "$root"
 while IFS= read -r -d '' file; do
   qmllint -I "$OMARCHY_PATH/shell" "$file"
-done < <(find "$root/desktop" -type f -name '*.qml' -print0)
+done < <(find "$root/ui" "$root/vendor/owl" -type f -name '*.qml' -print0)

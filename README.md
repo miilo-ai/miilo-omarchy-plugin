@@ -73,5 +73,13 @@ with the widgets repository. Update the lock intentionally after reviewing diffs
 The widgets repository is currently under EdyVision; its planned organization
 transfer must be reflected in the lock/docs once the actual destination is known.
 
-MIT. Upstream renderer notices remain in `desktop/runtime/LICENSE` and `UPSTREAM.md`.
+MIT. Upstream renderer notices remain in `vendor/owl/LICENSE` and `vendor/owl/UPSTREAM.md`.
 Contact: contact@miilo.tech. Maintained by Viratec Interactive LLC.
+
+## Source layout
+
+`ui/shell` adapts Omarchy lifecycle and theme tokens. `ui/components` holds
+presentation. Onboarding has separate state/controller, helper command adapter,
+invitation, group editor, session list and shared controls. `vendor/owl` contains
+the attributed evaluator; `assets` contains generated OWL. No provider engine or
+credential storage lives in QML. Authored QML modules are limited to 200 lines.

@@ -10,7 +10,7 @@
     "bar-widget"
   ],
   "entryPoints": {
-    "barWidget": "desktop/omarchy/BarWidget.qml"
+    "barWidget": "ui/shell/BarWidget.qml"
   },
   "barWidget": {
     "displayName": "Miilo",

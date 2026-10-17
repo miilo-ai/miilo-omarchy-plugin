@@ -60,3 +60,13 @@ Use `docs/marketplace.md` for the exact submission form and checklist. A real
 preview and qualified dependency install are remaining gates. Do not represent
 registration as completed before maintainer approval. Update the widgets URL only
 after its actual organization transfer.
+
+## Modular layout checkpoint
+
+The plugin now uses ui/shell, ui/components/onboarding, vendor/owl and assets.
+The command adapter owns Quickshell processes; the controller owns onboarding
+view state. LocalImport is the focus/shortcut/layout coordinator. View IDs remain
+local to each component. Review the new hierarchy before porting older UI tests.
+Test group draft resets on each edit, click/keyboard selection, partial selection,
+Escape/focus return, async error recovery, invitation dismissal and close/reopen.
+Node controller checks are not QML execution; make check-native is still required.

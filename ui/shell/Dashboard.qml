@@ -1,7 +1,7 @@
 import QtQuick
 import qs.Commons
 import qs.Commons as Commons
-import ".." as Miilo
+import "../components" as Miilo
 
 Item {
     id: root
