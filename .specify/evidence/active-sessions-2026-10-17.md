@@ -1,6 +1,6 @@
 # Active session visibility — 2026-10-17
 
-The owner reported sleeping robots and slow rendering with many enrolled sessions.
+Inactive enrolled sessions can crowd the fleet and increase rendering work.
 Read-only aggregate inspection found fresh local observation with one working
 session and twelve resting sessions; the working session was ninth in the cache.
 The first six Orbit cards could therefore show only historical idle sessions.
