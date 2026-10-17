@@ -1,5 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
+import ".." as Miilo
 import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
@@ -28,6 +29,7 @@ ScrollView {
             id: futureMatches
             objectName: "futureMatches"
             checked: !!view.controller.draft.future; text: "Include future matching sessions"
+            Layout.fillWidth: true
             focusPolicy: Qt.StrongFocus
             indicator: Rectangle {
                 implicitWidth: 20
@@ -43,9 +45,9 @@ ScrollView {
                     color: view.widget.ink("accent")
                 }
             }
-            contentItem: Text { leftPadding: 32; text: futureMatches.text; color: view.widget.ink(futureMatches.activeFocus ? "accent" : "foreground"); wrapMode: Text.WordWrap }
+            contentItem: Miilo.TypeText { typography: view.theme.typography; leftPadding: 32; text: futureMatches.text; color: view.widget.ink(futureMatches.activeFocus ? "accent" : "foreground"); wrapMode: Text.WordWrap }
         }
-        Text {
+        Miilo.TypeText { typography: view.theme.typography;
             Layout.fillWidth: true
             text: "Off by default. When enabled, Miilo checks every minute and enrolls new matching sessions, up to 100 total. Unchecking this on a later import stops future enrollment; existing selections remain."
             wrapMode: Text.WordWrap

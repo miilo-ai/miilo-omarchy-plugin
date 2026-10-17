@@ -1,12 +1,16 @@
 pragma ComponentBehavior: Bound
 import QtQuick
+import "../.." as Miilo
 import QtQuick.Controls
 import QtQuick.Layouts
 
 Button {
     required property var context
+    Layout.minimumWidth: 0
+    Layout.preferredWidth: 180
+    Layout.fillWidth: true
     id: control
-    implicitHeight: 40
+    implicitHeight: Math.max(context.theme.typography.touchTarget, contentItem.implicitHeight + 16)
     horizontalPadding: 14
     flat: true
     focusPolicy: Qt.StrongFocus
@@ -20,11 +24,11 @@ Button {
         opacity: control.enabled ? 1 : 0.5
         Rectangle { anchors.bottom: parent.bottom; anchors.horizontalCenter: parent.horizontalCenter; width: parent.width - 16; height: 2; visible: control.activeFocus; color: context.theme.accent }
     }
-    contentItem: Text {
+    contentItem: Miilo.TypeText { typography: context.theme.typography;
         text: control.text
         color: control.activeFocus ? context.theme.focusText : context.theme.foreground
         opacity: control.enabled ? 1 : 0.5
-        font.pixelSize: 13
+        role: "label"
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
     }

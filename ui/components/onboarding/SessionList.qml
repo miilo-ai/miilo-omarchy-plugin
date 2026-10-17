@@ -1,5 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
+import ".." as Miilo
 import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
@@ -31,15 +32,20 @@ ListView {
         id: choice
         required property var modelData
         required property int index
+        enabled: modelData.header || modelData.session.observable === true
         width: ListView.view.width
+        Accessible.role: modelData.header ? Accessible.Grouping : Accessible.CheckBox
+        Accessible.checkable: selectable
+        Accessible.checked: checked
         focusPolicy: Qt.NoFocus
         readonly property var groupSessions: controller.grouped[modelData.group] ? controller.grouped[modelData.group].sessions.filter(s => s.observable) : []
+        readonly property bool selectable: modelData.header ? groupSessions.length > 0 : modelData.session.observable === true
         readonly property int selectedCount: groupSessions.filter(s => controller.selected.indexOf(s.kind + ":" + s.id) >= 0).length
         readonly property bool partial: modelData.header && selectedCount > 0 && selectedCount < groupSessions.length
         readonly property bool cursor: view.activeFocus && view.currentIndex === index
         checked: modelData.header ? groupSessions.length > 0 && groupSessions.every(s => controller.selected.indexOf(s.kind + ":" + s.id) >= 0) : controller.selected.indexOf(modelData.session.kind + ":" + modelData.session.id) >= 0
         onClicked: { view.currentIndex = index; view.forceActiveFocus(); controller.activateRow(view.currentIndex); }
-        implicitHeight: modelData.header ? 48 : 64
+        implicitHeight: Math.max(view.theme.typography.touchTarget, contentItem.implicitHeight + 16)
         background: Rectangle {
             color: choice.down ? view.theme.pressedFill : choice.cursor ? view.theme.focusFill : choice.checked || choice.partial ? view.theme.selectedFill : choice.hovered ? view.theme.hoverFill : choice.modelData.header ? view.widget.ink("lighter_background") : "transparent"
             Rectangle { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; width: 3; height: 24; visible: choice.cursor; color: view.theme.accent }
@@ -52,7 +58,7 @@ ListView {
             text: controller.collapsed[choice.modelData.name] ? "+" : "−"
             Accessible.name: "Expand or collapse " + choice.modelData.name
             focusPolicy: Qt.NoFocus
-            contentItem: Text { text: foldButton.text; color: view.widget.ink("foreground"); horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+            contentItem: Miilo.TypeText { typography: view.theme.typography; text: foldButton.text; color: view.widget.ink("foreground"); horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
             background: Rectangle { color: view.widget.ink(foldButton.hovered ? "selection" : "lighter_background") }
             onClicked: controller.collapseGroup(choice.modelData.group)
         }
@@ -61,6 +67,7 @@ ListView {
             anchors.verticalCenter: parent.verticalCenter
             width: 20
             height: 20
+            visible: choice.selectable
             radius: 0
             color: "transparent"
             border.width: 1
@@ -73,23 +80,30 @@ ListView {
                 color: view.theme.accent
             }
         }
+        Miilo.AvailabilityIcon {
+            x: 8
+            anchors.verticalCenter: parent.verticalCenter
+            visible: !choice.selectable
+            available: false
+            ink: view.widget.ink("muted")
+        }
         contentItem: Column {
             leftPadding: 42
             spacing: 3
-            Text {
+            Miilo.TypeText { typography: view.theme.typography;
                 width: parent.width - (choice.modelData.header ? 76 : 32)
                 text: choice.modelData.header ? (controller.collapsed[choice.modelData.name] ? "▸ " : "▾ ") + choice.modelData.name + " (" + choice.modelData.count + ")" : choice.modelData.session.name || "Unnamed session"
-                elide: Text.ElideRight
-                color: choice.cursor ? view.theme.focusText : view.theme.foreground
-                font.pixelSize: 14
+                wrapMode: Text.Wrap
+                color: !choice.selectable ? view.widget.ink("muted") : choice.cursor ? view.theme.focusText : view.theme.foreground
+                role: "body"
             }
-            Text {
+            Miilo.TypeText { typography: view.theme.typography;
                 visible: !choice.modelData.header
                 width: parent.width - 32
                 text: choice.modelData.header ? "" : choice.modelData.session.kind + " · " + (choice.modelData.session.cwd || choice.modelData.session.id) + (choice.modelData.session.observable ? "" : " · import not available yet")
-                elide: Text.ElideMiddle
+                wrapMode: Text.WrapAnywhere
                 color: view.widget.ink("muted")
-                font.pixelSize: 11
+                role: "small"
             }
         }
     }

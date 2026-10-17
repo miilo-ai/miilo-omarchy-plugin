@@ -1,13 +1,16 @@
 pragma ComponentBehavior: Bound
 import QtQuick
+import "../.." as Miilo
 import QtQuick.Controls
 import QtQuick.Layouts
 
 ComboBox {
     required property var context
     id: control
+    Layout.minimumWidth: 0
+    Layout.preferredWidth: 180
     Layout.fillWidth: true
-    implicitHeight: 40
+    implicitHeight: Math.max(context.theme.typography.touchTarget, contentItem.implicitHeight + 16)
     focusPolicy: Qt.StrongFocus
     leftPadding: 12
     rightPadding: 32
@@ -17,14 +20,14 @@ ComboBox {
         border.width: 1
         Rectangle { anchors.bottom: parent.bottom; anchors.horizontalCenter: parent.horizontalCenter; width: parent.width - 16; height: 2; visible: control.activeFocus; color: context.theme.accent }
     }
-    contentItem: Text {
+    contentItem: Miilo.TypeText { typography: context.theme.typography;
         text: control.count ? control.displayText : "No saved groups"
         color: !control.enabled ? context.widget.ink("muted") : control.activeFocus ? context.theme.focusText : context.theme.foreground
-        font.pixelSize: 13
+        role: "label"
         verticalAlignment: Text.AlignVCenter
-        elide: Text.ElideRight
+        wrapMode: Text.Wrap
     }
-    indicator: Text {
+    indicator: Miilo.TypeText { typography: context.theme.typography;
         x: control.width - width - 12
         anchors.verticalCenter: parent.verticalCenter
         text: control.popup.visible ? "▴" : "▾"
@@ -35,14 +38,14 @@ ComboBox {
         required property var modelData
         required property int index
         width: control.width
-        implicitHeight: 40
+        implicitHeight: Math.max(context.theme.typography.touchTarget, contentItem.implicitHeight + 16)
         highlighted: control.highlightedIndex === index
-        contentItem: Text {
+        contentItem: Miilo.TypeText { typography: context.theme.typography;
             text: option.modelData
             color: option.highlighted ? context.theme.focusText : context.theme.foreground
-            font.pixelSize: 13
+            role: "label"
             verticalAlignment: Text.AlignVCenter
-            elide: Text.ElideRight
+            wrapMode: Text.Wrap
         }
         background: Rectangle {
             color: option.down ? context.theme.pressedFill : option.highlighted ? context.theme.focusFill : "transparent"

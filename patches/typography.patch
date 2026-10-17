@@ -1,0 +1,135 @@
+--- /dev/null
++++ b/vendor/owl/MiiloTypeScale.js
+@@ -0,0 +1,19 @@
++// Miilo host typography. Logical units; Qt owns display-density conversion.
++// Host text preferences are independent of widget/grid/robot geometry.
++var DESKTOP = { huge: 32, title: 16, body: 13, small: 12, muted: 13, label: 12 };
++var PHONE = { huge: 34, title: 20, body: 16, small: 14, muted: 16, label: 14 };
++
++function validScale(value) {
++    var number = Number(value);
++    return isFinite(number) && number > 0 ? number : 1;
++}
++
++function size(role, profile, scale) {
++    var roles = profile === 'phone' ? PHONE : DESKTOP;
++    var base = typeof roles[role] === 'number' ? roles[role] : roles.body;
++    return Math.max(1, Math.round(base * validScale(scale)));
++}
++
++function leading(role) {
++    return role === 'title' || role === 'huge' ? 1.25 : 1.45;
++}
+--- /dev/null
++++ b/vendor/owl/MiiloTypography.qml
+@@ -0,0 +1,12 @@
++import QtQuick
++import "MiiloTypeScale.js" as TypeScale
++
++QtObject {
++    property string profile: "desktop"
++    property real textScale: 1
++    readonly property real effectiveScale: TypeScale.validScale(textScale)
++    property string family: Qt.application.font.family
++    readonly property int touchTarget: profile === "phone" ? 48 : 40
++    function size(role) { return TypeScale.size(role, profile, textScale) }
++    function leading(role) { return TypeScale.leading(role) }
++}
+--- a/vendor/owl/OwlHost.qml
++++ b/vendor/owl/OwlHost.qml
+@@ -23,6 +23,9 @@
+   // One OWL dp, in px. A board usually sets OwlWidget.dp from its cell size
+   // instead, so widgets keep the launcher's proportions.
+   property real dp: 1
++  property string typographyProfile: "desktop"
++  // Hosts may bind their accessibility preference here; never multiply by DPR.
++  property real textScale: 1
+ 
+   property string sansFamily: "sans-serif"
+   property string monoFamily: "monospace"
+--- a/vendor/owl/OwlWidget.qml
++++ b/vendor/owl/OwlWidget.qml
+@@ -26,6 +26,10 @@
+   property string errorDir: root.dir + "/.errors"
+   // The shell's side: fonts, actions, media. An OwlHost.
+   property OwlHost host: OwlHost {}
++  property MiiloTypography typography: MiiloTypography {
++    profile: root.host.typographyProfile
++    textScale: root.host.textScale
++  }
+   // name -> ARGB, from OwlTheme.
+   property var palette: ({})
+   // Sources run and animations play only while this is true: the board is up.
+--- a/vendor/owl/OwlNode.qml
++++ b/vendor/owl/OwlNode.qml
+@@ -481,6 +481,8 @@
+   // --------------------------------------------------------------- leaves
+ 
+   readonly property var textStyle: L.style(root.p.style)
++  property MiiloTypography fallbackTypography: MiiloTypography {}
++  readonly property var typography: root.widget && root.widget.typography ? root.widget.typography : fallbackTypography
+   function family(f) {
+     if (!root.widget) return ""
+     return f === "sans" ? root.widget.sansFamily : f === "serif" ? "serif"
+@@ -489,22 +491,21 @@
+ 
+   Component {
+     id: textC
+-    // Sized as the launcher's lines are: Android's system monospace spaces
+-    // lines about 1.17 em apart against this font's 1.32, and a Qt Text keeps
+-    // its font's own height on a single line whatever lineHeight says. So the
+-    // box is lines x 1.17 em, and the glyphs sit centred in each line.
++    // Use measured font height: fallback glyphs must not be clipped.
+     Item {
+       id: textBox
+-      readonly property real line: label.font.pixelSize * 1.17
++      readonly property real line: label.font.pixelSize * root.typography.leading(root.p.style)
+       implicitWidth: label.implicitWidth
+-      implicitHeight: Math.max(1, label.lineCount) * textBox.line
++      implicitHeight: label.implicitHeight
+       Text {
+         id: label
+         width: parent.width
+         anchors.verticalCenter: parent.verticalCenter
+         text: root.p.text === undefined || root.p.text === null ? "\u2026" : String(root.p.text)
+         color: root.p.color || (root.widget ? root.widget.ink(root.textStyle[1] ? "muted" : "foreground") : "white")
+-        font.pixelSize: Math.max(1, L.num(root.p.fontSize, root.textStyle[0]) * root.dp)
++        font.pixelSize: root.p.fontSize === undefined ? root.typography.size(root.p.style)
++          : Math.max(1, Math.round(L.num(root.p.fontSize, 13) * root.typography.effectiveScale))
++        textFormat: Text.PlainText
+         font.weight: root.p.bold === true ? Font.Bold : Font.Normal
+         font.italic: root.p.italic === true
+         font.family: root.family(root.p.font)
+@@ -541,7 +542,7 @@
+         anchors.centerIn: parent
+         text: root.p.text === undefined || root.p.text === null ? "…" : String(root.p.text)
+         color: root.p.color || (root.widget ? root.widget.ink("accent") : "white")
+-        font.pixelSize: 13 * root.dp
++        font.pixelSize: root.typography.size("body")
+         font.family: root.family("mono")
+       }
+     }
+@@ -794,7 +795,8 @@
+         anchors.margins: 6 * root.dp
+         verticalAlignment: TextInput.AlignVCenter
+         color: root.p.color || (root.widget ? root.widget.ink("foreground") : "white")
+-        font.pixelSize: L.num(root.p.fontSize, 14) * root.dp
++        font.pixelSize: root.p.fontSize === undefined ? root.typography.size("body")
++          : Math.max(1, Math.round(L.num(root.p.fontSize, 13) * root.typography.effectiveScale))
+         font.family: root.family("sans")
+         clip: true
+         text: root.p.text === undefined || root.p.text === null || root.p.text === "…" ? "" : String(root.p.text)
+--- a/vendor/owl/UPSTREAM.md
++++ b/vendor/owl/UPSTREAM.md
+@@ -10,3 +10,11 @@
+ Interactive OwlNode elements support Tab focus, Enter/Space activation, and
+ compact focus markers; text inputs participate in Tab navigation.
+ Local hosts and integration live one directory up.
++
++Miilo typography patch: shared semantic desktop/phone roles and a host text-scale
++port, independent of grid dp and device-pixel ratio. OwlNode measures multiline
++text height, gives body text additional leading and renders observation text
++literally. Explicit OWL fontSize remains an authored logical-size override; it
++still follows the host text scale. New MiiloTypography.qml/MiiloTypeScale.js are
++Miilo-authored additions. Android Compose/Omalauncher is a separate renderer and
++requires its own host integration and on-device acceptance.

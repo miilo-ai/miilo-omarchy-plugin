@@ -41,3 +41,46 @@ stale workflow, partial sources and observer updates. Use a harmless fixture fir
 then record real configured Gemma inference, exact model and first-token latency.
 Portable helper tests are not native proof. Do not publish or submit a marketplace
 entry from this handoff. Preserve user configuration and existing widgets.
+
+## Stream-state checkpoint — 2026-10-17
+
+`ui/components/chat/StreamState.js` now provides the native presentation state
+port. It has no process, network, credentials, persistence or action authority.
+The visible panel and process adapter are still pending; M3 remains unchecked.
+
+Host integration contract:
+
+- Create one state per open conversation. `select(state, focusOrNull)` copies the
+  opaque target and resets on a work/revision change; terminate the old helper
+  when it returns true. Close/disable must cancel, terminate and discard state.
+- Generate a unique request ID for every turn, including retry. `begin` returns
+  the SDK-shaped request; send its JSON on stdin using an argument-array process
+  and close stdin after writing. Never interpolate the question into a command.
+- Capture that ID on the process instance. Feed complete NDJSON lines through
+  `receive(state, capturedId, line)`, and process completion/failure through
+  `exited(state, capturedId)`. Both ports ignore callbacks from older processes.
+- `cancel` invalidates state before the host terminates the owned process. A
+  failed receive that leaves phase `incomplete` also requires termination.
+  Display partial text as incomplete; only `done` means success, regardless of
+  exit status. Unknown events and broken ordering fail closed.
+- Render `context` separately from `answer`, including source status and omitted
+  count. Do not interpret generated text as reference metadata or action requests.
+- Mutations are plain JavaScript; a QML adapter must notify bindings explicitly
+  after each update. No QML execution or host notification behavior is proven here.
+
+History contains only completed turn pairs, capped at eight messages. The SDK
+caps each history message at 4,000 Unicode characters whereas helper output can
+reach 64,000 bytes. An oversized completed answer stays visible but clears the
+next request's history, avoiding invalid requests or silently truncated evidence.
+The panel should disclose that history reset. Error bodies are not displayed.
+
+Evidence: `make check` passes manifest/provenance/import checks, six Python
+package tests, onboarding checks and the chat suite. `node tests/chat.test.mjs`
+individually reports six passing tests covering incremental text/context,
+cancel/retry/late callbacks, target revision changes, missing/invalid terminal
+events, bounded history/output and malformed input. `git diff --check` passes.
+These are portable state tests, not native shell, process-stream or model proof.
+Example Lab/Semantica tools were unavailable; no shared memory read/write occurred.
+
+Next: implement the per-process Quickshell adapter and shared presentation port,
+then wire the panel with setup access and run actual-host M3/M4 acceptance.

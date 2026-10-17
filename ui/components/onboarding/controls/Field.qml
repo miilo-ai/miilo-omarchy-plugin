@@ -6,11 +6,16 @@ import QtQuick.Layouts
 TextField {
     required property var context
     id: field
+    Layout.minimumWidth: 0
+    Layout.preferredWidth: 180
     Layout.fillWidth: true
     color: context.widget.ink("foreground")
     placeholderTextColor: context.widget.ink("muted")
     selectionColor: context.theme.selectionFill
     selectedTextColor: context.widget.ink("foreground")
+    font.family: context.theme.typography.family
+    font.pixelSize: context.theme.typography.size("body")
+    implicitHeight: Math.max(context.theme.typography.touchTarget, contentHeight + topPadding + bottomPadding)
     selectByMouse: true
     background: Rectangle {
         color: field.activeFocus ? context.theme.focusFill : context.widget.ink("lighter_background")

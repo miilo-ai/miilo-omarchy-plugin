@@ -29,8 +29,10 @@
     {
       "source": "desktop/runtime/OwlHost.qml",
       "path": "vendor/owl/OwlHost.qml",
-      "sha256": "0951f2156952807175f3a9b54d43d475d21a6511c89bef4849053fa30be734e5",
-      "patches": []
+      "sha256": "ac4d0cfa508fa8e58d6115fd907d31d146fe1033717090d73d9649b6109673c8",
+      "patches": [
+        "patches/typography.patch"
+      ]
     },
     {
       "source": "desktop/runtime/OwlLayout.js",
@@ -41,8 +43,10 @@
     {
       "source": "desktop/runtime/OwlNode.qml",
       "path": "vendor/owl/OwlNode.qml",
-      "sha256": "e9cacf3ed27a64a0cef0c445103739e3d9cf376753729d33355dcb3c1c0a842c",
-      "patches": []
+      "sha256": "f4f85e5b206fc7d3bfea8b2069ffc03b9f1804a13484d8f2425961879755a661",
+      "patches": [
+        "patches/typography.patch"
+      ]
     },
     {
       "source": "desktop/runtime/OwlSource.qml",
@@ -59,14 +63,18 @@
     {
       "source": "desktop/runtime/OwlWidget.qml",
       "path": "vendor/owl/OwlWidget.qml",
-      "sha256": "e4fe901e142265053b6f22dd9f3f580eb631eecc7573c4d9373cad24c69480a0",
-      "patches": []
+      "sha256": "81a614b6e3943cb08854435ada11b819d6e2db43c969769f5659720fde3e9b9b",
+      "patches": [
+        "patches/typography.patch"
+      ]
     },
     {
       "source": "desktop/runtime/UPSTREAM.md",
       "path": "vendor/owl/UPSTREAM.md",
-      "sha256": "3033fe6bdba87eb52d90e281a8562a1453b29cfa384e01eac64e2c765da4d540",
-      "patches": []
+      "sha256": "bf137fa1d0330a25d1351e6a4150ef2333c952e4255b817a7a35b3dccef92c71",
+      "patches": [
+        "patches/typography.patch"
+      ]
     },
     {
       "source": "desktop/runtime/owl-source",
@@ -79,6 +87,22 @@
       "path": "LICENSE",
       "sha256": "bc2ed798c89325ee276fba7a56f86be7dca75446beab17134d82f1815976e839",
       "patches": []
+    },
+    {
+      "source": "desktop/runtime/MiiloTypeScale.js",
+      "path": "vendor/owl/MiiloTypeScale.js",
+      "patches": [
+        "patches/typography.patch"
+      ],
+      "sha256": "8988b781ad2b3128e5bf526a66f15a8e2a71043d46f306cef6568d365ad52f2f"
+    },
+    {
+      "source": "desktop/runtime/MiiloTypography.qml",
+      "path": "vendor/owl/MiiloTypography.qml",
+      "patches": [
+        "patches/typography.patch"
+      ],
+      "sha256": "1ce763192ff5a13a1034afef54e3b74a464a492fdfa7203c5d7c227f735911ab"
     }
   ],
   "authoredUiOrigin": {
