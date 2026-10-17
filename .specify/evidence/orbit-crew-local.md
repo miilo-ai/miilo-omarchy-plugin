@@ -30,3 +30,7 @@ saved-color fixture. Shared-source exact-frame parity has 54 passing comparisons
 Smooth rail follow-up: the shared asset now uses one unwarped ellipse for the
 rail, work positions and light. Updated actual Qt fixture screenshot inspected;
 shared equation/seam and renderer regressions passed. Native gates are unchanged.
+
+Readability update: shared asset has the original center robot at 93 dp, explicit
+task counts and one combined filter/view row. Actual Qt 900/360 px renders and
+selection checks passed. Matching wide/narrow fixture previews are committed.

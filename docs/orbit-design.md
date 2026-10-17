@@ -57,3 +57,8 @@ Robot identity correction: onboarding now executes assets/RobotProgram.js genera
 from the exact original shared Bot source. RobotPortrait.qml only supplies theme,
 size, saved colors and a clock to the existing OWL painter; it draws no independent
 character geometry. Previews above have been refreshed to show that correction.
+
+The combined filter/view row and larger original center robot are also checked
+at narrow width:
+
+![Narrow Orbit fixture](images/orbit-narrow-qt-fixture.png)
