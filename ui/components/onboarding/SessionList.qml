@@ -39,7 +39,7 @@ ListView {
         readonly property bool cursor: view.activeFocus && view.currentIndex === index
         checked: modelData.header ? groupSessions.length > 0 && groupSessions.every(s => controller.selected.indexOf(s.kind + ":" + s.id) >= 0) : controller.selected.indexOf(modelData.session.kind + ":" + modelData.session.id) >= 0
         onClicked: { view.currentIndex = index; view.forceActiveFocus(); controller.activateRow(view.currentIndex); }
-        implicitHeight: modelData.header ? 48 : 64
+        implicitHeight: modelData.header ? 52 : 60
         background: Rectangle {
             color: choice.down ? view.theme.pressedFill : choice.cursor ? view.theme.focusFill : choice.checked || choice.partial ? view.theme.selectedFill : choice.hovered ? view.theme.hoverFill : choice.modelData.header ? view.widget.ink("lighter_background") : "transparent"
             Rectangle { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; width: 3; height: 24; visible: choice.cursor; color: view.theme.accent }
@@ -73,12 +73,23 @@ ListView {
                 color: view.theme.accent
             }
         }
+        RobotPortrait {
+            visible: choice.modelData.header
+            anchors.left: parent.left
+            anchors.leftMargin: 38
+            anchors.verticalCenter: parent.verticalCenter
+            width: 32
+            height: 32
+            ink: view.widget.ink("foreground")
+            accent: view.widget.ink("accent")
+            motion: "off"
+        }
         contentItem: Column {
-            leftPadding: 42
+            leftPadding: choice.modelData.header ? 82 : 42
             spacing: 3
             Text {
                 width: parent.width - (choice.modelData.header ? 76 : 32)
-                text: choice.modelData.header ? (controller.collapsed[choice.modelData.name] ? "▸ " : "▾ ") + choice.modelData.name + " (" + choice.modelData.count + ")" : choice.modelData.session.name || "Unnamed session"
+                text: choice.modelData.header ? choice.modelData.name + " (" + choice.modelData.count + ")" : choice.modelData.session.name || "Unnamed session"
                 elide: Text.ElideRight
                 color: choice.cursor ? view.theme.focusText : view.theme.foreground
                 font.pixelSize: 14

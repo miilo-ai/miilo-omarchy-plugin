@@ -1,11 +1,11 @@
 {
   "repository": "https://github.com/EdyVision/miilo-owl-widgets",
-  "revision": "dfc04105b298a17d4cd6c724009423796da142fc",
+  "revision": "bb218cc5d83a9e3b755953c961f5cd331a02c7fa",
   "files": [
     {
       "source": "70-miilo-fleet.owl",
       "path": "assets/70-miilo-fleet.owl",
-      "sha256": "b24dfa78dede559458a26e0b3307164cc1697a8068036b956943f9506ee2d86b",
+      "sha256": "cf8cc87ad8cd081f671d985cde3f5835e2df80d90b0d7671df4a15f800d08d0b",
       "patches": []
     },
     {
@@ -23,7 +23,7 @@
     {
       "source": "desktop/runtime/OwlCanvas.qml",
       "path": "vendor/owl/OwlCanvas.qml",
-      "sha256": "e2f05af133ec6eab6c5cb643780516496ee2dc3530a955470665222e2b5f6e5c",
+      "sha256": "7d21e813fa00974b95c67bf6a0c4cdfb76156d6e7e7a883dd4996dd460b7ece7",
       "patches": []
     },
     {
@@ -65,7 +65,7 @@
     {
       "source": "desktop/runtime/UPSTREAM.md",
       "path": "vendor/owl/UPSTREAM.md",
-      "sha256": "3033fe6bdba87eb52d90e281a8562a1453b29cfa384e01eac64e2c765da4d540",
+      "sha256": "24df4eeaa6c510260d0ea2481edc4cd6923804c0d459b2112e2c2b557d94009e",
       "patches": []
     },
     {
@@ -87,7 +87,8 @@
     "changes": [
       "Separate shell/components/vendor/assets.",
       "Split onboarding controller, command adapter, views and controls.",
-      "Qualify Commons.Color for Qt 6.12."
+      "Qualify Commons.Color for Qt 6.12.",
+      "Original robot welcome crew, compact expandable agent rows and robot group markers; Orbit asset pin."
     ]
   }
 }

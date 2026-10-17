@@ -108,3 +108,12 @@ verify the actually installed helper connects to an eligible compressed CE
 response, with existing action/session behavior preserved. SSE/voice stay
 uncompressed; ordinary UI and onboarding semantics are unchanged. Physical
 Android/Omarchy performance and installed release artifacts remain native gates.
+
+## Orbit / Crew candidate
+
+See ../specs/005-orbit-onboarding/spec.md and ../evidence/orbit-crew-local.md.
+Pull matching main assets after preserving local native edits. New robot invitation,
+compact expandable agent rows and group portraits are implemented. Shared Orbit
+uses existing helper snapshots; no new CLI generation command is needed. Start
+with actual shell screenshots and close/open/focus, then measure frame cost.
+Local Qt fixtures are available via make render-design but are not shell acceptance.

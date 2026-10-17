@@ -2,35 +2,37 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Quickshell
 import "controls" as Controls
 
-ColumnLayout {
+ScrollView {
     id: view
     required property var controller
     required property var widget
     required property var theme
     readonly property var context: view
     Layout.fillWidth: true
-    spacing: 14
-    Repeater {
-        model: controller.agents
-        delegate: ColumnLayout {
-            required property var modelData
+    Layout.fillHeight: true
+    clip: true
+    contentWidth: availableWidth
+    ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+    ColumnLayout {
+        width: view.availableWidth
+        spacing: 6
+        Repeater {
+            model: view.controller.agents
+            delegate: AgentSetupRow {
+                required property var modelData
+                agent: modelData
+                widget: view.widget
+                theme: view.theme
+            }
+        }
+        Text {
+            visible: view.controller.agents.length === 0
             Layout.fillWidth: true
-            spacing: 4
-            Text {
-                text: modelData.name + (modelData.observationSupported ? "" : " · import not available yet")
-                color: view.widget.ink("foreground")
-                font.pixelSize: 14
-            }
-            Text {
-                Layout.fillWidth: true
-                text: (modelData.locations || []).map(p => p.replace(Quickshell.env("HOME"), "~")).join(" · ") || "Installed command found"
-                color: view.widget.ink("muted")
-                font.pixelSize: 12
-                wrapMode: Text.WrapAnywhere
-            }
+            text: "No local setups detected. You can still choose a project directory."
+            color: view.widget.ink("muted")
+            wrapMode: Text.WordWrap
         }
     }
 }

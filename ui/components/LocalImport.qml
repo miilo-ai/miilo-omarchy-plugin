@@ -35,21 +35,14 @@ FocusScope {
     Rectangle { anchors.fill: parent; color: root.widget.ink("background") }
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 24
-        spacing: 16
-        Text {
-            Layout.fillWidth: true
-            text: flow.mode === "invite" ? "I found your local agent setups" : flow.mode === "importing" ? "Importing selected sessions…" : flow.mode === "group" ? "Define an agent group" : "Import local agents"
-            color: root.widget.ink("foreground")
-            font.pixelSize: 22
-            wrapMode: Text.WordWrap
-        }
-        Text {
-            Layout.fillWidth: true
-            text: flow.mode === "invite" ? "Would you like to import them into Miilo?" : flow.mode === "importing" ? "Starting local observation and saving your Miilo connection." : flow.mode === "group" ? "Match projects within a folder. * matches any text; ? matches one character." : "↑/↓ navigate · Space selects · Enter folds groups · Ctrl+G adds a group"
-            color: root.widget.ink("foreground")
-            font.pixelSize: 14
-            wrapMode: Text.WordWrap
+        anchors.margins: 18
+        spacing: 10
+        Onboarding.CrewHeader {
+            widget: root.widget
+            active: root.active && root.visible
+            failed: !!flow.error
+            title: flow.mode === "invite" ? "Your local crew" : flow.mode === "importing" ? "Connecting your crew" : flow.mode === "group" ? "Define an agent group" : "Choose your sessions"
+            subtitle: flow.mode === "invite" ? "Choose which sessions Miilo observes." : flow.mode === "importing" ? "Saving your selection and starting local observation." : flow.mode === "group" ? "Match projects within a folder. * matches any text; ? matches one character." : "Space selects · Enter folds groups · Ctrl+G adds a group"
         }
         Onboarding.AgentInvitation { visible: flow.mode === "invite"; Layout.fillWidth: true; controller: flow; widget: root.widget; theme: root.theme }
         RowLayout {
@@ -96,7 +89,7 @@ FocusScope {
             wrapMode: Text.WordWrap
         }
         Item {
-            visible: flow.mode !== "review" && flow.mode !== "group"
+            visible: flow.mode !== "review" && flow.mode !== "group" && flow.mode !== "invite"
             Layout.fillHeight: true
         }
         Text {

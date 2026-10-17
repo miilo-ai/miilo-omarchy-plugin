@@ -1,3 +1,4 @@
+PYTHON ?= python3
 .PHONY: check check-native
 check:
 	python3 tools/check.py
@@ -7,3 +8,7 @@ check:
 
 check-native: check
 	bash tools/check-native.sh
+
+.PHONY: render-design
+render-design:
+	$(PYTHON) tools/render-crew.py

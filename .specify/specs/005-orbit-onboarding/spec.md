@@ -1,6 +1,7 @@
 # NATIVE-ORBIT-001 — Orbit hosting and lively local-agent onboarding
 
-Status: specified, not implemented. Date: 2026-10-17.
+Status: initial UI candidate implemented; native Omarchy acceptance pending.
+Date: 2026-10-17. See ../../evidence/orbit-crew-local.md.
 Read ../002-plugin-layout/plan.md and ../../handoffs/omarchy-agent.md first.
 Shared animation authority: ORBIT-001 in miilo-owl-widgets. This plugin consumes
 its versioned output; it does not create another observer, codec or provider policy.
