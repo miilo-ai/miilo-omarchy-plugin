@@ -1,11 +1,11 @@
 {
   "repository": "https://github.com/EdyVision/miilo-owl-widgets",
-  "revision": "c7c450a852020206186c2a050a8cc7a17d0c9a55",
+  "revision": "ba941fff3e99304cb1d045abc2900a4f28f6d64c",
   "files": [
     {
       "source": "70-miilo-fleet.owl",
       "path": "assets/70-miilo-fleet.owl",
-      "sha256": "8771a42478414af7d835115de49595eca977a62fb9b7345f18990b6ac6fda4d2",
+      "sha256": "3fad09d75d2f84d26036a91ba5d5e5229dc2f6759d713929ee2ea034495540f6",
       "patches": []
     },
     {
@@ -83,7 +83,7 @@
     {
       "source": "desktop/RobotProgram.js",
       "path": "assets/RobotProgram.js",
-      "sha256": "381a810724f688a4580d945ec095467a7cea22f25a7a89a9b081a61bcebc053b",
+      "sha256": "6af8640c6b07fe5e3bfd1efc81545650eb2c15f5c7dc662ca3a4b319e361471f",
       "patches": []
     }
   ],
