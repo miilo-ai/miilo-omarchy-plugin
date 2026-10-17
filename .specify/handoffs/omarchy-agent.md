@@ -1,6 +1,6 @@
 # Native agent handoff
 
-Work in `miilo-ai/miilo-omarchy-plugin`. Its new `main` branch has a clean history.
+Work in `miilo-ai/miilo-omarchy-plugin`. The canonical development branch is `main`.
 Do not reset your existing work. Review and port relevant newer QML changes with
 attribution. The canonical marketplace ID is `io.miilo.bar`; the default manifest
 declares only `bar-widget`, with the dashboard loaded internally.

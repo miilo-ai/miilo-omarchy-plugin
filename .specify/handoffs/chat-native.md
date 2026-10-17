@@ -80,7 +80,6 @@ individually reports six passing tests covering incremental text/context,
 cancel/retry/late callbacks, target revision changes, missing/invalid terminal
 events, bounded history/output and malformed input. `git diff --check` passes.
 These are portable state tests, not native shell, process-stream or model proof.
-Example Lab/Semantica tools were unavailable; no shared memory read/write occurred.
 
 Next: implement the per-process Quickshell adapter and shared presentation port,
 then wire the panel with setup access and run actual-host M3/M4 acceptance.

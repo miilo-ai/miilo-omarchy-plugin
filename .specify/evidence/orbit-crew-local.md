@@ -19,8 +19,8 @@ synthetic agents, no real import or process call. No screenshots claim to be cap
 from an installed Omarchy shell. Physical host typography/theme, lifecycle, touch,
 keyboard, focus return, performance and native Android remain pending.
 
-Reported extra native typography edits were not visible on the fetched remote main
-heads before this increment. Native agent must reconcile them, not silently discard.
+The inspected source baseline did not include concurrent typography changes.
+Integrate those changes before installed-host validation.
 
 Original robot correction: the simplified QML character is removed. Portraits
 execute the pinned shared Bot program through the existing OWL evaluator/painter.

@@ -1,7 +1,7 @@
 # Shared user configuration checkpoint — 2026-10-17
 
 Coordinated source candidate across SDK, CLI, widgets helper and native plugin.
-User requested `~/.miilo/` following other agent tools. No real user migration,
+The user configuration root is `~/.miilo/`. No real user migration,
 installation, collector change or desktop restart was performed in this session.
 
 ## Outcome

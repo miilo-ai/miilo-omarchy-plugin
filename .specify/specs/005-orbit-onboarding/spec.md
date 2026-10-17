@@ -11,10 +11,9 @@ its versioned output; it does not create another observer, codec or provider pol
 Current main uses ui/components/LocalImport.qml as coordinator and
 ui/components/onboarding/AgentInvitation.qml for a text-only invitation list.
 The legacy desktop/LocalImport.qml in widgets is not this plugin's layout authority.
-Upstream main was checked at a63ca81; shared widgets at c5cf3e2. New typography work
-reported on another workstation was not visible on these remote main heads.
-Before editing, reconcile that agent's working tree/commit. Preserve its typography
-improvements, controller state, shortcuts, consent, grouping and native fixes.
+Source baseline: native plugin a63ca81; shared widgets c5cf3e2. Integrate newer
+changes through reviewed commits. Preserve typography, controller state,
+shortcuts, consent, grouping and native fixes.
 Do not merge or overwrite an unknown in-progress branch automatically.
 
 ## Design: a welcome crew, not a wizard billboard
@@ -88,7 +87,7 @@ Runtime patches must be explicit, attributed and tested, not silent vendor drift
 
 ## Validation checkpoints
 
-- [x] Reconcile other agent's typography/native commit; record resulting revisions.
+- [x] Integrate typography/native changes; record resulting revisions.
 - [ ] Fixture screenshots: none, supported-only, mixed supported/discovery-only,
       multiple locations, discovery failure, busy import, empty review and many sessions.
 - [ ] Header robot appears in invite/review/importing/error; motion follows settings.

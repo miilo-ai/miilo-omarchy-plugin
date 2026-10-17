@@ -9,15 +9,15 @@ Onboarding now has an original robot header, compact agent rows and expandable
 locations. Agent rows distinguish review availability from detection-only; neither
 means connected. Session selection, grouping, future enrollment opt-in, credentials
 and command/controller boundaries remain unchanged. Review groups also have small
-static robot markers. The active native agent must reconcile any additional local
-typography changes before updating an installed checkout.
+static robot markers. Integrate any additional typography changes before updating
+an installed checkout.
 
 ## Local checks
 
 Run make check. Optional real Qt component render (developer dependency only):
 
 ```sh
-uv run --with PySide6-Essentials python tools/render-crew.py /tmp/miilo-crew-preview
+node tools/render-crew.cjs /tmp/miilo-crew-preview
 ```
 
 This executes actual QML and a row click, captures dark/expanded/narrow-light states
@@ -69,8 +69,8 @@ at narrow width:
 
 [MP4 recording](images/orbit-crossed-qt-fixture.mp4). Both atom planes gently sweep around the centered original robot; their open
 nucleus stays clear. Stable system offsets, subtle neon and muted dormant rings
-match the approved motion study. Task dots stay on their assigned projected rail.
-State labels now carry small accent-colored icons. Reduced/Off or stale sources
+use the shared projection. Task dots stay on their assigned projected rail.
+Compact task rows use one themed state icon and a truncated title. Reduced/Off or stale sources
 freeze orbital motion. The original shared robot and work detail actions remain.
 
 This deterministic software Qt recording demonstrates geometry and layout, not

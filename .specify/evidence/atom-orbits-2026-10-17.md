@@ -2,8 +2,8 @@
 
 Canonical widget revision: 0951319. The plugin pins the full immutable revision
 in sources.lock.json and copies the generated fleet/portrait assets unchanged.
-All vendored runtime files match that revision, including the other agent's
-reconciled typography work. Typography no longer needs an additional patch at
+All vendored runtime files match that revision, including the integrated
+typography changes. Typography no longer needs an additional patch at
 this revision; patches/typography.patch is retained as historical provenance.
 No provider, authentication, collector or action protocol is changed.
 

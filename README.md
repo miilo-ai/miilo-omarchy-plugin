@@ -1,11 +1,34 @@
-# Miilo for Omarchy
+<h1 align="center">Miilo for Omarchy</h1>
+
+<p align="center">
+  <img alt="QML" src="https://img.shields.io/badge/QML-267b36?style=flat-square&amp;logo=qt&amp;logoColor=white" />
+  <img alt="JavaScript" src="https://img.shields.io/badge/JavaScript-675b00?style=flat-square&amp;logo=javascript&amp;logoColor=white" />
+  <img alt="Qt" src="https://img.shields.io/badge/Qt-267b36?style=flat-square&amp;logo=qt&amp;logoColor=white" />
+  <img alt="Omarchy" src="https://img.shields.io/badge/Omarchy-346a74?style=flat-square" />
+  <img alt="Linux" src="https://img.shields.io/badge/Linux-343434?style=flat-square&amp;logo=linux&amp;logoColor=white" />
+</p>
 
 Your agents, with a little personality. An Omarchy bar plugin that opens Miilo's
 robot fleet, searchable work, explanations and supported provider actions.
 
-This is a separate plugin repository with a clean Git history. It imports a
-recorded renderer snapshot; it does not contain the Miilo backend, agent engine,
-credentials, or the history of another repository. Native acceptance is pending.
+The plugin consumes a versioned shared renderer and delegates observation to the
+native helper. Provider credentials and execution remain outside the UI.
+Installed Omarchy acceptance is pending.
+
+## Preview
+
+<p align="center">
+  <img src="docs/images/orbit-crossed-qt-fixture.gif" alt="Miilo robots in Tokyo Night Orbit: compact tasks beside working and resting systems" width="720" />
+</p>
+
+<p align="center"><sub>Native Qt render · sample systems and tasks · installed-host acceptance is separate.</sub></p>
+
+<details>
+<summary>Inspect evidence and file changes</summary>
+
+<p align="center"><img src="docs/images/task-inspection.png" alt="Expanded task evidence, verification output, and colored file changes" width="520" /></p>
+
+</details>
 
 ## Install
 

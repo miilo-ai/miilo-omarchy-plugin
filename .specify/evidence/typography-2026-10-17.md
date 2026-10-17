@@ -46,8 +46,7 @@ accessibility settings. No complete cross-platform accessibility claim is made.
 
 A new Cargo xtask build is blocked by the read-only default Cargo Git cache;
 using the existing binary for its current-source evaluator tests is disclosed
-above. No binary rebuild or release is claimed. Example Lab tools were not exposed;
-no shared-memory handoff was read or saved.
+above. No binary rebuild or release is claimed.
 
 Next: apply the backed-up update on the user's desktop, inspect both themes and
 font sizes with actual focus/keyboard behavior, then integrate/qualify the phone
