@@ -25,11 +25,13 @@ ItemDelegate {
     contentItem: RowLayout {
         spacing: 10
         RobotPortrait {
+            widget: root.widget
+            agentKey: "setup-" + root.agent.name
             Layout.preferredWidth: 38
             Layout.preferredHeight: 38
             ink: root.widget.ink("foreground")
             accent: root.widget.ink(root.agent.observationSupported ? "accent" : "muted")
-            expression: root.agent.observationSupported ? "curious" : "resting"
+            expression: "ready"
             motion: "off"
         }
         ColumnLayout {

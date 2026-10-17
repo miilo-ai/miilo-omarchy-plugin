@@ -52,3 +52,8 @@ These are actual Qt renders with synthetic inventory, not the installed Omarchy 
 ![Compact robot invitation](images/crew-qt-fixture.png)
 
 ![Narrow light invitation](images/crew-light-qt-fixture.png)
+
+Robot identity correction: onboarding now executes assets/RobotProgram.js generated
+from the exact original shared Bot source. RobotPortrait.qml only supplies theme,
+size, saved colors and a clock to the existing OWL painter; it draws no independent
+character geometry. Previews above have been refreshed to show that correction.

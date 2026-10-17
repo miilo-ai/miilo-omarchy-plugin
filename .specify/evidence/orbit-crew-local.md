@@ -21,3 +21,8 @@ keyboard, focus return, performance and native Android remain pending.
 
 Reported extra native typography edits were not visible on the fetched remote main
 heads before this increment. Native agent must reconcile them, not silently discard.
+
+Original robot correction: the simplified QML character is removed. Portraits
+execute the pinned shared Bot program through the existing OWL evaluator/painter.
+Actual Qt dark/expanded/narrow-light renders and row click passed, including a
+saved-color fixture. Shared-source exact-frame parity has 54 passing comparisons.

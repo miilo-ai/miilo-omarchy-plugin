@@ -74,6 +74,8 @@ ListView {
             }
         }
         RobotPortrait {
+            widget: view.widget
+            agentKey: "group-" + choice.modelData.name
             visible: choice.modelData.header
             anchors.left: parent.left
             anchors.leftMargin: 38

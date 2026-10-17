@@ -1,4 +1,5 @@
 import QtQuick
+import "../../vendor/owl/Owl.js" as Owl
 import QtQuick.Controls
 import "../../ui/components/onboarding/controls" as Controls
 import QtQuick.Layouts
@@ -8,7 +9,8 @@ Window {
  id: root; width: 680; height: 480; visible: true
  property bool light: false
  color: light ? "#faf5ee" : "#16151d"
- QtObject { id: fakeWidget; property int frame:0; property var instance:null; property var program:null
+ QtObject { id: fakeWidget; property int frame:0; property var instance: ({read:i => i === 0 ? Owl.fromJson([{key:"welcome",color:2}]) : "off"}); property var program: ({globals:[{name:"robotColors"},{name:"robotMotion"}]})
+  property var palette: Owl.themeFromToml('background="' + root.color + '"\nforeground="' + (root.light?"#28232e":"#eeeaf4") + '"\naccent="#ac9cf5"\npurple="#ac9cf5"\nblue="#75abc9"\ngreen="#86b88c"\norange="#c8966a"\ncyan="#6dbab8"\nred="#d38896"')
   function ink(n) { return ({foreground:root.light?"#28232e":"#eeeaf4",muted:root.light?"#65586b":"#b4aabb",accent:root.light?"#5e469e":"#ac9cf5",red:"#e07785",background:root.color.toString(),selection:"#6e6099"})[n] || "#a69cbb" }
  }
  QtObject { id: fakeController; property var agents: [

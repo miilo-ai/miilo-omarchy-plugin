@@ -1,49 +1,61 @@
 import QtQuick
+import "../../../assets/RobotProgram.js" as RobotProgram
+import "../../../vendor/owl/Owl.js" as Owl
+import "../../../vendor/owl/OwlLayout.js" as Layout
 
-// Original decorative Miilo character. Never represents an enrolled agent.
+// Draw the original shared Bot program. No independent character geometry here.
 Canvas {
     id: root
+    property var widget: null
     property color ink: "white"
     property color accent: ink
-    property string expression: "curious"
+    property string agentKey: "welcome"
+    property string expression: "ready"
     property string motion: "reduced"
     property bool active: true
-    property real clock: 0
+    property real clock: 0.6
+    readonly property var fallbackPalette: Owl.themeFromToml('foreground="' + ink + '"\naccent="' + accent + '"\nbackground="' + (widget ? widget.ink("background") : "#16151d") + '"')
+    readonly property var colors: widget && widget.palette ? widget.palette : fallbackPalette
+    readonly property var program: Owl.compile(RobotProgram.source)
+    readonly property var slots: program.globals.reduce((result, g, i) => { result[g.name] = i; return result }, {})
+    readonly property var instance: new Owl.Instance(program, {
+        theme: name => root.colors[name] === undefined ? null : root.colors[name],
+        tile: name => null,
+        report: message => console.warn("Miilo shared portrait: " + message),
+        changed: () => {}, act: () => {},
+        runInto: () => { throw new Error("A decorative portrait must not run commands") }
+    }, {})
     implicitWidth: 56
     implicitHeight: 56
     Accessible.ignored: true
     FrameAnimation {
-        running: root.active && root.visible && root.motion === "full"
-        onTriggered: root.clock = elapsedTime
+        running: root.active && root.visible && root.motion !== "off"
+        onTriggered: root.clock = elapsedTime + 0.6
     }
     onClockChanged: requestPaint()
-    onInkChanged: requestPaint()
-    onAccentChanged: requestPaint()
+    onColorsChanged: requestPaint()
     onExpressionChanged: requestPaint()
-    onMotionChanged: { clock = 0; requestPaint() }
+    onMotionChanged: { clock = 0.6; requestPaint() }
+    onAgentKeyChanged: requestPaint()
     onWidthChanged: requestPaint()
     onHeightChanged: requestPaint()
+    function setValue(name, value) { instance.values[slots[name]] = Owl.fromJson(value) }
     onPaint: {
+        var s = Math.min(width, height);
+        if (s <= 0) return;
         var c = getContext("2d"); c.reset();
-        var s = Math.min(width,height), x = width/2, y = height*0.44;
-        var t = motion === "full" ? clock : 0;
-        var r = s*.28, blink = t > 0 && t%6.3 < .14;
-        var gaze = expression === "curious" ? Math.sin(t*.55)*r*.09 : 0;
-        function tint(color,a) { return Qt.rgba(color.r,color.g,color.b,a); }
-        c.fillStyle=tint(accent,.07); c.beginPath(); c.arc(x,y,r*1.55,0,Math.PI*2); c.fill();
-        c.strokeStyle=ink; c.lineWidth=1.8; c.lineCap="round";
-        c.beginPath(); c.roundedRect(x-r,y-r*.7,r*2,r*1.55,r*.24,r*.24); c.stroke();
-        c.beginPath(); c.moveTo(x,y-r*.7); c.lineTo(x,y-r*1.03); c.stroke();
-        c.fillStyle=accent; c.beginPath(); c.arc(x,y-r*1.12,r*.1,0,Math.PI*2); c.fill();
-        for (var side=-1;side<=1;side+=2) {
-            var ex=x+side*r*.36+gaze;
-            if (blink || expression === "resting") {
-                c.strokeStyle=accent; c.beginPath(); c.moveTo(ex-r*.12,y); c.lineTo(ex+r*.12,y); c.stroke();
-            } else {
-                c.fillStyle=accent; c.beginPath(); c.arc(ex,y,r*.13,0,Math.PI*2); c.fill();
-            }
+        setValue("portraitAgent", {_key: agentKey, name: "Miilo", status: expression === "failed" ? "failed" : expression === "resting" ? "resting" : "ready", health: "healthy"});
+        setValue("portraitSize", s);
+        setValue("robotMotion", motion);
+        if (widget && widget.instance && widget.program) {
+            var i = widget.program.globals.findIndex(g => g.name === "robotColors");
+            if (i >= 0) setValue("robotColors", Owl.toJson(widget.instance.read(i)));
         }
-        c.strokeStyle=tint(ink,.7); c.beginPath(); c.moveTo(x-r*.2,y+r*.45); c.lineTo(x+r*.2,y+r*.45); c.stroke();
-        c.fillStyle=tint(ink,.28); c.fillRect(x-r*.43,y+r*.91,r*.86,r*.18);
+        instance.invalidate();
+        instance.frame(clock);
+        var canvas = instance.render(false).children.find(node => node.kind === "Canvas");
+        if (!canvas) return;
+        c.translate((width-s)/2, (height-s)/2);
+        Layout.paint(c, canvas.draw(s,s), {foreground: ink}, "sans-serif", null);
     }
 }

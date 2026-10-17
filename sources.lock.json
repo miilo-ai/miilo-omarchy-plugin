@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/EdyVision/miilo-owl-widgets",
-  "revision": "bb218cc5d83a9e3b755953c961f5cd331a02c7fa",
+  "revision": "9aeef61f4605d22bdabbffde38b7ac7933da332a",
   "files": [
     {
       "source": "70-miilo-fleet.owl",
@@ -79,6 +79,12 @@
       "path": "LICENSE",
       "sha256": "bc2ed798c89325ee276fba7a56f86be7dca75446beab17134d82f1815976e839",
       "patches": []
+    },
+    {
+      "source": "desktop/RobotProgram.js",
+      "path": "assets/RobotProgram.js",
+      "sha256": "381a810724f688a4580d945ec095467a7cea22f25a7a89a9b081a61bcebc053b",
+      "patches": []
     }
   ],
   "authoredUiOrigin": {
@@ -88,7 +94,8 @@
       "Separate shell/components/vendor/assets.",
       "Split onboarding controller, command adapter, views and controls.",
       "Qualify Commons.Color for Qt 6.12.",
-      "Original robot welcome crew, compact expandable agent rows and robot group markers; Orbit asset pin."
+      "Original robot welcome crew, compact expandable agent rows and robot group markers; Orbit asset pin.",
+      "Replace simplified portrait with exact generated shared Bot program; native adapter contains no robot geometry."
     ]
   }
 }

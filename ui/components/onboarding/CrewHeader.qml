@@ -17,6 +17,8 @@ RowLayout {
     spacing: 10
     Layout.fillWidth: true
     RobotPortrait {
+        widget: root.widget
+        expression: root.failed ? "failed" : "ready"
         Layout.preferredWidth: 64
         Layout.preferredHeight: 64
         ink: root.widget.ink("foreground")
