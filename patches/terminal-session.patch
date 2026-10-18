@@ -1,0 +1,30 @@
+diff --git a/vendor/owl/OwlTerminal.qml b/vendor/owl/OwlTerminal.qml
+index 9bd7a7f..7b93d32 100644
+--- a/vendor/owl/OwlTerminal.qml
++++ b/vendor/owl/OwlTerminal.qml
+@@ -21,6 +21,7 @@ Rectangle {
+ 
+   property var node: null
+   property var widget: null
++  property bool sessionActive: !!root.widget && root.widget.active
+ 
+   readonly property var p: root.node && root.node.p ? root.node.p : ({})
+   readonly property real dp: root.widget ? root.widget.dp : 1
+@@ -94,7 +95,7 @@ Rectangle {
+   // Not before the tile is laid out: stty tells the shell its size once, at
+   // the start, and a session begun at 0x0 would format for 20 columns. A
+   // tile resized later keeps the size it started with; lines still wrap.
+-  readonly property bool wanted: !!root.widget && root.widget.active && root.visible
++  readonly property bool wanted: !!root.widget && root.sessionActive && root.visible
+     && output.width > 40 * root.dp && output.height > 30 * root.dp
+   onWantedChanged: if (root.wanted && !root.started) startLater.restart()
+   Component.onCompleted: if (root.wanted) startLater.restart()
+@@ -176,6 +177,8 @@ Rectangle {
+ 
+     TextInput {
+       id: field
++      objectName: "terminalInput"
++      activeFocusOnTab: true
+       anchors { left: parent.left; right: keys.left; verticalCenter: parent.verticalCenter; leftMargin: 6 * root.dp }
+       color: root.widget ? root.widget.ink("foreground") : "white"
+       font: metrics.font

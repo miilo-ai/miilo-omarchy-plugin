@@ -1,6 +1,6 @@
 // Miilo host typography. Logical units; Qt owns display-density conversion.
 // Host text preferences are independent of widget/grid/robot geometry.
-var DESKTOP = { huge: 32, title: 16, body: 13, small: 12, muted: 13, label: 12 };
+var DESKTOP = { huge: 26, title: 14, body: 12, small: 11, muted: 12, label: 11 };
 var PHONE = { huge: 34, title: 20, body: 16, small: 14, muted: 16, label: 14 };
 
 function validScale(value) {

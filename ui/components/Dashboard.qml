@@ -15,9 +15,14 @@ FloatingWindow {
     property alias surface: surface
     property alias importer: importer
     property int importedCount: 0
+    property bool showingSettings: false
+    function showSettings(section) { surface.closeSettings(); settingsPanel.section = section; showingSettings = true; settingsPanel.forceActiveFocus() }
+    function showSessions() { surface.closeSettings(); showingSettings = false; importer.review() }
+    function back() { if (showingSettings) showingSettings = false; else root.visible = false }
     property QtObject interactionTheme: InteractionTheme { widget: surface.widget }
-    Shortcut { sequence: "Ctrl+L"; enabled: root.visible && !importer.busy; onActivated: importer.review() }
-    Shortcut { sequence: "Escape"; enabled: root.visible && !importer.visible; onActivated: root.visible = false }
+    Shortcut { sequence: "Ctrl+L"; enabled: root.visible && !importer.busy; onActivated: root.showSessions() }
+    Shortcut { sequence: "Escape"; enabled: root.visible && !importer.visible; onActivated: root.back() }
+    Shortcut { sequence: "Ctrl+,"; enabled: root.visible && !importer.busy; onActivated: root.showSettings("appearance") }
     Item {
         anchors.fill: parent
         Rectangle {
@@ -27,48 +32,19 @@ FloatingWindow {
                 left: parent.left
                 right: parent.right
             }
-            height: headerContent.implicitHeight + 16
+            height: headerContent.implicitHeight + 12
             color: surface.widget.ink("background")
-            GridLayout {
+            DesktopToolbar {
                 id: headerContent
-                anchors { left: parent.left; right: parent.right; top: parent.top; margins: 8 }
-                columns: root.compactFleet || width >= 480 * root.interactionTheme.typography.effectiveScale ? 2 : 1
-                TypeText {
-                typography: root.interactionTheme.typography
-                role: "title"
-                Layout.fillWidth: true
-                text: "Miilo"
-                color: surface.widget.ink("foreground")
-            }
-            Button {
-                id: localButton
-                Layout.minimumWidth: 0
-                Layout.fillWidth: headerContent.columns === 1
-                text: root.width < 480 ? "Local agents" : "Local agents · Ctrl+L"
-                focusPolicy: Qt.StrongFocus
-                Keys.onReturnPressed: clicked()
-                implicitHeight: root.interactionTheme.typography.controlHeight(contentItem.implicitHeight, 8)
-                horizontalPadding: 12
-                verticalPadding: 4
-                onClicked: importer.review()
-                enabled: !importer.busy
-                flat: true
-                background: Rectangle {
-                    color: localButton.down ? root.interactionTheme.pressedFill : localButton.activeFocus ? root.interactionTheme.focusFill : localButton.hovered ? root.interactionTheme.hoverFill : "transparent"
-                    border.color: root.interactionTheme.border
-                    border.width: 1
-                    radius: 0
-                    Rectangle { anchors.bottom: parent.bottom; anchors.horizontalCenter: parent.horizontalCenter; width: parent.width - 16; height: 2; visible: localButton.activeFocus; color: root.interactionTheme.accent }
-                }
-                contentItem: TypeText {
-                    typography: root.interactionTheme.typography
-                    role: "label"
-                    text: localButton.text
-                    color: localButton.activeFocus ? root.interactionTheme.focusText : root.interactionTheme.foreground
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-            }
+                anchors { left: parent.left; right: parent.right; top: parent.top; margins: 6 }
+                theme: root.interactionTheme
+                activeSection: root.showingSettings ? settingsPanel.section : ""
+                busy: importer.busy
+                onLocalRequested: root.showSessions()
+                onRemoteRequested: root.showSettings("systems")
+                onRefreshRequested: surface.widget.refresh()
+                onSettingsRequested: section => root.showSettings(section)
+                onSystemsRequested: root.showSettings("filters")
             }
         }
         MiiloSurface {
@@ -81,13 +57,20 @@ FloatingWindow {
             }
             hostTextScale: root.textScale
             hostFontFamily: root.textFamily
-            active: root.visible && !importer.visible
-            visible: !importer.visible
+            active: root.visible && !importer.visible && !root.showingSettings
+            visible: !importer.visible && !root.showingSettings
             expanded: true
-            configureLocal: () => importer.review()
             interactionTheme: root.interactionTheme
             focus: true
-            Keys.onEscapePressed: root.visible = false
+            Keys.onEscapePressed: root.back()
+        }
+        DesktopSettings {
+            id: settingsPanel
+            anchors.fill: surface
+            surface: root.surface
+            theme: root.interactionTheme
+            visible: root.showingSettings
+            onClosed: root.showingSettings = false
         }
         LocalImport {
             id: importer
@@ -95,7 +78,8 @@ FloatingWindow {
             widget: surface.widget
             theme: root.interactionTheme
             active: root.visible
-            onVisibleChanged: if (!visible && root.visible) localButton.forceActiveFocus()
+            suspended: root.showingSettings
+            onVisibleChanged: if (!visible && root.visible) headerContent.focusAdd()
             onConnected: count => {
                 root.importedCount = count;
                 surface.widget.refresh();

@@ -15,10 +15,10 @@ function fixture(){
   const workItems=providers.map((p,i)=>({_key:`w${i}`,id:`w${i}`,providerId:p.id,title:`Work ${i}`,lifecycle:i===8?'active':'waiting',phase:'implementing',attention:'none',_actorKeys:[`a${i}`],_revisionKey:'r1',actions:[]}));
   return {configured:true,errors:[],snapshot:{providers,actors,workItems,attention:[]}};
 }
-function scene(data,saved={}){
+function scene(data,saved={},viewport={}){
   const errors=[],palette=Owl.themeFromToml('');
   const instance=new Owl.Instance(program,{
-    theme:k=>palette[k]??null,tile:k=>({linux:true,tileWidth:260,tileHeight:180,screenWidth:900,screenHeight:760})[k]??null,
+    theme:k=>palette[k]??null,tile:k=>({linux:true,tileWidth:260,tileHeight:180,screenWidth:900,screenHeight:760,...viewport})[k]??null,
     report:e=>errors.push(e),changed(){},act(){},runInto(){throw Error('Visibility must not invoke a provider');}
   },{observatoryView:'orbit',...saved});
   const slot=k=>program.globals.findIndex(g=>g.name===k);
@@ -36,8 +36,8 @@ assert.equal(s.get('allActors').filter(a=>a.status==='resting').length,12,'Never
 assert.equal(s.get('provs').length,1);
 assert.equal(s.render().filter(n=>n.kind==='Canvas'&&n.p.height===164).length,1,'Only visible session gets an Orbit field');
 assert.equal(s.get('systemsOpen'),false,'Menu starts collapsed');
-const menu=s.render().filter(n=>n.kind==='Box'&&n.p?.width===44&&n.h?.onTap&&(n.c||n.children||[]).some(c=>c.kind==='Canvas'&&c.p.width===24)).at(-1);
-assert(menu,'Menu can be explicitly opened');menu.h.onTap(0,0);
+// The native header owns navigation; its state drives the same selector projection.
+s.set('systemsOpen',true);
 assert.equal(s.get('systemsOpen'),true);
 let nodes=s.render();
 assert(nodes.some(n=>n.kind==='Button'&&n.p.text==='Session 8'));
@@ -86,3 +86,31 @@ orbitTile.render().find(n=>n.p?.text==='Back').h.onTap(0,0);
 assert.equal(orbitTile.get('observatoryView'),'orbit','Back restores the entry mode explicitly');
 assert.equal(orbitTile.get('expandedSystem'),'');
 assert.equal(orbitTile.render().filter(n=>n.kind==='Canvas'&&n.p.height===164).length,1);
+
+// Narrow desktop windows wrap filters and display modes into separate rows.
+for (const width of [240, 260, 900]) {
+  const layout = scene(fixture(), {}, {screenWidth:width}).render();
+  const combined = layout.filter(n => n.kind === 'Row' && [...walk(n)].some(c => c.p?.text === 'All work') && [...walk(n)].some(c => c.p?.text === 'Compact'));
+  assert.equal(combined.length > 0, width >= 280, 'Toolbar grouping must follow the actual viewport');
+}
+
+// Settings replace work content, then return to the same inspected task.
+const settingsScene = scene(fixture(), {observatoryView:'orbit'});
+settingsScene.set('selectedWork','w8');
+settingsScene.set('setupSection','appearance'); settingsScene.set('setupOpen',true);
+let settingsNodes = settingsScene.render();
+assert(settingsNodes.some(n => n.p?.text === 'Appearance'));
+assert(!settingsNodes.some(n => n.p?.text === 'Work 8'), 'Work details must not compete with settings');
+settingsNodes.find(n => n.kind === 'Button' && n.p.text === 'Done').h.onTap(0,0);
+assert.equal(settingsScene.get('setupOpen'),false);
+assert.equal(settingsScene.get('selectedWork'),'w8', 'Settings must preserve the inspected work');
+assert(settingsScene.render().some(n => n.p?.text === 'Work 8'));
+
+// Fleet geometry follows viewport width while preserving the Compact/Detail column caps.
+const fleetFixture = fixture(); fleetFixture.snapshot.actors.forEach(a => a.status = 'working');
+for (const width of [240, 360, 600, 960]) {
+  const compact = scene(fleetFixture,{observatoryView:'quiet'},{screenWidth:width}).render().find(n => n.kind === 'Grid');
+  assert(compact); assert.equal(compact.p.columns,Math.max(1,Math.min(4,Math.floor((width-18)/88))));
+  const detail = scene(fleetFixture,{observatoryView:'orbit'},{screenWidth:width}).render().find(n => n.kind === 'Grid');
+  assert(detail); assert.equal(detail.p.columns,Math.max(1,Math.min(3,Math.floor((width-14)/218))));
+}

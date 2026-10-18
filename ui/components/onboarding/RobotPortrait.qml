@@ -9,13 +9,19 @@ Canvas {
     property var widget: null
     property color ink: "white"
     property color accent: ink
+    property bool accentOnly: false
+    property bool highContrast: false
     property string agentKey: "welcome"
     property string expression: "ready"
     property string motion: "reduced"
     property bool active: true
     property real clock: 0.6
     readonly property var fallbackPalette: Owl.themeFromToml('foreground="' + ink + '"\naccent="' + accent + '"\nbackground="' + (widget ? widget.ink("background") : "#16151d") + '"')
-    readonly property var colors: widget && widget.palette ? widget.palette : fallbackPalette
+    readonly property var colors: {
+        var base = widget && widget.palette ? widget.palette : fallbackPalette;
+        var tint = Owl.argb(String(accent));
+        return accentOnly ? Object.assign({}, base, {blue: tint, green: tint, purple: tint, magenta: tint, orange: tint, cyan: tint, red: tint}) : base;
+    }
     readonly property var program: Owl.compile(RobotProgram.source)
     readonly property var slots: program.globals.reduce((result, g, i) => { result[g.name] = i; return result }, {})
     readonly property var instance: new Owl.Instance(program, {
@@ -34,6 +40,7 @@ Canvas {
     }
     onClockChanged: requestPaint()
     onColorsChanged: requestPaint()
+    onHighContrastChanged: requestPaint()
     onExpressionChanged: requestPaint()
     onMotionChanged: { clock = 0.6; requestPaint() }
     onAgentKeyChanged: requestPaint()
@@ -56,6 +63,9 @@ Canvas {
         var canvas = instance.render(false).children.find(node => node.kind === "Canvas");
         if (!canvas) return;
         c.translate((width-s)/2, (height-s)/2);
-        Layout.paint(c, canvas.draw(s,s), {foreground: ink}, "sans-serif", null);
+        var commands = canvas.draw(s,s);
+        // Reinforce translucent strokes at bar-icon sizes without changing geometry.
+        for (var pass = 0; pass < (highContrast ? 3 : 1); pass++)
+            Layout.paint(c, commands, {foreground: ink}, "sans-serif", null);
     }
 }

@@ -10,12 +10,14 @@ FocusScope {
     property var widget
     property InteractionTheme theme: InteractionTheme { widget: root.widget }
     property bool active: true
+    property bool suspended: false
     readonly property alias controller: flow
     readonly property string mode: flow.mode
     readonly property bool busy: flow.busy
     signal connected(int count)
-    visible: flow.mode !== ""
+    visible: flow.mode !== "" && !suspended
     function review() { flow.review() }
+    onSuspendedChanged: if (!suspended && visible) Qt.callLater(() => forceActiveFocus())
     Onboarding.OnboardingController { id: flow; active: root.active; onConnected: count => root.connected(count) }
     Connections {
         target: flow
@@ -39,24 +41,23 @@ FocusScope {
         anchors.fill: parent
         clip: true
         contentWidth: availableWidth
-        contentHeight: page.implicitHeight + 32
+        contentHeight: page.implicitHeight + 2 * page.inset
         ColumnLayout {
             id: page
-            x: 16; y: 16
-            width: Math.max(0, pageScroll.availableWidth - 32)
-            spacing: 12
+            readonly property int inset: root.theme.typography.profile === "phone" ? 16 : 10
+            x: inset; y: inset
+            width: Math.max(0, pageScroll.availableWidth - 2 * inset)
+            spacing: root.theme.typography.profile === "phone" ? 12 : 8
             Onboarding.CrewHeader {
                 widget: root.widget
                 theme: root.theme
-                active: root.active && root.visible
-                failed: !!flow.error
                 title: flow.mode === "invite" ? "Your local crew" : flow.mode === "importing" ? "Connecting your crew" : flow.mode === "group" ? "Define an agent group" : "Choose your sessions"
                 subtitle: flow.mode === "invite" ? (flow.agents.some(a => a.observationSupported === true) ? "Choose which sessions Miilo observes." : "Setups detected. Observation is not available for these agents yet.") : flow.mode === "importing" ? "Saving your selection and starting local observation." : flow.mode === "group" ? "Match projects within a folder. * matches any text; ? matches one character." : "Space selects · Enter folds groups · Ctrl+G adds a group"
             }
             Onboarding.AgentInvitation { visible: flow.mode === "invite"; Layout.fillWidth: true; controller: flow; widget: root.widget; theme: root.theme }
             GridLayout {
-                columns: Math.max(1, Math.min(3, Math.floor(width / (180 * root.theme.typography.effectiveScale))))
-                columnSpacing: 8; rowSpacing: 8
+                columns: Math.max(1, Math.min(3, Math.floor(width / ((root.theme.typography.profile === "phone" ? 180 : 140) * root.theme.typography.effectiveScale))))
+                columnSpacing: 6; rowSpacing: 6
                 visible: flow.mode === "review"
                 Layout.fillWidth: true
                 Controls.Field { context: root;
@@ -72,8 +73,8 @@ FocusScope {
                 }
             }
             GridLayout {
-                columns: Math.max(1, Math.min(3, Math.floor(width / (180 * root.theme.typography.effectiveScale))))
-                columnSpacing: 8; rowSpacing: 8
+                columns: Math.max(1, Math.min(3, Math.floor(width / ((root.theme.typography.profile === "phone" ? 180 : 140) * root.theme.typography.effectiveScale))))
+                columnSpacing: 6; rowSpacing: 6
                 visible: flow.mode === "review"
                 Layout.fillWidth: true
                 Controls.Action { context: root; text: "Add group"; onClicked: flow.editGroup(-1) }
@@ -86,14 +87,15 @@ FocusScope {
                 }
                 Controls.Action { context: root; text: "Edit group"; enabled: flow.groups.length > 0; onClicked: flow.editGroup(existingGroup.currentIndex) }
             }
-            Onboarding.GroupEditor { id: groupEditor; visible: flow.mode === "group"; Layout.fillWidth: true; Layout.preferredHeight: Math.max(180, root.height * 0.45); controller: flow; widget: root.widget; theme: root.theme }
-            TypeText { typography: root.theme.typography;
-                visible: flow.mode === "loading"
+            Onboarding.GroupEditor { id: groupEditor; visible: flow.mode === "group"; Layout.fillWidth: true; Layout.preferredHeight: root.theme.typography.profile === "phone" ? Math.max(180, root.height * 0.45) : Math.max(96, Math.min(root.height * 0.45, root.height - 240 * root.theme.typography.effectiveScale)); controller: flow; widget: root.widget; theme: root.theme }
+            LoadingCrew {
+                visible: flow.mode === "loading" || flow.mode === "importing"
+                widget: root.widget; theme: root.theme
+                message: flow.mode === "importing" ? "Connecting your crew…" : "Rounding up your sessions…"
                 Layout.fillWidth: true
-                text: "Looking for existing sessions…"
-                color: root.widget.ink("foreground")
+                Layout.topMargin: 12; Layout.bottomMargin: 12
             }
-            Onboarding.SessionList { id: sessionList; visible: flow.mode === "review"; Layout.fillWidth: true; Layout.preferredHeight: Math.max(180, root.height * 0.45); controller: flow; widget: root.widget; theme: root.theme }
+            Onboarding.SessionList { id: sessionList; visible: flow.mode === "review"; Layout.fillWidth: true; Layout.preferredHeight: root.theme.typography.profile === "phone" ? Math.max(180, root.height * 0.45) : Math.max(96, Math.min(root.height * 0.45, root.height - 240 * root.theme.typography.effectiveScale)); controller: flow; widget: root.widget; theme: root.theme }
             TypeText { typography: root.theme.typography;
                 visible: flow.mode === "review" && !flow.sessions.length
                 Layout.fillWidth: true
@@ -115,9 +117,9 @@ FocusScope {
                 role: "small"
                 wrapMode: Text.WordWrap
             }
-            GridLayout {
-                columns: Math.max(1, Math.min(3, Math.floor(width / (180 * root.theme.typography.effectiveScale))))
-                columnSpacing: 8; rowSpacing: 8
+            Flow {
+                layoutDirection: root.theme.typography.profile === "phone" ? Qt.LeftToRight : Qt.RightToLeft
+                spacing: 6
                 Layout.fillWidth: true
                 Controls.Action { context: root;
                     id: reviewButton
@@ -135,7 +137,8 @@ FocusScope {
                 }
                 Controls.Action { context: root;
                     visible: flow.mode === "review"
-                    text: (flow.groupsDirty ? "Apply groups & import (" : "Import selected (") + flow.selected.length + ")"
+                    primary: true
+                    text: (flow.groupsDirty ? "Apply & import (" : "Import (") + flow.selected.length + ")"
                     enabled: (flow.selected.length > 0 || flow.groupsDirty) && !flow.busy
                     onClicked: flow.importSelected()
                 }
