@@ -10,6 +10,11 @@ Item {
         id: palette
         property var typography: typeSystem
         property int generation: 0
+        property bool active: false
+        property real dp: 1
+        property string monoFamily: "monospace"
+        property var host: ({fieldFocused: function(focused) {}})
+        function alpha(color, opacity) { return "transparent" }
         function ink(name) { return name === "background" ? "#18202c" : "#b9d9ff" }
     }
     QtObject {
@@ -22,6 +27,7 @@ Item {
     Miilo.InteractionTheme { id: theme; widget: palette; typography: typeSystem }
     Miilo.DesktopSettings { id: panel; visible: false; width: 600; height: 600; surface: state; theme: theme }
     Miilo.LoadingCrew { id: loading; visible: false; widget: palette; theme: theme }
+    Owl.OwlTerminal { id: terminal; width: 500; height: 180; visible: false; widget: palette; sessionActive: visible; node: ({p:{command:"printf terminal-ready"}}) }
     SignalSpy { id: closeSpy; target: panel; signalName: "closed" }
     TestCase {
         name: "MiiloDesktopSettings"
@@ -42,6 +48,13 @@ Item {
             compare(state.values.robotMotion,"off");
             motion.currentIndex = 0; motion.activated(0);
             compare(state.values.robotMotion,"full");
+        }
+        function test_settings_terminal_runs_with_paused_feed() {
+            compare(palette.active,false);
+            terminal.visible = true;
+            tryVerify(() => terminal.lines.join(" ").indexOf("terminal-ready") >= 0,3000);
+            compare(findChild(terminal,"terminalInput").activeFocusOnTab,true);
+            terminal.visible = false;
         }
         function test_registered_remote_systems() {
             state.setViewState("allProviders",[{id:"local",name:"Coding session"},{id:"remote",name:"Workshop factory",kind:"automation_factory",health:"healthy"}]);

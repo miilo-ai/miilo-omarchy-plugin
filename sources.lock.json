@@ -58,8 +58,10 @@
     {
       "source": "desktop/runtime/OwlTerminal.qml",
       "path": "vendor/owl/OwlTerminal.qml",
-      "sha256": "0811fea1b1fd28230549e6c112d12d90bfe6f9f669175b1c685a73ac63789c16",
-      "patches": []
+      "sha256": "eed490bcc0444f16283733f4db80200db05746698dea0efff53d0fc22be1d808",
+      "patches": [
+        "patches/terminal-session.patch"
+      ]
     },
     {
       "source": "desktop/runtime/OwlWidget.qml",

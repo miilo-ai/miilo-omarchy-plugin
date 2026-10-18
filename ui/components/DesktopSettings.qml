@@ -83,7 +83,7 @@ FocusScope {
                             Layout.fillWidth: true; Layout.preferredHeight: active ? Math.max(180, root.height * 0.6) : 0
                             active: root.visible && root.configuring
                             sourceComponent: Component {
-                                Owl.OwlTerminal { widget: root.widget; node: ({p:{command:root.section === "chat" ? "miilo-owl chat-setup" : "miilo-owl setup"}}) }
+                                Owl.OwlTerminal { widget: root.widget; sessionActive: root.visible; node: ({p:{command:root.section === "chat" ? "miilo-owl chat-setup" : "miilo-owl setup"}}) }
                             }
                         }
                     }
