@@ -19,6 +19,7 @@ fi
 manager="${MIILO_OMARCHY_EXECUTABLE:-omarchy}"
 command -v "$manager" >/dev/null || { printf '%s\n' 'Omarchy is unavailable; no removal performed.' >&2; exit 1; }
 command -v jq >/dev/null || { printf '%s\n' 'jq is required to inspect plugin state; no removal performed.' >&2; exit 1; }
+command -v timeout >/dev/null || { printf '%s\n' 'timeout is required for bounded verification; no removal performed.' >&2; exit 1; }
 plugins=$("$manager" plugin list --json) || { printf '%s\n' 'Cannot inspect Omarchy; no removal performed.' >&2; exit 1; }
 printf '%s' "$plugins" | jq -e 'type == "array" and all(.[]; type == "object" and (.id | type == "string"))' >/dev/null || {
   printf '%s\n' 'Invalid Omarchy plugin inventory; no removal performed.' >&2; exit 1;
@@ -45,8 +46,23 @@ if [[ ! -L "$installed" && -e "$installed/.git" ]]; then
 fi
 "$manager" plugin disable io.miilo.bar || { printf '%s\n' 'Cannot unload Miilo; removal stopped.' >&2; exit 1; }
 "$manager" plugin remove io.miilo.bar --yes || { printf '%s\n' 'Removal failed after disable; files/data may remain. Inspect the manager output before retrying.' >&2; exit 1; }
-after=$("$manager" plugin list --json) || { printf '%s\n' 'Removal returned but verification failed; inspect Omarchy before claiming success.' >&2; exit 1; }
-printf '%s' "$after" | jq -e 'type == "array" and all(.[]; type == "object" and (.id | type == "string")) and all(.[]; .id != "io.miilo.bar")' >/dev/null || {
-  printf '%s\n' 'Miilo remains registered or inventory is invalid; removal is incomplete.' >&2; exit 1;
-}
+# Removal starts an asynchronous shell rescan. Retry only valid, stale inventory;
+# unavailable/malformed inventory is an error, never evidence of absence.
+deadline=$((SECONDS + 10))
+while :; do
+  after=$(OMARCHY_SHELL_IPC_TIMEOUT=1s timeout 2s "$manager" plugin list --json) || {
+    printf '%s\n' 'Removal returned but verification failed; inspect Omarchy before claiming success.' >&2; exit 1;
+  }
+  printf '%s' "$after" | jq -e 'type == "array" and all(.[]; type == "object" and (.id | type == "string"))' >/dev/null || {
+    printf '%s\n' 'Invalid Omarchy plugin inventory after removal; removal is incomplete.' >&2; exit 1;
+  }
+  if printf '%s' "$after" | jq -e 'all(.[]; .id != "io.miilo.bar")' >/dev/null; then
+    [[ ! -e "$installed" && ! -L "$installed" ]] || {
+      printf '%s\n' 'Miilo install path remains after removal; removal is incomplete.' >&2; exit 1;
+    }
+    break
+  fi
+  (( SECONDS < deadline )) || { printf '%s\n' 'Timed out waiting for Miilo to leave the shell inventory; removal is incomplete.' >&2; exit 1; }
+  sleep 0.1
+done
 printf '%s\n' 'Miilo Omarchy integration removed. Shared software, services and private data were retained.'

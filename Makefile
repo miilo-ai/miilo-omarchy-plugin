@@ -7,6 +7,7 @@ check:
 	bash -n uninstall.sh tools/check-native.sh
 	bash -n tools/test-typography.sh
 	bash -n tools/dev-relaunch.sh tools/install-dev-skill.sh
+	bash -n tools/shell-lifecycle.sh
 	bash -n tools/test-configuration.sh
 	bash -n tools/qualify-user-config.sh
 	bash -n tools/cargo-auth.sh

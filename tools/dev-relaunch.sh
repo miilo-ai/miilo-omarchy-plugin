@@ -43,10 +43,13 @@ if "$rebuild"; then install_args+=(--install-binaries --cli "$cli_binary"); fi
 run "$node_bin" "$root/tools/install-dev-plugin.cjs" "${install_args[@]}"
 if "$migrate_config"; then run "$HOME/.local/bin/miilo" config migrate; fi
 if "$restart"; then
-    run omarchy restart shell
+    source "$root/tools/shell-lifecycle.sh"
+    # Persist enablement before restart; do not rescan a newly starting shell.
     run omarchy-shell shell rescanPlugins
+    run miilo_wait_discovery
     run omarchy plugin enable io.miilo.bar
-    run omarchy-shell shell summon io.miilo.bar '{}'
+    run omarchy restart shell
+    run miilo_wait_summon
     run omarchy plugin list --json
 fi
 if "$dry_run"; then

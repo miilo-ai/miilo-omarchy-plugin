@@ -16,6 +16,13 @@ printf '%s\\n' "$*" >> "$STATE/calls"
 case "$2" in
 list)
   [ "\${FAIL_LIST:-0}" = 0 ] || exit 3
+  if [ -f "$STATE/disabled" ] && [ ! -f "$STATE/present" ]; then
+    [ "\${FAIL_AFTER:-0}" = 0 ] || exit 3
+    if [ "\${INVALID_AFTER:-0}" = 1 ]; then echo '{}'; exit; fi
+    if [ "\${STALE_AFTER:-0}" = forever ] || { [ "\${STALE_AFTER:-0}" = 1 ] && [ ! -f "$STATE/stale-read" ]; }; then
+      touch "$STATE/stale-read"; echo '[{"id":"io.miilo.bar"}]'; exit
+    fi
+  fi
   if [ -f "$STATE/present" ]; then printf '[{"id":"io.miilo.bar"},{"id":"other.widget"}]'; else printf '[{"id":"other.widget"}]'; fi ;;
 disable) [ "\${FAIL_DISABLE:-0}" = 0 ] || exit 4; touch "$STATE/disabled" ;;
 remove)
@@ -63,4 +70,29 @@ test('locally edited installed Git checkout is not removed',t=>{
   const r=run(['--confirm']);assert.notEqual(r.status,0);assert.match(r.stderr,/local changes/);
   assert.equal(fs.existsSync(path.join(root,'present')),true);
   assert.doesNotMatch(fs.readFileSync(path.join(root,'calls'),'utf8'),/plugin (remove|disable)/);
+});
+
+test('waits for asynchronous removal inventory without repeating disable/remove',t=>{
+  const {root,run}=fixture(t),r=run(['--confirm'],{STALE_AFTER:'1'});
+  assert.equal(r.status,0,r.stderr);assert.match(r.stdout,/integration removed/);
+  const calls=fs.readFileSync(path.join(root,'calls'),'utf8');
+  assert.equal(calls.match(/plugin remove/g).length,1);
+  assert.equal(calls.match(/plugin list/g).length,3);
+});
+test('post-removal unavailable or malformed inventory never reports success',t=>{
+  for(const env of [{FAIL_AFTER:'1'},{INVALID_AFTER:'1'}]){
+    const {run}=fixture(t),r=run(['--confirm'],env);
+    assert.notEqual(r.status,0);assert.doesNotMatch(r.stdout,/integration removed/);
+  }
+});
+test('permanently stale inventory times out instead of claiming removal',t=>{
+  const {run}=fixture(t),r=run(['--confirm'],{STALE_AFTER:'forever'});
+  assert.notEqual(r.status,0);assert.match(r.stderr,/Timed out/);
+  assert.doesNotMatch(r.stdout,/integration removed/);
+});
+test('absent inventory cannot hide an install path left by the manager',t=>{
+  const {root,run}=fixture(t);
+  fs.mkdirSync(path.join(root,'.config/omarchy/plugins/io.miilo.bar'),{recursive:true});
+  const r=run(['--confirm']);assert.notEqual(r.status,0);
+  assert.match(r.stderr,/install path remains/);
 });
