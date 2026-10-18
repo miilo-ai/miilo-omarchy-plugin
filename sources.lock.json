@@ -5,7 +5,7 @@
     {
       "source": "70-miilo-fleet.owl",
       "path": "assets/70-miilo-fleet.owl",
-      "sha256": "3e579fc5b3132529be32a321c0dfe10fe0974499b585673e11717fcd1b31d717",
+      "sha256": "c2c83c686a27a6a75d10b4a6127eb1023a33bc0e44e9c9b86ad3d523a26a9a19",
       "patches": [
         "patches/presentation-consistency.patch"
       ]
@@ -87,7 +87,7 @@
     {
       "source": "desktop/RobotProgram.js",
       "path": "assets/RobotProgram.js",
-      "sha256": "4693a31ee5f677b28f84153767549d953c8b6eef646fdd6479bf147e3032e420",
+      "sha256": "f32488c236de948de0495ca8032d8d69cff35277733b83b5b9a849f210e72cbd",
       "patches": [
         "patches/presentation-consistency.patch"
       ]

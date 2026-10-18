@@ -1,7 +1,7 @@
-# Quiet / Orbit and your local crew
+# Compact / Detail and your local crew
 
 The plugin consumes the shared Orbit widget asset pinned in sources.lock.json.
-The expanded view offers Quiet/Orbit; existing installations default to Quiet.
+The expanded view offers Compact/Detail; saved quiet/orbit values remain compatible.
 Full/Reduced/Off remain independent motion settings. No helper protocol change or
 new CLI binary is required by this presentation increment.
 

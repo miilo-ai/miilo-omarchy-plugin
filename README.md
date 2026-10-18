@@ -153,7 +153,7 @@ invitation, group editor, session list and shared controls. `vendor/owl` contain
 the attributed evaluator; `assets` contains generated OWL. No provider engine or
 credential storage lives in QML. Authored QML modules are limited to 200 lines.
 
-Native design candidate: [Quiet / Orbit and your local crew](docs/orbit-design.md).
+Native design candidate: [Compact / Detail and your local crew](docs/orbit-design.md).
 Existing work/consent rules remain unchanged; native qualification is still required.
 
 Development and preview tooling: [toolchain guide](docs/development-toolchain.md).
