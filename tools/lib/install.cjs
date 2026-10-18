@@ -22,7 +22,7 @@ function install(root,args) {
   if(exists(path.join(target,'.git')))throw Error('Installed plugin is a Git checkout; reconcile before replacing');
   if(exists(target)&&JSON.parse(fs.readFileSync(path.join(target,'manifest.json'),'utf8')).id!=='io.miilo.bar')throw Error('Refusing to replace unrelated plugin');
   const managed=['ui','vendor','assets'].flatMap(folder=>files(path.join(root,folder)).map(name=>folder+'/'+name));
-  managed.push('LICENSE','sources.lock.json','manifest.json');
+  managed.push('LICENSE','sources.lock.json','uninstall.sh','manifest.json');
   for(const relative of managed){safeFile(root,relative);noLinks(path.join(target,relative));}
   const binaries=[['miilo-owl',args.helper],['miilo-local',args.local]];
   if(args.cli)binaries.push(['miilo',args.cli]);

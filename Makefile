@@ -4,9 +4,10 @@ check:
 	node --test tools/no-python.test.cjs
 	node tools/check.cjs
 	node --test tests/*.test.mjs
-	bash -n tools/check-native.sh
+	bash -n uninstall.sh tools/check-native.sh
 	bash -n tools/test-typography.sh
 	bash -n tools/dev-relaunch.sh tools/install-dev-skill.sh
+	bash -n tools/shell-lifecycle.sh
 	bash -n tools/test-configuration.sh
 	bash -n tools/qualify-user-config.sh
 	bash -n tools/cargo-auth.sh
