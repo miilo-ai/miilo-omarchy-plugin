@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "io.miilo.bar",
   "name": "Miilo",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Viratec Interactive LLC",
   "license": "MIT",
   "description": "Animated agents and a searchable work dashboard in the Omarchy bar.",
