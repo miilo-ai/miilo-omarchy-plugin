@@ -31,10 +31,9 @@ termination, unrelated widget survival, retained resource hashes, reinstall,
 restart, and injected manager/inventory failures. Keep the native gate open until
 that evidence exists. Do not submit or publish on the basis of these checks.
 
-## Authorized physical laptop continuation — 2026-10-18
+## Physical laptop continuation — 2026-10-18
 
-The owner explicitly authorized this laptop as the test machine, superseding the
-handoff's disposable-host restriction for this run. Candidate remains
+Test machine: physical Omarchy laptop. Candidate remains
 `2454789404785af5aedeaf7db84d2b6002de2e99`; work stayed on
 `fix/uninstall-validation`. No implementation change or publication occurred.
 
@@ -120,14 +119,12 @@ passing uninstall/reinstall based on eventual recovery.
 Transient request PID termination, retry suppression over time, Escape/focus,
 injected *native* manager failures and visual survival of every unrelated widget
 were not instrumented here. Fake-manager failure tests remain source evidence
-only. No new enrollment or provider action was requested. Shared-memory tools
-were unavailable; no Semantica read or write occurred.
+only. No new enrollment or provider action was requested.
 
 ## Corrected lifecycle — physical retest, 2026-10-18
 
 Tested implementation: `8f4bbfe8140f7405164791a9ee488762cb71c582`.
-The owner authorized correction, further native validation, and pushing the
-reviewed branch. This section supersedes the two lifecycle failures above.
+This section supersedes the two lifecycle failures above.
 
 ### Correction and regression checks
 

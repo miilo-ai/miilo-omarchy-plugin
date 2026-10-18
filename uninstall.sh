@@ -26,23 +26,48 @@ printf '%s' "$plugins" | jq -e 'type == "array" and all(.[]; type == "object" an
 }
 printf '%s\n' 'Retained: shared miilo/miilo-local/miilo-owl binaries, observer services, private configuration, credentials, backups and other integrations.'
 printf '%s\n' 'An independently running observer continues collecting until you explicitly stop it.'
+installed="${HOME:?}/.config/omarchy/plugins/io.miilo.bar"
 if ! printf '%s' "$plugins" | jq -e 'any(.[]; .id == "io.miilo.bar")' >/dev/null; then
+  [[ ! -e "$installed" && ! -L "$installed" ]] || {
+    printf '%s\n' 'Miilo install path remains despite absent shell inventory; inspect Omarchy before removal.' >&2; exit 1;
+  }
   printf '%s\n' 'Miilo integration is already absent; nothing removed.'
   exit 0
 fi
 if ! "$confirm"; then
   printf '%s\n' 'Plan: disable io.miilo.bar, remove it with the Omarchy plugin manager, then verify its absence.'
-  printf '%s\n' 'Git checkouts are deleted; hand-copied installs may be moved to an Omarchy backup.'
+  printf '%s\n' 'Git checkouts are archived privately before deletion; hand-copied installs may be moved to an Omarchy backup.'
   printf '%s\n' 'Review the retained resources, then rerun with --confirm to remove this integration.'
   exit 0
 fi
-installed="${HOME:?}/.config/omarchy/plugins/io.miilo.bar"
 if [[ ! -L "$installed" && -e "$installed/.git" ]]; then
+  [[ -d "$installed/.git" && ! -L "$installed/.git" ]] || {
+    printf '%s\n' 'Linked Git metadata requires manual preservation before removal.' >&2; exit 1;
+  }
   changes=$(git -c core.fsmonitor=false -C "$installed" status --porcelain) || { printf '%s\n' 'Cannot inspect installed Git checkout; removal stopped.' >&2; exit 1; }
   if [[ -n "$changes" ]]; then
     printf '%s\n' 'Installed checkout has local changes; preserve them before removal.' >&2
     exit 1
   fi
+  command -v tar >/dev/null || { printf '%s\n' 'tar is required to preserve the Git checkout; removal stopped.' >&2; exit 1; }
+  state="${XDG_STATE_HOME:-$HOME/.local/state}"
+  [[ "$state" == /* && "$state" != "$installed" && "$state" != "$installed/"* ]] || {
+    printf '%s\n' 'Backup state must be absolute and outside the installed checkout; removal stopped.' >&2; exit 1;
+  }
+  # Archive the entire checkout, including ignored files and unpublished Git history.
+  # Restrictive creation modes keep any local-only content private.
+  backup=$(umask 077; mkdir -p "$state/miilo/plugin-backups" && mktemp -d "$state/miilo/plugin-backups/uninstall-XXXXXXXX") || {
+    printf '%s\n' 'Cannot create private checkout backup; removal stopped.' >&2; exit 1;
+  }
+  backup=$(cd -- "$backup" && pwd -P)
+  checkout=$(cd -- "$installed" && pwd -P)
+  [[ "$backup" != "$checkout" && "$backup" != "$checkout/"* ]] || {
+    printf '%s\n' 'Backup resolves inside the installed checkout; removal stopped.' >&2; exit 1;
+  }
+  if ! (umask 077; tar -cpf "$backup/checkout.tar" -C "$installed" .) || ! tar -tf "$backup/checkout.tar" >/dev/null; then
+    printf '%s\n' "Checkout backup failed; removal stopped. Inspect: $backup" >&2; exit 1;
+  fi
+  printf '%s\n' "Git checkout preserved in: $backup/checkout.tar"
 fi
 "$manager" plugin disable io.miilo.bar || { printf '%s\n' 'Cannot unload Miilo; removal stopped.' >&2; exit 1; }
 "$manager" plugin remove io.miilo.bar --yes || { printf '%s\n' 'Removal failed after disable; files/data may remain. Inspect the manager output before retrying.' >&2; exit 1; }

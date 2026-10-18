@@ -33,6 +33,13 @@ device removal from a successful integration removal.
 - Reinstall and confirm retained connection/display settings are restored.
 - Copy uninstall.sh to a disposable path before removal if testing a second run;
   it should report already absent without changing other registrations.
+- Before clean Git removal, add a synthetic unpublished commit and ignored file.
+  Confirm the printed private `checkout.tar` survives removal; extract into a new
+  disposable directory and verify both the commit and file contents. Backup
+  directories must be mode 0700 and archives 0600. A failed archive write or a
+  state path resolving inside the checkout must stop before disable/remove.
+- With inventory absent but an install directory or dangling link still present,
+  verify removal reports incomplete state instead of successful absence.
 - Edit an installed Git checkout and confirm removal refuses until edits are
   preserved. The wrapper must not discard local modifications.
 - Check a manager failure, unavailable shell inventory and failed disable: report

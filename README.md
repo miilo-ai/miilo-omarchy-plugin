@@ -74,6 +74,11 @@ omarchy plugin remove io.miilo.bar
 For the preview-first removal wrapper in this checkout, run `bash uninstall.sh`
 without arguments, review what remains, then run `bash uninstall.sh --confirm`.
 It disables and removes only `io.miilo.bar` through Omarchy, and verifies absence.
+Before deleting a clean Git installation, it saves the complete checkout, including
+ignored files and unpublished history, in a private `checkout.tar` under
+`$XDG_STATE_HOME/miilo/plugin-backups` (default `~/.local/state`). Backup failures
+stop removal. Linked Git metadata requires manual preservation. An installation
+path left behind despite absent inventory is reported as incomplete removal.
 Verification waits up to ten seconds for asynchronous shell inventory updates;
 unavailable inventory, invalid responses or a remaining install path fail visibly.
 This source change does not add a private-data purge or remove shared helpers.
