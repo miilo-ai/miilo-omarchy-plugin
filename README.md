@@ -35,9 +35,9 @@ Installed Omarchy acceptance is pending.
 Requires Omarchy Quattro with its plugin commands, Quickshell/Qt, Nerd Font icons,
 `miilo-owl` 1.4.0 from miilo-owl-widgets, and `miilo-local` 0.2.0 from miilo-cli
 for local session onboarding. Put both binaries on the shell's PATH first.
-No release has been made. These are candidate versions, not published artifacts.
+Download the matching helper and CLI binaries from their GitHub Releases.
 
-Once this repository is public and native acceptance passes:
+Install the plugin, then validate it against your Omarchy shell version:
 
 ```sh
 omarchy plugin add https://github.com/miilo-ai/miilo-omarchy-plugin.git
@@ -153,7 +153,7 @@ invitation, group editor, session list and shared controls. `vendor/owl` contain
 the attributed evaluator; `assets` contains generated OWL. No provider engine or
 credential storage lives in QML. Authored QML modules are limited to 200 lines.
 
-Native design candidate: [Compact / Detail and your local crew](docs/orbit-design.md).
+Native design: [Compact / Detail and your local crew](docs/orbit-design.md).
 Existing work/consent rules remain unchanged; native qualification is still required.
 
 Development and preview tooling: [toolchain guide](docs/development-toolchain.md).
