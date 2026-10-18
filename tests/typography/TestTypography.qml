@@ -109,7 +109,7 @@ Item {
             portrait.motion = "reduced"; portrait.active = true;
         }
         function test_roles_and_plain_text() {
-            compare(typeSystem.size("title"),16); compare(typeSystem.size("body"),13);
+            compare(typeSystem.size("title"),14); compare(typeSystem.size("body"),12);
             typeSystem.profile = "phone"; compare(typeSystem.size("body"),16);
             typeSystem.textScale = 2; compare(typeSystem.size("body"),32);
             compare(plain.textFormat, Text.PlainText);
@@ -158,7 +158,7 @@ Item {
             var robot = findChild(row,"setupRobot"), name = findChild(row,"setupName");
             var status = findChild(row,"setupStatus"), label = findChild(row,"setupStatusLabel");
             tryVerify(() => Math.abs(robot.mapToItem(row,0,robot.height/2).y - name.mapToItem(row,0,name.height/2).y) < 1);
-            verify(Math.abs(status.mapToItem(row,0,status.height/2).y - label.mapToItem(row,0,label.height/2).y) < 1);
+            tryVerify(() => Math.abs(status.mapToItem(row,0,status.height/2).y - label.mapToItem(row,0,label.height/2).y) < 1);
             typeSystem.profile = "phone";
             tryVerify(() => row.implicitHeight >= typeSystem.touchTarget);
         }
@@ -174,7 +174,9 @@ Item {
             var header = list.currentItem, robot = findChild(header,"groupRobot");
             var title = findChild(header,"sessionTitle"), check = findChild(header,"sessionCheckbox");
             tryVerify(() => Math.abs(robot.mapToItem(header,0,robot.height/2).y - title.mapToItem(header,0,title.height/2).y) < 1);
-            compare(check.width,16); compare(check.height,16);
+            tryCompare(check,"width",12); tryCompare(check,"height",12); tryCompare(robot,"width",24);
+            typeSystem.profile = "phone"; tryCompare(check,"width",16); tryCompare(robot,"width",32); typeSystem.profile = "desktop"; tryCompare(robot,"width",24);
+            tryVerify(() => Math.abs(check.mapToItem(header,0,check.height/2).y - title.mapToItem(header,0,title.height/2).y) < 1);
             verify(check.x > header.width/2); verify(!title.text.includes("▾") && !title.text.includes("▸"));
             var headerTextX = title.mapToItem(list,0,0).x;
             mouseClick(header,header.width-18,header.height/2);

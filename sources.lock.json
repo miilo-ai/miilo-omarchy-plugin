@@ -5,9 +5,10 @@
     {
       "source": "70-miilo-fleet.owl",
       "path": "assets/70-miilo-fleet.owl",
-      "sha256": "c2c83c686a27a6a75d10b4a6127eb1023a33bc0e44e9c9b86ad3d523a26a9a19",
+      "sha256": "17b035b895b011be042fc728ea5fb86d44b83b54261d2c06b1e3945e53cd4814",
       "patches": [
-        "patches/presentation-consistency.patch"
+        "patches/presentation-consistency.patch",
+        "patches/desktop-density.patch"
       ]
     },
     {
@@ -95,8 +96,10 @@
     {
       "source": "desktop/runtime/MiiloTypeScale.js",
       "path": "vendor/owl/MiiloTypeScale.js",
-      "sha256": "8988b781ad2b3128e5bf526a66f15a8e2a71043d46f306cef6568d365ad52f2f",
-      "patches": []
+      "sha256": "6d95d37deadfb8b8556ea30ce9dec46c6124e99d928b393d4a21e2539b004214",
+      "patches": [
+        "patches/desktop-density.patch"
+      ]
     },
     {
       "source": "desktop/runtime/MiiloTypography.qml",

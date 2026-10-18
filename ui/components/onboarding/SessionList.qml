@@ -12,11 +12,12 @@ ListView {
     required property var widget
     required property var theme
     readonly property var context: view
+    readonly property bool desktop: theme.typography.profile !== "phone"
     objectName: "sessionList"
     Layout.fillWidth: true
     Layout.fillHeight: true
     clip: true
-    spacing: 4
+    spacing: desktop ? 0 : 4
     model: controller.rows
     activeFocusOnTab: true
     keyNavigationEnabled: true
@@ -39,27 +40,37 @@ ListView {
         Accessible.checked: checked
         focusPolicy: Qt.NoFocus
         readonly property var groupSessions: controller.grouped[modelData.group] ? controller.grouped[modelData.group].sessions.filter(s => s.observable) : []
+        readonly property string sessionContext: {
+            if (modelData.header) return "";
+            var session = modelData.session;
+            var group = controller.grouped[modelData.group];
+            var location = session.cwd || session.id;
+            var repeated = group && !group.rule && group.name === session.kind + " / " + location;
+            var detail = repeated ? "" : session.kind + " · " + location;
+            return detail + (session.observable ? "" : (detail ? " · " : "") + "Import not available yet");
+        }
         readonly property bool selectable: modelData.header ? groupSessions.length > 0 : modelData.session.observable === true
         readonly property int selectedCount: groupSessions.filter(s => controller.selected.indexOf(s.kind + ":" + s.id) >= 0).length
         readonly property bool partial: modelData.header && selectedCount > 0 && selectedCount < groupSessions.length
         readonly property bool cursor: view.activeFocus && view.currentIndex === index
         checked: modelData.header ? groupSessions.length > 0 && groupSessions.every(s => controller.selected.indexOf(s.kind + ":" + s.id) >= 0) : controller.selected.indexOf(modelData.session.kind + ":" + modelData.session.id) >= 0
         onClicked: { view.currentIndex = index; view.forceActiveFocus(); controller.activateRow(view.currentIndex); }
-        leftPadding: modelData.header ? 8 : 64
-        rightPadding: 36
-        topPadding: 3.2; bottomPadding: 3.2
+        leftPadding: modelData.header ? (view.desktop ? 6 : 8) : (view.desktop ? 44 : 64)
+        rightPadding: view.desktop ? 32 : 36
+        topPadding: view.desktop ? 1 : 3.2; bottomPadding: topPadding
+        topInset: 0; bottomInset: 0
         implicitHeight: view.theme.typography.controlHeight(contentItem.implicitHeight, topPadding + bottomPadding)
         background: Rectangle {
             color: choice.down ? view.theme.pressedFill : choice.cursor ? view.theme.focusFill : choice.checked || choice.partial ? view.theme.selectedFill : choice.hovered ? view.theme.hoverFill : choice.modelData.header ? view.widget.ink("lighter_background") : "transparent"
-            Rectangle { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; width: 3; height: 24; visible: choice.cursor; color: view.theme.accent }
+            Rectangle { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; width: 3; height: Math.min(24, parent.height - 4); visible: choice.cursor; color: view.theme.accent }
         }
         Rectangle {
             objectName: "sessionCheckbox"
             anchors.right: parent.right
-            anchors.rightMargin: 10
+            anchors.rightMargin: view.desktop ? 14 : 10
             anchors.verticalCenter: parent.verticalCenter
-            width: 16
-            height: 16
+            width: view.desktop ? 12 : 16
+            height: width
             visible: choice.selectable
             radius: 0
             color: "transparent"
@@ -67,29 +78,29 @@ ListView {
             border.color: view.widget.ink(choice.modelData.header || choice.modelData.session.observable ? "foreground" : "muted")
             Rectangle {
                 anchors.centerIn: parent
-                width: 8
-                height: choice.partial ? 2 : 8
+                width: view.desktop ? 6 : 8
+                height: choice.partial ? 2 : width
                 visible: choice.checked || choice.partial
                 color: view.theme.accent
             }
         }
         Miilo.AvailabilityIcon {
             anchors.right: parent.right
-            anchors.rightMargin: 10
+            anchors.rightMargin: view.desktop ? 14 : 10
             anchors.verticalCenter: parent.verticalCenter
-            size: 16
+            size: view.desktop ? 12 : 16
             visible: !choice.selectable
             available: false
             ink: view.widget.ink("muted")
         }
         contentItem: RowLayout {
-            spacing: 8
+            spacing: view.desktop ? 6 : 8
             RobotPortrait {
                 objectName: "groupRobot"
                 widget: view.widget
                 agentKey: "group-" + choice.modelData.name
                 visible: choice.modelData.header
-                Layout.preferredWidth: 32; Layout.preferredHeight: 32
+                Layout.preferredWidth: view.desktop ? 24 : 32; Layout.preferredHeight: view.desktop ? 24 : 32
                 Layout.alignment: Qt.AlignVCenter
                 ink: view.widget.ink("foreground")
                 accent: view.widget.ink("accent")
@@ -108,13 +119,16 @@ ListView {
                     wrapMode: Text.Wrap
                     verticalAlignment: Text.AlignVCenter
                     color: !choice.selectable ? view.widget.ink("muted") : choice.cursor ? view.theme.focusText : view.theme.foreground
-                    role: "body"
+                    lineHeight: view.desktop ? 1.15 : view.theme.typography.leading("body")
+                    role: view.desktop ? "small" : "body"
+                    font.weight: choice.modelData.header ? Font.DemiBold : Font.Normal
                 }
                 Miilo.TypeText {
                     typography: view.theme.typography
-                    visible: !choice.modelData.header
+                    objectName: "sessionContext"
+                    visible: choice.sessionContext !== ""
                     Layout.fillWidth: true; Layout.minimumWidth: 0
-                    text: choice.modelData.header ? "" : choice.modelData.session.kind + " · " + (choice.modelData.session.cwd || choice.modelData.session.id) + (choice.modelData.session.observable ? "" : " · import not available yet")
+                    text: choice.sessionContext
                     wrapMode: Text.WrapAnywhere
                     color: view.widget.ink("muted")
                     role: "small"

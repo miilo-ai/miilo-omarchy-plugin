@@ -1,0 +1,277 @@
+--- a/70-miilo-fleet.owl
++++ b/70-miilo-fleet.owl
+@@ -94,9 +94,9 @@
+   let actor = find(allActors, a => a._key == selectedActor)
+   let receipt = reply == "" || reply == "pending" ? null : parseJson(reply)
+   let issueCount = len(data.errors ?? [])
+-  let toolbarHeight = linux ? 34 : 44
+-  let fieldHeight = linux ? 32 : 44
+-  let tabHeight = linux ? 28 : 44
++  let toolbarHeight = linux ? 26 : 44
++  let fieldHeight = linux ? 22 : 44
++  let tabHeight = linux ? 22 : 44
+   let phases = ["planning", "implementing", "verifying", "reviewing", "promoting"]
+   on reply { requestPending = value == "pending"; refresh() }
+   onTap: screen()
+@@ -175,7 +175,6 @@
+         if !leftHanded { Spacer { weight: 1 } }
+         if focused != null { Box { width: 44; height: toolbarHeight; align: center; onTap: { selectedWork = ""; proposed = ""; evidenceOpen = false; reply = requestPending ? reply : "" } ToolbarIcon { kind: "back" } } }
+         else if actor != null { Box { width: 44; height: toolbarHeight; align: center; onTap: { selectedActor = ""; renameOpen = false } ToolbarIcon { kind: "back" } } }
+-        ToolbarControls { }
+         if leftHanded { Spacer { weight: 1 } }
+       }
+     }
+@@ -198,39 +197,87 @@
+ 
+   component SetupTerminal() {
+     if setupOpen {
+-      Row {
++      Text { text: setupSection == "appearance" ? "Appearance" : setupSection == "chat" ? "Chat model" : setupSection == "filters" ? "Systems" : "Connections"; style: body; weight: 1 }
++      Flow {
+         gap: 6
+-        Button { text: "Systems"; color: setupSection == "systems" ? accent : muted; onTap: setupSection = "systems" }
++        Button { text: "Connections"; color: setupSection == "systems" ? accent : muted; onTap: setupSection = "systems" }
++        Button { text: "Systems"; color: setupSection == "filters" ? accent : muted; onTap: { setupSection = "filters"; systemsOpen = true } }
++        Button { text: "Appearance"; color: setupSection == "appearance" ? accent : muted; onTap: setupSection = "appearance" }
+         Button { text: "Chat model"; color: setupSection == "chat" ? accent : muted; onTap: setupSection = "chat" }
+       }
+       if setupSection == "chat" {
+         Text { text: "Choose your chat endpoint, model and credential file. Consent applies to the questions and task context you share."; style: small; color: muted; maxLines: 4 }
+         Terminal { command: "miilo-owl chat-setup"; fill: width; height: max(1, screenHeight * 0.6) }
+         Text { text: "Voice integration is not implemented in this launcher yet. Transcription and speech output will use separate endpoint settings."; style: small; color: muted; maxLines: 4 }
+-      } else {
++      } else if setupSection == "filters" {
++      Setup { }
++      if len(selectableProviders) <= 1 { Text { text: "All connected systems are shown."; style: small; color: muted } }
++      } else if setupSection == "appearance" {
+       RobotAppearance { }
+       Button { text: leftHanded ? "Controls: left hand" : "Controls: right hand"; onTap: leftHanded = !leftHanded }
+       Button { text: previewRobots ? "Hide preview robots" : "Show preview robots"; onTap: previewRobots = !previewRobots }
++      } else {
++      Text { text: "Use an @credential-file reference for remote access. Local sessions are available from Add system."; style: small; color: muted; maxLines: 3 }
+       Terminal { command: "miilo-owl setup"; fill: width; height: max(1, screenHeight * 0.6) }
+       Text { text: "Add or change systems here. Type q then Enter when done, or tap Done."; style: small; color: muted; maxLines: 3 }
+       }
+       Button { text: "Done"; onTap: { setupOpen = false; setupSection = "systems"; refresh() } }
++    }
++  }
++
++  component OrbitStateIcon(phase, attention, offline, failed, ink = accent) {
++    Canvas {
++      width: 14
++      height: 14
++      // Optical alignment with the title glyphs, rather than the line box.
++      offset: [0, 1]
++      if offline {
++        circle(7, 7, 4.5, stroke: ink, width: 1)
++        line(3, 11, 11, 3, stroke: ink, width: 1)
++      } else if failed {
++        line(3.5, 3.5, 10.5, 10.5, stroke: ink, width: 1.3)
++        line(3.5, 10.5, 10.5, 3.5, stroke: ink, width: 1.3)
++      } else if attention != "none" {
++        // Canvas text has different ascent from vector strokes.
++        text("?!", 7, 10, size: 12, bold: true, align: center, color: ink)
++      } else if phase == "implementing" {
++        path([[4.5, 3], [1.5, 7], [4.5, 11]], stroke: ink, width: 1.1, cap: round)
++        path([[9.5, 3], [12.5, 7], [9.5, 11]], stroke: ink, width: 1.1, cap: round)
++        line(8, 3.5, 6, 10.5, stroke: ink, width: 1)
++      } else if phase == "verifying" {
++        path([[6, 2], [6, 7], [2.5, 11], [3.5, 12], [10.5, 12], [11.5, 11], [8, 7], [8, 2]], stroke: ink, width: 1, cap: round)
++        line(5, 2, 9, 2, stroke: ink, width: 1)
++        line(5, 8, 9, 8, stroke: ink, width: 1)
++      } else if contains(["reviewing", "review"], phase) {
++        circle(6, 6, 3.5, stroke: ink, width: 1)
++        line(8.5, 8.5, 12, 12, stroke: ink, width: 1.2)
++      } else {
++        circle(7, 7, 4.5, stroke: ink, width: 1)
++        path([[7, 4], [7, 7], [9, 8]], stroke: ink, width: 1, cap: round)
++      }
+     }
+   }
+ 
++  state observatoryView = "quiet" persist
++  state inspectionView = ""
++  state orbitPage = 0
+   component WorkRows(list, showSystem = false) {
+     for w in list.take(pageSize) key w._key {
+       Column {
+-        gap: 2
++        gap: 1
+         fill: width
+         onTap: { selectedWork = w._key; reply = requestPending ? reply : ""; evidenceOpen = false; proposed = "" }
+         Row {
+           gap: 6
+           fill: width
+-          Text { text: w.title; style: body; weight: 1; maxLines: 1 }
+-          Text { text: "›"; width: 10; style: small; color: muted }
++          height: linux ? 20 : 44
++          align: center
++          let rowInk = w.lifecycle == "failed" ? mix(red, foreground, 0.15) : w.attention != "none" ? accent : foreground
++          OrbitStateIcon { phase: w.phase; attention: w.attention; offline: false; failed: w.lifecycle == "failed"; ink: rowInk }
++          Text { text: w.title; weight: 1; fontSize: linux ? 10 : 16; maxLines: 1; color: rowInk; offset: [0, 2] }
++          Text { text: "›"; width: 10; fontSize: linux ? 10 : 14; color: muted }
+         }
+-        Text { text: showSystem ? "${get(find(allProviders, p => p.id == w.providerId), "name", "System")} · ${w.phase}" : "${w.phase} · ${w.lifecycle}"; style: small; color: muted; maxLines: 1 }
++        if showSystem { Text { text: get(find(allProviders, p => p.id == w.providerId), "name", "System"); fontSize: linux ? 10 : 14; color: muted; maxLines: 1 } }
+       }
+     }
+     if len(list) > pageSize {
+@@ -399,7 +446,6 @@
+       fill: width
+       gap: 6
+       align: center
+-      if !searchEditing && leftHanded && configured { ToolbarControls { } }
+       if searchEditing {
+         Box {
+           weight: 1
+@@ -415,13 +461,12 @@
+           Text { text: "✓"; width: 36; fontSize: 22; align: center; color: accent }
+         }
+       } else {
+-        Box { weight: 1; height: fieldHeight; align: start; padding: 6; radius: 6; background: alpha(muted, 0.08); onTap: searchEditing = true
+-          Text { text: query == "" ? placeholder : query; fill: width; fontSize: 13; color: query == "" ? muted : foreground; maxLines: 1 }
++        Box { weight: 1; height: fieldHeight; align: start; padding: 3; radius: 6; background: alpha(muted, 0.08); onTap: searchEditing = true
++          Text { text: query == "" ? placeholder : query; fill: width; fontSize: linux ? 12 : 13; color: query == "" ? muted : foreground; maxLines: 1 }
+         }
+         if needle != "" { Box { width: 30; height: fieldHeight; align: center; onTap: { query = ""; pageSize = 5 }
+           Text { text: "×"; width: 30; fontSize: 22; align: center; color: muted }
+         } }
+-        if !leftHanded && configured { ToolbarControls { } }
+       }
+     }
+   }
+@@ -656,53 +701,29 @@
+   }
+ 
+   // Presentation only: labels and provider action policy remain authoritative.
+-  component OrbitStateIcon(phase, attention, offline, failed, ink = accent) {
+-    Canvas {
+-      width: 14
+-      height: 14
+-      // Optical alignment with the title glyphs, rather than the line box.
+-      offset: [0, 1]
+-      if offline {
+-        circle(7, 7, 4.5, stroke: ink, width: 1)
+-        line(3, 11, 11, 3, stroke: ink, width: 1)
+-      } else if failed {
+-        line(3.5, 3.5, 10.5, 10.5, stroke: ink, width: 1.3)
+-        line(3.5, 10.5, 10.5, 3.5, stroke: ink, width: 1.3)
+-      } else if attention != "none" {
+-        // Canvas text has different ascent from vector strokes.
+-        text("?!", 7, 10, size: 12, bold: true, align: center, color: ink)
+-      } else if phase == "implementing" {
+-        path([[4.5, 3], [1.5, 7], [4.5, 11]], stroke: ink, width: 1.1, cap: round)
+-        path([[9.5, 3], [12.5, 7], [9.5, 11]], stroke: ink, width: 1.1, cap: round)
+-        line(8, 3.5, 6, 10.5, stroke: ink, width: 1)
+-      } else if phase == "verifying" {
+-        path([[6, 2], [6, 7], [2.5, 11], [3.5, 12], [10.5, 12], [11.5, 11], [8, 7], [8, 2]], stroke: ink, width: 1, cap: round)
+-        line(5, 2, 9, 2, stroke: ink, width: 1)
+-        line(5, 8, 9, 8, stroke: ink, width: 1)
+-      } else if contains(["reviewing", "review"], phase) {
+-        circle(6, 6, 3.5, stroke: ink, width: 1)
+-        line(8.5, 8.5, 12, 12, stroke: ink, width: 1.2)
+-      } else {
+-        circle(7, 7, 4.5, stroke: ink, width: 1)
+-        path([[7, 4], [7, 7], [9, 8]], stroke: ink, width: 1, cap: round)
+-      }
++  component WorkFilters(count) {
++    Row { gap: 4
++      Box { width: linux ? 62 : 72; height: tabHeight; align: center; radius: 6; background: !needsOnly ? alpha(accent, 0.09) : transparent; onTap: { needsOnly = false; workflowActor = ""; pageSize = 5 } Text { text: "All work"; fill: width; align: center; fontSize: 11; maxLines: 1; color: !needsOnly ? accent : muted } }
++      Box { width: linux ? max(74, 56 + len("${count}") * 7) : max(84, 64 + len("${count}") * 7); height: tabHeight; align: center; radius: 6; background: needsOnly ? alpha(accent, 0.09) : transparent; onTap: { needsOnly = true; workflowActor = ""; pageSize = 5 } Text { text: "Needs you (${count})"; fill: width; align: center; fontSize: 11; maxLines: 1; color: needsOnly ? accent : muted } }
+     }
+   }
+-
+-  state observatoryView = "quiet" persist
+-  state inspectionView = ""
+-  state orbitPage = 0
++  component ViewModes() {
++    Row { gap: 4
++        Box { width: linux ? 56 : 62; height: tabHeight; align: center; radius: 6; background: observatoryView != "orbit" ? alpha(accent, 0.09) : transparent; onTap: { observatoryView = "quiet"; expandedSystem = ""; workflowActor = ""; query = "" } Text { text: "Compact"; fill: width; align: center; fontSize: 11; maxLines: 1; color: observatoryView != "orbit" ? accent : muted } }
++        Box { width: linux ? 42 : 48; height: tabHeight; align: center; radius: 6; background: observatoryView == "orbit" ? alpha(accent, 0.09) : transparent; onTap: { observatoryView = "orbit"; orbitPage = 0 } Text { text: "Detail"; fill: width; align: center; fontSize: 11; maxLines: 1; color: observatoryView == "orbit" ? accent : muted } }
++    }
++  }
+   component WorkViewToolbar(count) {
+-    Row {
+-      fill: width
+-      gap: 6
+-      Box { width: 72; height: tabHeight; align: center; radius: 6; background: !needsOnly ? alpha(accent, 0.09) : transparent; onTap: { needsOnly = false; workflowActor = ""; pageSize = 5 } Text { text: "All work"; fill: width; align: center; fontSize: 11; maxLines: 1; color: !needsOnly ? accent : muted } }
+-      Box { width: max(84, 64 + len("${count}") * 7); height: tabHeight; align: center; radius: 6; background: needsOnly ? alpha(accent, 0.09) : transparent; onTap: { needsOnly = true; workflowActor = ""; pageSize = 5 } Text { text: "Needs you ${count}"; fill: width; align: center; fontSize: 11; maxLines: 1; color: needsOnly ? accent : muted } }
+-      Spacer { weight: 1 }
+-      Row {
+-        gap: 4
+-        Box { width: 62; height: tabHeight; align: center; radius: 6; background: observatoryView != "orbit" ? alpha(accent, 0.09) : transparent; onTap: { observatoryView = "quiet"; expandedSystem = ""; workflowActor = ""; query = "" } Text { text: "Compact"; fill: width; align: center; fontSize: 11; maxLines: 1; color: observatoryView != "orbit" ? accent : muted } }
+-        Box { width: 48; height: tabHeight; align: center; radius: 6; background: observatoryView == "orbit" ? alpha(accent, 0.09) : transparent; onTap: { observatoryView = "orbit"; orbitPage = 0 } Text { text: "Detail"; fill: width; align: center; fontSize: 11; maxLines: 1; color: observatoryView == "orbit" ? accent : muted } }
++    if linux && screenWidth < 280 {
++      Column { fill: width; gap: 4
++        WorkFilters { count: count }
++        ViewModes { }
++      }
++    } else {
++      Row { fill: width; gap: 6
++        WorkFilters { count: count }
++        Spacer { weight: 1 }
++        ViewModes { }
+       }
+     }
+   }
+@@ -733,14 +754,14 @@
+       for w in current key w._key {
+         Row {
+           fill: width
+-          height: linux ? 22 : 44
++          height: linux ? 20 : 44
+           gap: 6
+           align: center
+           onTap: { selectedWork = w._key; reply = requestPending ? reply : ""; proposed = ""; evidenceOpen = false }
+           let rowInk = offline ? muted : w.lifecycle == "failed" ? mix(red, foreground, 0.15) : w.attention != "none" ? accent : w.phase == "verifying" ? mix(cyan, foreground, 0.4) : foreground
+           OrbitStateIcon { phase: w.phase; attention: w.attention; offline: offline; failed: w.lifecycle == "failed"; ink: rowInk }
+           // Match visible title glyphs to the icon center; Qt line leading sits above it.
+-          Text { text: w.title; weight: 1; fontSize: 11; maxLines: 1; color: rowInk; offset: [0, 2] }
++          Text { text: w.title; weight: 1; fontSize: linux ? 10 : 11; maxLines: 1; color: rowInk; offset: [0, 2] }
+         }
+       }
+       if len(items) > 8 { Button { text: "+${len(items) - 8} ${len(items) == 9 ? "task" : "tasks"} · inspect system"; onTap: { inspectionView = "orbit"; expandedSystem = provider.id; workflowActor = ""; pageSize = 12 } } }
+@@ -783,7 +804,7 @@
+         Column {
+           weight: 1
+           gap: 1
+-          Text { text: a.name; style: body; maxLines: 1 }
++          Text { text: a.name; style: linux ? "small" : "body"; maxLines: 1 }
+           Text { text: a.status; style: small; color: muted; maxLines: 1 }
+         }
+         Text { text: "›"; width: 10; style: small; color: muted }
+@@ -946,11 +967,13 @@
+     title: "miilo"
+     Column {
+       scroll: true
+-      gap: 10
++      gap: linux ? 3 : 6
++      if setupOpen {
++        SetupTerminal { }
++        if setupSection == "appearance" { RobotColors { } }
++      } else {
+       Setup { }
+       if focused == null && actor == null { Search { placeholder: "Search systems, agents or work" } }
+-      if setupOpen && setupSection != "chat" { RobotColors { } }
+-      SetupTerminal { }
+       if focused != null {
+         WorkDetail { }
+       } else if actor != null {
+@@ -985,6 +1008,7 @@
+           QuietSystemTasks { provider: find(provs, p => p.id == expandedSystem); list: visible }
+         }
+       }
++      }
+     }
+   }
+ }
+--- a/desktop/runtime/MiiloTypeScale.js
++++ b/desktop/runtime/MiiloTypeScale.js
+@@ -1,6 +1,6 @@
+ // Miilo host typography. Logical units; Qt owns display-density conversion.
+ // Host text preferences are independent of widget/grid/robot geometry.
+-var DESKTOP = { huge: 32, title: 16, body: 13, small: 12, muted: 13, label: 12 };
++var DESKTOP = { huge: 26, title: 14, body: 12, small: 11, muted: 12, label: 11 };
+ var PHONE = { huge: 34, title: 20, body: 16, small: 14, muted: 16, label: 14 };
+ 
+ function validScale(value) {

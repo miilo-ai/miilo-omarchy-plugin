@@ -10,9 +10,12 @@ Item {
     property string hostFontFamily: Qt.application.font.family
     property bool active: visible
     property bool expanded: false
-    property var configureLocal: null
     property var interactionTheme: null
     readonly property string miiloHome: Quickshell.env("MIILO_HOME") || Quickshell.env("HOME") + "/.miilo"
+    readonly property bool loading: {
+        var revision = widget.generation;
+        return !root.configurationError && !widget.error && (!widget.program || viewValue("feed") === null);
+    }
     property bool configurationReady: false
     property bool sharedConfiguration: false
     property string configurationError: ""
@@ -52,6 +55,17 @@ Item {
         var slot = widget.program.globals.findIndex(g => g.name === "systemsOpen");
         if (slot >= 0) widget.instance.setState(slot, false);
     }
+    function setViewState(name, value) {
+        if (!widget.instance || !widget.program) return;
+        var slot = widget.program.globals.findIndex(g => g.name === name);
+        if (slot >= 0) widget.instance.setState(slot, OwlJs.fromJson(value));
+    }
+    function viewValue(name) {
+        if (!widget.instance || !widget.program) return null;
+        var slot = widget.program.globals.findIndex(g => g.name === name);
+        return slot < 0 ? null : OwlJs.toJson(widget.instance.read(slot));
+    }
+    function closeSettings() { setViewState("setupOpen", false) }
     function closeDetails() { widget.closeScreen() }
     FileView {
         path: root.miiloHome + "/config.json"
@@ -96,14 +110,14 @@ Item {
     Owl.OwlWidget {
         id: widget
         anchors.fill: parent
-        anchors.margins: 12
+        anchors.margins: host.typographyProfile === "phone" ? 12 : 8
         path: root.configurationReady && !root.configurationError ? root.widgetPath : ""
         errorDir: (Quickshell.env("XDG_STATE_HOME") || host.home + "/.local/state") + "/miilo/widgets/errors"
         host: host
         typography.family: root.hostFontFamily
         palette: root.owlPalette
         active: root.active
-        configureLocal: root.configureLocal
+        configureLocal: null
         interactionTheme: root.interactionTheme
         cols: 3
         rows: 2
@@ -121,7 +135,7 @@ Item {
     Owl.OwlNode {
         anchors.fill: widget
         widget: widget
-        visible: !widget.error
+        visible: !widget.error && !root.loading
         node: {
             var tree = root.expanded ? widget.screenTree : widget.tree
             if (!tree) return null
@@ -129,6 +143,14 @@ Item {
                 : { kind: "Column", p: { gap: 0 }, h: {}, a: {}, c: tree.children }
         }
     }
+    LoadingCrew {
+        anchors.centerIn: widget
+        width: Math.max(0, widget.width - 16)
+        widget: root.widget
+        theme: root.interactionTheme || fallbackTheme
+        visible: root.loading
+    }
+    InteractionTheme { id: fallbackTheme; widget: root.widget }
     TypeText {
         typography: widget.typography
         anchors.fill: widget

@@ -16,8 +16,8 @@ TextField {
     font.family: context.theme.typography.family
     font.pixelSize: context.theme.typography.size("body")
     implicitHeight: context.theme.typography.controlHeight(contentHeight, topPadding + bottomPadding)
-    topPadding: 3
-    bottomPadding: 3
+    topPadding: 2
+    bottomPadding: 2
     selectByMouse: true
     background: Rectangle {
         color: field.activeFocus ? context.theme.focusFill : context.widget.ink("lighter_background")

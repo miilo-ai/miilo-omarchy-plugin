@@ -10,11 +10,11 @@ ComboBox {
     Layout.minimumWidth: 0
     Layout.preferredWidth: 180
     Layout.fillWidth: true
-    implicitHeight: context.theme.typography.controlHeight(contentItem.implicitHeight, 8)
-    verticalPadding: 4
+    implicitHeight: context.theme.typography.controlHeight(contentItem.implicitHeight, 4)
+    verticalPadding: 2
     focusPolicy: Qt.StrongFocus
-    leftPadding: 12
-    rightPadding: 32
+    leftPadding: 8
+    rightPadding: indicator.visible ? 24 : 8
     background: Rectangle {
         color: control.down ? context.theme.pressedFill : control.activeFocus ? context.theme.focusFill : control.hovered ? context.theme.hoverFill : context.widget.ink("lighter_background")
         border.color: context.theme.border
@@ -28,19 +28,28 @@ ComboBox {
         verticalAlignment: Text.AlignVCenter
         wrapMode: Text.Wrap
     }
-    indicator: Miilo.TypeText { typography: context.theme.typography;
-        x: control.width - width - 12
-        anchors.verticalCenter: parent.verticalCenter
-        text: control.popup.visible ? "▴" : "▾"
-        color: context.widget.ink(control.enabled ? "foreground" : "muted")
+    indicator: Canvas {
+        width: 12; height: 12
+        x: control.width - width - 8
+        y: (control.height - height) / 2
+        visible: control.enabled && control.count > 0
+        rotation: control.popup.visible ? 180 : 0
+        property color ink: control.context.theme.foreground
+        onInkChanged: requestPaint()
+        onPaint: {
+            var c = getContext("2d"); c.reset();
+            c.strokeStyle = ink; c.lineWidth = 1.4;
+            c.lineCap = "round"; c.lineJoin = "round";
+            c.beginPath(); c.moveTo(3, 4.5); c.lineTo(6, 7.5); c.lineTo(9, 4.5); c.stroke();
+        }
     }
     delegate: ItemDelegate {
         id: option
         required property var modelData
         required property int index
         width: control.width
-        implicitHeight: context.theme.typography.controlHeight(contentItem.implicitHeight, 8)
-        topPadding: 4; bottomPadding: 4
+        implicitHeight: context.theme.typography.controlHeight(contentItem.implicitHeight, 4)
+        topPadding: 2; bottomPadding: 2
         highlighted: control.highlightedIndex === index
         contentItem: Miilo.TypeText { typography: context.theme.typography;
             text: option.modelData

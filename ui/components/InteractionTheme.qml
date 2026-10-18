@@ -8,11 +8,16 @@ QtObject {
     property var typography: widget && widget.typography ? widget.typography : fallbackTypography
     property var widget
     function tint(name, opacity) {
-        var color = Qt.color(widget.ink(name));
+        return wash(widget.ink(name), opacity);
+    }
+    function wash(value, opacity) {
+        var color = Qt.color(value);
         return Qt.rgba(color.r, color.g, color.b, opacity);
     }
     property color foreground: widget.ink("foreground")
     property color accent: widget.ink("accent")
+    property color secondary: widget && widget.palette && widget.palette.secondary !== undefined ? widget.ink("secondary") : widget.ink("cyan")
+    property color secondaryFill: wash(secondary, 0.14)
     property color pathText: accent
     property color border: tint("foreground", 0.22)
     property color hoverFill: tint("foreground", 0.06)
