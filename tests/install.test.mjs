@@ -7,7 +7,7 @@ import installer from '../tools/lib/install.cjs';
 const source=path.resolve(import.meta.dirname,'..');
 function fixture(t){const base=fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(),'miilo-install-')));t.after(()=>fs.rmSync(base,{recursive:true,force:true}));
   const root=path.join(base,'miilo-omarchy-plugin');fs.mkdirSync(root);
-  for(const name of ['manifest.json','sources.lock.json','LICENSE','ui','vendor','assets'])fs.cpSync(path.join(source,name),path.join(root,name),{recursive:true});
+  for(const name of ['manifest.json','sources.lock.json','LICENSE','uninstall.sh','ui','vendor','assets'])fs.cpSync(path.join(source,name),path.join(root,name),{recursive:true});
   for(const [name,section,version]of [['miilo-owl-widgets/helper','package','1.4.0'],['miilo-cli','workspace.package','0.2.0']]){const folder=path.join(base,name);fs.mkdirSync(folder,{recursive:true});fs.writeFileSync(path.join(folder,'Cargo.toml'),'['+section+']\nversion = "'+version+'"\n');}
   const args={pluginDir:path.join(base,'plugins/io.miilo.bar'),binDir:path.join(base,'bin'),stateDir:path.join(base,'state'),installBinaries:true,gitMetadata:()=>''};
   const binary=(name,version)=>{const file=path.join(base,name);fs.writeFileSync(file,'#!/bin/sh\n[ "$1" = "--version" ] || exit 99\nprintf "%s\\n" "'+name+' '+version+'"\n',{mode:0o755});return file;};

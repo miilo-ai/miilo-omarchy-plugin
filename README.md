@@ -71,6 +71,13 @@ omarchy plugin disable io.miilo.bar
 omarchy plugin remove io.miilo.bar
 ```
 
+For the preview-first removal wrapper in this checkout, run `bash uninstall.sh`
+without arguments, review what remains, then run `bash uninstall.sh --confirm`.
+It disables and removes only `io.miilo.bar` through Omarchy, and verifies absence.
+This source change does not add a private-data purge or remove shared helpers.
+If the checkout was already removed, use the standard manager commands above;
+see [the native validation handoff](.specify/handoffs/uninstall-validation.md).
+
 Removing the plugin retains connections and observations. Stop the separately
 owned collector explicitly if desired:
 `systemctl --user disable --now miilo-local-desktop.service`.
