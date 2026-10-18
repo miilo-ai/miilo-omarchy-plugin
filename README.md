@@ -74,6 +74,8 @@ omarchy plugin remove io.miilo.bar
 For the preview-first removal wrapper in this checkout, run `bash uninstall.sh`
 without arguments, review what remains, then run `bash uninstall.sh --confirm`.
 It disables and removes only `io.miilo.bar` through Omarchy, and verifies absence.
+Verification waits up to ten seconds for asynchronous shell inventory updates;
+unavailable inventory, invalid responses or a remaining install path fail visibly.
 This source change does not add a private-data purge or remove shared helpers.
 If the checkout was already removed, use the standard manager commands above;
 see [the native validation handoff](.specify/handoffs/uninstall-validation.md).
@@ -108,6 +110,8 @@ Requires sibling `miilo-owl-widgets` and `miilo-cli` checkouts, Cargo registry/G
 access for rebuilds, and normal user access to the plugin directory and desktop
 socket. `--dry-run` prints the plan; `--no-restart` installs without restarting or
 enabling the shell plugin. Checks/version mismatches stop before installation.
+Relaunch enables the discovered plugin before restarting, then waits up to ten
+seconds for its live bar widget to accept summon. A timeout returns failure.
 
 For private SDK dependencies, the workflows use Git's CLI authentication. When
 the sibling SDK checkout uses GitHub SSH, its SSH URL is applied to the pinned
