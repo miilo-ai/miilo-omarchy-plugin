@@ -1,0 +1,57 @@
+name: Source release
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing version tag to release
+        required: true
+        type: string
+      publish:
+        description: Publish the qualified source archive
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: source-release-${{ inputs.tag }}
+  cancel-in-progress: false
+jobs:
+  release:
+    if: inputs.publish
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: write
+    env:
+      RELEASE_TAG: ${{ inputs.tag }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ inputs.tag }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+      - name: Verify exact version and tag context
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = "refs/tags/$RELEASE_TAG"
+          test "$RELEASE_TAG" = "v$(node -p 'require("./manifest.json").version')"
+          test "$(git rev-parse HEAD)" = "$(git rev-parse "$RELEASE_TAG^{commit}")"
+      - run: make check
+      - name: Package and publish source
+        run: |
+          set -euo pipefail
+          mkdir release
+          filename="miilo-omarchy-plugin-${RELEASE_TAG#v}.tar.gz"
+          git archive --format=tar.gz --prefix=miilo-omarchy-plugin/ HEAD > "release/$filename"
+          (cd release && sha256sum "$filename" > SHA256SUMS)
+          printf '%s\n' 'Native Omarchy integration with Compact and Detail robot views.' '' 'Requires Omarchy Quattro, Quickshell/Qt, miilo-owl 1.4.0 and miilo-local 0.2.0. This archive contains plugin source; it does not install its runtime dependencies. Validate compatibility with your installed shell. Marketplace submission is separate.' > release-notes.md
+          gh release create "$RELEASE_TAG" release/* --verify-tag --title "Miilo Omarchy plugin ${RELEASE_TAG#v}" --notes-file release-notes.md
+  no-release:
+    if: inputs.publish != true
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo 'No release has been made' >> "$GITHUB_STEP_SUMMARY"
