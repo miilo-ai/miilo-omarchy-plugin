@@ -47,6 +47,11 @@ omarchy plugin enable io.miilo.bar
 
 Click Miilo in the bar to open the dashboard. Escape closes it. **Local agents**
 lets you select existing Codex/Cursor sessions; nothing is enrolled on install.
+Local agents means sessions on this Omarchy computer, not on another device.
+To view them from a phone, use an operator-provisioned observation endpoint;
+local collection does not expose an API automatically. Read the
+[phone and remote guide](https://github.com/miilo-ai/miilo-cli/blob/main/docs/PHONE_AND_REMOTE.md).
+Tailscale, Miilo credentials, model credentials and agent sign-in are separate.
 Local observations need neither CE nor a Miilo account. Native import can start
 the owned `miilo-local-desktop.service` after you confirm your selection.
 Local transcripts have no approval actions. Remote provider actions appear only
@@ -139,8 +144,8 @@ On Omarchy, run `make check-native` against the installed shell. See
 Renderer inputs and their hashes are recorded in `sources.lock.json`.
 Native integration fixes belong here; shared renderer fixes must be coordinated
 with the widgets repository. Update the lock intentionally after reviewing diffs.
-The widgets repository is currently under EdyVision; its planned organization
-transfer must be reflected in the lock/docs once the actual destination is known.
+The shared widgets repository is `miilo-ai/miilo-owl-widgets`. Review the actual
+source revision and hashes before updating the renderer lock.
 
 MIT. Upstream renderer notices remain in `vendor/owl/LICENSE` and `vendor/owl/UPSTREAM.md`.
 Contact: contact@miilo.tech. Maintained by Viratec Interactive LLC.
