@@ -13,7 +13,7 @@ check:
 	bash -n tools/cargo-auth.sh
 	bash tools/test-cargo-auth.sh
 
-check-typography:
+check-typography: check-plain-text
 	bash tools/test-typography.sh
 	bash tools/test-configuration.sh
 
@@ -29,3 +29,6 @@ check-canvas-clock:
 	node tools/test-canvas-clock.cjs
 
 check-typography: check-canvas-clock
+.PHONY: check-plain-text
+check-plain-text:
+	node tools/test-plain-text.cjs

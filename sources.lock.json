@@ -44,9 +44,10 @@
     {
       "source": "desktop/runtime/OwlNode.qml",
       "path": "vendor/owl/OwlNode.qml",
-      "sha256": "637b4e5dcfeddde07d0643020c1c812c5c985acceda15c34f0f25e3b00545279",
+      "sha256": "a8032fb30a291f994cf9558dcb75fabb12ddf4aad066c2c5835518e518c7a222",
       "patches": [
-        "patches/presentation-consistency.patch"
+        "patches/presentation-consistency.patch",
+        "patches/plain-text-labels.patch"
       ]
     },
     {
@@ -58,9 +59,10 @@
     {
       "source": "desktop/runtime/OwlTerminal.qml",
       "path": "vendor/owl/OwlTerminal.qml",
-      "sha256": "eed490bcc0444f16283733f4db80200db05746698dea0efff53d0fc22be1d808",
+      "sha256": "b1450e5f65ba1f0d40c7d1ad412049c0f930f9c1d0bd3080c741a6aa8a323610",
       "patches": [
-        "patches/terminal-session.patch"
+        "patches/terminal-session.patch",
+        "patches/plain-text-labels.patch"
       ]
     },
     {
@@ -74,8 +76,10 @@
     {
       "source": "desktop/runtime/UPSTREAM.md",
       "path": "vendor/owl/UPSTREAM.md",
-      "sha256": "d3028177dbb53123466f6e74d0231bd84c5ced49f82ab96f067d71502c07c89c",
-      "patches": []
+      "sha256": "3d482415423d8e69f323f1981725e99f1649c5f1f49816bab26242f53d08e52f",
+      "patches": [
+        "patches/plain-text-labels.patch"
+      ]
     },
     {
       "source": "desktop/runtime/owl-source",
