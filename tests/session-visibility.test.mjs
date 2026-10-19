@@ -34,7 +34,7 @@ assert.deepEqual(s.get('actors').map(a=>a._key),['a8'],'Observed working session
 assert.deepEqual(s.get('selectableProviders').map(p=>p.id),['p8']);
 assert.equal(s.get('allActors').filter(a=>a.status==='resting').length,12,'Never fake activity');
 assert.equal(s.get('provs').length,1);
-assert.equal(s.render().filter(n=>n.kind==='Canvas'&&n.p.height===164).length,1,'Only visible session gets an Orbit field');
+assert.equal(s.render().filter(n=>n.kind==='Canvas'&&n.p.height===82).length,1,'Only visible session gets an Orbit field');
 assert.equal(s.get('systemsOpen'),false,'Menu starts collapsed');
 // The native header owns navigation; its state drives the same selector projection.
 s.set('systemsOpen',true);
@@ -85,7 +85,7 @@ orbitTile.set('observatoryView','quiet');
 orbitTile.render().find(n=>n.p?.text==='Back').h.onTap(0,0);
 assert.equal(orbitTile.get('observatoryView'),'orbit','Back restores the entry mode explicitly');
 assert.equal(orbitTile.get('expandedSystem'),'');
-assert.equal(orbitTile.render().filter(n=>n.kind==='Canvas'&&n.p.height===164).length,1);
+assert.equal(orbitTile.render().filter(n=>n.kind==='Canvas'&&n.p.height===82).length,1);
 
 // Narrow desktop windows wrap filters and display modes into separate rows.
 for (const width of [240, 260, 900]) {
@@ -112,5 +112,5 @@ for (const width of [240, 360, 600, 960]) {
   const compact = scene(fleetFixture,{observatoryView:'quiet'},{screenWidth:width}).render().find(n => n.kind === 'Grid');
   assert(compact); assert.equal(compact.p.columns,Math.max(1,Math.min(4,Math.floor((width-18)/88))));
   const detail = scene(fleetFixture,{observatoryView:'orbit'},{screenWidth:width}).render().find(n => n.kind === 'Grid');
-  assert(detail); assert.equal(detail.p.columns,Math.max(1,Math.min(3,Math.floor((width-14)/218))));
+  assert(detail); assert.equal(detail.p.columns,Math.max(1,Math.min(4,Math.floor((width-14)/190))));
 }

@@ -32,3 +32,12 @@ Keyboard follow-up: native tests exercise actual generated robot cards with Tab,
 Enter and Space. Existing activation handlers are retained; a full themed outline
 replaces the small edge marker. Transcript-backed rows show the latest summary in
 one line instead of repeating the session title. No evidence content is invented.
+
+Desktop density follow-up: overview robot/orbit geometry is scaled by 0.5 in
+Detail and Compact modes. The Detail animation band is 82 logical pixels instead
+of 164, and cards allow up to four columns with viewport-driven wrapping.
+Geometry checks at 480/800/1200 logical widths and the updated existing layout
+regressions pass. Full native qualification and the maintained backed-up relaunch
+passed; the actual workspace-1 window was visually inspected at its current narrow
+size. This is a native plugin presentation patch; Android widget sources and
+rendering were not changed by the density follow-up.

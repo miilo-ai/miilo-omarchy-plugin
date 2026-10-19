@@ -760,7 +760,7 @@ widget "miilo" {
         Text { text: provider.name; weight: 1; fontSize: 11; maxLines: 1 }
         Text { text: offline ? "Unavailable" : "${len(items)} ${len(items) == 1 ? "task" : "tasks"}"; width: 60; align: end; fontSize: 10; color: muted; maxLines: 1 }
       }
-      OrbitField { items: current; anchor: anchor; offline: offline; energized: any(items, w => w.lifecycle == "active"); slot: slot; alert: mark; fit: fit }
+      OrbitField { items: current; anchor: anchor; offline: offline; energized: any(items, w => w.lifecycle == "active"); slot: slot; alert: mark; fit: fit * 0.5; fieldSize: 82 }
       if len(items) == 0 { Text { text: offline ? "Waiting for a fresh observation" : "No tasks in flight"; style: small; color: muted } }
       for w in current key w._key {
         Row {
@@ -782,13 +782,13 @@ widget "miilo" {
     let systems = provs.filter(p => !needsOnly || any(list, w => w.providerId == p.id))
     let page = min(orbitPage, max(0, ceil(len(systems) / 6) - 1))
     // Content-sized columns, not a desktop/mobile breakpoint.
-    let columns = max(1, min(len(systems), min(3, floor((screenWidth - 14) / 218))))
+    let columns = max(1, min(len(systems), min(4, floor((screenWidth - 14) / 190))))
     Grid {
-      width: min(max(screenWidth - 24, 100), columns * 330 + (columns - 1) * 10)
+      width: min(max(screenWidth - 24, 100), columns * 240 + (columns - 1) * 10)
       columns: columns
       gap: 10
       for p, i in systems.filter((p, i) => i >= page * 6 && i < (page + 1) * 6) key p.id {
-        OrbitCluster { provider: p; items: list.filter(w => w.providerId == p.id); slot: indexOf(allProviders.map(q => q.id), p.id); fit: min(0.85, ((min(max(screenWidth - 24, 100), columns * 330 + (columns - 1) * 10) - (columns - 1) * 10) / columns - 20) / 270) }
+        OrbitCluster { provider: p; items: list.filter(w => w.providerId == p.id); slot: indexOf(allProviders.map(q => q.id), p.id); fit: min(0.85, ((min(max(screenWidth - 24, 100), columns * 240 + (columns - 1) * 10) - (columns - 1) * 10) / columns - 20) / 270) }
       }
     }
     if len(systems) == 0 { Text { text: needsOnly ? "Nothing needs you" : "No systems to display"; style: small; color: muted } }
@@ -845,7 +845,7 @@ widget "miilo" {
           align: center
           gap: 2
           onTap: { inspectionView = "quiet"; expandedSystem = p.id; workflowActor = ""; selectedActor = ""; pageSize = 5; agentsOpen = false }
-          QuietPortrait { provider: p; items: live.filter(w => w.providerId == p.id); s: min(128, max(48, (screenWidth - 24 - (columns - 1) * 6) / columns)) }
+          QuietPortrait { provider: p; items: live.filter(w => w.providerId == p.id); s: min(128, max(48, (screenWidth - 24 - (columns - 1) * 6) / columns)) * 0.5 }
           Text { text: replace(p.name, "-", " "); width: max(48, (screenWidth - 24 - (columns - 1) * 8) / columns); height: 28; align: center; fontSize: 10; maxLines: 2 }
         }
       }
