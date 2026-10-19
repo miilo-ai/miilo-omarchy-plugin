@@ -21,3 +21,14 @@ Validated on a native Omarchy host from an isolated copy of this branch:
 The widgets repository records actual Android launcher navigation and cross-device
 revocation/restart/staleness tests. Its helper owns pairing and protocol behavior.
 Private captures, device addresses, invitations and credentials are not committed.
+
+Subsequent live-shell acceptance: the backed-up candidate was installed with the
+maintained native installer and desktop relaunch workflow. The regular window
+on workspace 1 displayed the existing factory plus the paired computer sessions.
+The owner then explicitly selected the current Codex conversation; the installed
+helper received it with no endpoint errors. Exactly one live shell remained.
+
+Keyboard follow-up: native tests exercise actual generated robot cards with Tab,
+Enter and Space. Existing activation handlers are retained; a full themed outline
+replaces the small edge marker. Transcript-backed rows show the latest summary in
+one line instead of repeating the session title. No evidence content is invented.
