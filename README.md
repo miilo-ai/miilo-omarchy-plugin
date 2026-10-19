@@ -33,9 +33,14 @@ Installed Omarchy acceptance is pending.
 ## Install
 
 Requires Omarchy Quattro with its plugin commands, Quickshell/Qt, Nerd Font icons,
-`miilo-owl` 1.4.0 from miilo-owl-widgets, and `miilo-local` 0.2.0 from miilo-cli
+`miilo-owl` 1.5.0 from miilo-owl-widgets, and `miilo-local` 0.3.0 from miilo-cli
 for local session onboarding. Put both binaries on the shell's PATH first.
 Download the matching helper and CLI binaries from their GitHub Releases.
+
+The picker supports Codex, Claude Code, Cursor, OpenCode, Devin CLI, Grok CLI and
+Hermes, individually or in explicit folder groups. These local sources are
+observation-only. See the CLI [compatibility matrix](https://github.com/miilo-ai/miilo-cli/blob/main/docs/AGENT_COMPATIBILITY.md)
+for tested versions, storage formats and live-validation scope.
 
 Install the plugin, then validate it against your Omarchy shell version:
 

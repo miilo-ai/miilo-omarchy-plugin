@@ -48,7 +48,7 @@ jobs:
           filename="miilo-omarchy-plugin-${RELEASE_TAG#v}.tar.gz"
           git archive --format=tar.gz --prefix=miilo-omarchy-plugin/ HEAD > "release/$filename"
           (cd release && sha256sum "$filename" > SHA256SUMS)
-          printf '%s\n' 'Native Omarchy integration with Compact and Detail robot views.' '' 'Requires Omarchy Quattro, Quickshell/Qt, miilo-owl 1.4.0 and miilo-local 0.2.0. This archive contains plugin source; it does not install its runtime dependencies. Validate compatibility with your installed shell. Marketplace submission is separate.' > release-notes.md
+          printf '%s\n' 'Native Omarchy integration with Compact and Detail robot views.' '' 'Requires Omarchy Quattro, Quickshell/Qt, miilo-owl 1.5.0 and miilo-local 0.3.0. This archive contains plugin source; it does not install its runtime dependencies. Validate compatibility with your installed shell. Marketplace submission is separate.' > release-notes.md
           gh release create "$RELEASE_TAG" release/* --verify-tag --title "Miilo Omarchy plugin ${RELEASE_TAG#v}" --notes-file release-notes.md
   no-release:
     if: inputs.publish != true
