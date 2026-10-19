@@ -1,5 +1,8 @@
 # Shared user configuration checkpoint — 2026-10-17
 
+> Historical validation record. Results apply only to the revision and environment recorded below; they do not describe current release readiness.
+
+
 Coordinated source candidate across SDK, CLI, widgets helper and native plugin.
 The user configuration root is `~/.miilo/`. No real user migration,
 installation, collector change or desktop restart was performed in this session.

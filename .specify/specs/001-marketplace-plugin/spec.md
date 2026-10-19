@@ -1,5 +1,8 @@
 # Independent Omarchy plugin
 
+> Retained design record. Unchecked historical milestones are not a current release checklist. See docs/release-status.md for current scope and outstanding validation.
+
+
 One public-intended repository owns native shell presentation. Its permanent
 identity is `io.miilo.bar`, retained for compatibility with prior local installs.
 The root manifest loads `desktop/omarchy/BarWidget.qml`, which opens the nested

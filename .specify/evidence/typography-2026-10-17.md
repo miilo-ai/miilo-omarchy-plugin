@@ -1,5 +1,8 @@
 # Typography and onboarding availability — 2026-10-17
 
+> Historical validation record. Results apply only to the revision and environment recorded below; they do not describe current release readiness.
+
+
 Source checkpoint only. No installed plugin, shell
 configuration, observation connection or user data was changed.
 

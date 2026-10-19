@@ -13,7 +13,7 @@ robot fleet, searchable work, explanations and supported provider actions.
 
 The plugin consumes a versioned shared renderer and delegates observation to the
 native helper. Provider credentials and execution remain outside the UI.
-Installed Omarchy acceptance is pending.
+See the release-status guide for validation scope and remaining platform checks.
 
 ## Preview
 
@@ -183,3 +183,5 @@ Native design: [Compact / Detail and your local crew](docs/orbit-design.md).
 Existing work/consent rules remain unchanged; native qualification is still required.
 
 Development and preview tooling: [toolchain guide](docs/development-toolchain.md).
+
+Release scope and remaining validation: [release status](docs/release-status.md).

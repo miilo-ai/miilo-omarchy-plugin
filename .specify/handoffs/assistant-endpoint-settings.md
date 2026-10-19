@@ -1,5 +1,8 @@
 # Assistant endpoint settings
 
+> Retained design record. Unchecked historical milestones are not a current release checklist. See docs/release-status.md for current scope and outstanding validation.
+
+
 The shared OWL asset now exposes **Chat model** under its settings cog. It runs the existing `miilo-owl chat-setup` flow. Voice support is explicitly deferred, matching `004-launcher-voice`.
 
 ## Existing contract

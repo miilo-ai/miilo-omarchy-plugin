@@ -1,5 +1,8 @@
 # NATIVE-ORBIT-001 — Orbit hosting and lively local-agent onboarding
 
+> Retained design record. Unchecked historical milestones are not a current release checklist. See docs/release-status.md for current scope and outstanding validation.
+
+
 Status: initial UI candidate implemented; native Omarchy acceptance pending.
 Date: 2026-10-17. See ../../evidence/orbit-crew-local.md.
 Read ../002-plugin-layout/plan.md and ../../handoffs/omarchy-agent.md first.

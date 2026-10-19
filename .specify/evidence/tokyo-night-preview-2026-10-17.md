@@ -1,5 +1,8 @@
 # Tokyo Night preview — 2026-10-17
 
+> Historical validation record. Results apply only to the revision and environment recorded below; they do not describe current release readiness.
+
+
 Palette: Omarchy themes/tokyo-night/colors.toml.
 Source: https://github.com/omacom/omarchy/blob/afa2839a5ac7bf1c2da4f49649b8dbd0f83f7f12/themes/tokyo-night/colors.toml
 SHA-256 of color data: 8b5f53ba35b9305aafa72776dd56ea2029faaf29015e2e42db5e19ef698a8e0e
