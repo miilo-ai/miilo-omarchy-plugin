@@ -66,8 +66,10 @@
     {
       "source": "desktop/runtime/OwlWidget.qml",
       "path": "vendor/owl/OwlWidget.qml",
-      "sha256": "81a614b6e3943cb08854435ada11b819d6e2db43c969769f5659720fde3e9b9b",
-      "patches": []
+      "sha256": "73bee8bfbc079c6c8e4d893e469bb58f877ba12bc8171cad06bb2485fa7475e3",
+      "patches": [
+        "patches/canvas-animation-clock.patch"
+      ]
     },
     {
       "source": "desktop/runtime/UPSTREAM.md",

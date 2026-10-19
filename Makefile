@@ -23,3 +23,9 @@ check-native: check
 .PHONY: render-design
 render-design:
 	node tools/render-crew.cjs
+
+.PHONY: check-canvas-clock
+check-canvas-clock:
+	node tools/test-canvas-clock.cjs
+
+check-typography: check-canvas-clock
