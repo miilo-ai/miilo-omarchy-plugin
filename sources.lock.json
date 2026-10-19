@@ -5,7 +5,7 @@
     {
       "source": "70-miilo-fleet.owl",
       "path": "assets/70-miilo-fleet.owl",
-      "sha256": "4ac8346933cdac2bcdaa83abd1d60496e35127c21e4525a45076dd05f3edf9e7",
+      "sha256": "7aa8ac9bc846808a93689010cf9efb34f6e5523e5a5dd6ed7171d0589a2ddb8d",
       "patches": [
         "patches/presentation-consistency.patch",
         "patches/desktop-density.patch",
@@ -14,7 +14,8 @@
         "patches/computer-pairing.patch",
         "patches/keyboard-activity.patch",
         "patches/desktop-robot-scale.patch",
-        "patches/detail-task-limit.patch"
+        "patches/detail-task-limit.patch",
+        "patches/action-alignment.patch"
       ]
     },
     {

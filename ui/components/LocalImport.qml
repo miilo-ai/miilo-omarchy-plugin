@@ -9,6 +9,7 @@ FocusScope {
     id: root
     property var widget
     property InteractionTheme theme: InteractionTheme { widget: root.widget }
+    property bool leftHanded: false
     property bool active: true
     property bool suspended: false
     readonly property alias controller: flow
@@ -118,7 +119,8 @@ FocusScope {
                 wrapMode: Text.WordWrap
             }
             Flow {
-                layoutDirection: root.theme.typography.profile === "phone" ? Qt.LeftToRight : Qt.RightToLeft
+                objectName: "importActions"
+                layoutDirection: root.leftHanded ? Qt.LeftToRight : Qt.RightToLeft
                 spacing: 6
                 Layout.fillWidth: true
                 Controls.Action { context: root;

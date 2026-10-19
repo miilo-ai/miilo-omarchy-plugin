@@ -94,3 +94,12 @@ The Qt renderer defaults to a 30 FPS paint budget. Always pass elapsed time into
 the interpreter; never count accepted paints as animation time or replay missed
 frames in a burst. State/input invalidation remains immediate. Keep the native
 paint-budget and wall-clock-speed assertions in the canvas-clock fixture.
+
+## Action placement
+
+Action groups follow the saved Controls side in Appearance: right handed places
+commands on the right, left handed places them on the left. Do not infer this
+preference from desktop/phone typography. Keep related actions such as Import and
+Cancel together, and apply the same preference to card overflow and confirmation
+commands. Navigation tabs retain their own grouping and must reserve enough width
+for the entire label and counter; move groups onto separate rows before clipping.

@@ -1,0 +1,62 @@
+diff --git a/assets/70-miilo-fleet.owl b/assets/70-miilo-fleet.owl
+index 0b631da..433cd09 100644
+--- a/assets/70-miilo-fleet.owl
++++ b/assets/70-miilo-fleet.owl
+@@ -44,7 +44,7 @@ widget "miilo" {
+   state agentLimit = 5
+   state needsOnly = false
+   state agentsOpen = false
+-  state leftHanded = false
++  state leftHanded = false persist
+   state previewRobots = false
+   state robotColors = [] persist
+   state colorAgent = ""
+@@ -402,10 +402,13 @@ widget "miilo" {
+         let action = find(focused.actions ?? [], a => a._key == proposed)
+         if action != null && focused._revisionKey == proposalRevision {
+           Text { text: "${action.label}: ${focused.title}?"; style: small; maxLines: 2 }
+-          Flow {
++          Row {
++            fill: width
+             gap: 6
++            if !leftHanded { Spacer { weight: 1 } }
+             Button { text: "Confirm"; color: accent; onTap: { requestPending = true; replyWork = proposalWork; replyRevision = proposalRevision; reply = run("miilo-owl action ${sh(proposalWork)} ${sh(proposed)} ${sh(proposalRevision)}"); reply = "pending"; proposed = "" } }
+             Button { text: "Cancel"; onTap: proposed = "" }
++            if leftHanded { Spacer { weight: 1 } }
+           }
+         } else {
+           Text { text: "Task changed. Review again."; style: small; color: muted }
+@@ -716,7 +719,7 @@ widget "miilo" {
+   component WorkFilters(count) {
+     Row { gap: 4
+       Box { width: linux ? 62 : 72; height: tabHeight; align: center; radius: 6; background: !needsOnly ? alpha(accent, 0.09) : transparent; onTap: { needsOnly = false; workflowActor = ""; pageSize = 5 } Text { text: "All work"; fill: width; align: center; fontSize: 11; maxLines: 1; color: !needsOnly ? accent : muted } }
+-      Box { width: linux ? max(74, 56 + len("${count}") * 7) : max(84, 64 + len("${count}") * 7); height: tabHeight; align: center; radius: 6; background: needsOnly ? alpha(accent, 0.09) : transparent; onTap: { needsOnly = true; workflowActor = ""; pageSize = 5 } Text { text: "Needs you (${count})"; fill: width; align: center; fontSize: 11; maxLines: 1; color: needsOnly ? accent : muted } }
++      Box { width: max(104, 97 + len("${count}") * 7); height: tabHeight; align: center; radius: 6; background: needsOnly ? alpha(accent, 0.09) : transparent; onTap: { needsOnly = true; workflowActor = ""; pageSize = 5 } Text { text: "Needs you (${count})"; fill: width; align: center; fontSize: 11; maxLines: 1; color: needsOnly ? accent : muted } }
+     }
+   }
+   component ViewModes() {
+@@ -726,7 +729,7 @@ widget "miilo" {
+     }
+   }
+   component WorkViewToolbar(count) {
+-    if linux && screenWidth < 280 {
++    if linux && screenWidth < 340 {
+       Column { fill: width; gap: 4
+         WorkFilters { count: count }
+         ViewModes { }
+@@ -777,7 +780,14 @@ widget "miilo" {
+           Text { text: get(w.extensions ?? {}, "dev.miilo.session", null) != null && trim(w.summary ?? "") != "" ? w.summary : w.title; weight: 1; fontSize: linux ? 10 : 11; maxLines: 1; color: rowInk; offset: [0, 2] }
+         }
+       }
+-      if len(items) > visibleLimit { Button { text: "View more"; color: accent; onTap: { inspectionView = "orbit"; expandedSystem = provider.id; workflowActor = ""; pageSize = 12 } } }
++      if len(items) > visibleLimit {
++        Row {
++          fill: width
++          if !leftHanded { Spacer { weight: 1 } }
++          Button { text: "View more"; width: 84; height: 24; scale: 0.85; color: accent; onTap: { inspectionView = "orbit"; expandedSystem = provider.id; workflowActor = ""; pageSize = 12 } }
++          if leftHanded { Spacer { weight: 1 } }
++        }
++      }
+     }
+   }
+   component OrbitView(list) {

@@ -50,3 +50,15 @@ The actual Qt settings control is exercised in the native settings fixture.
 `make check-native check-typography` and the maintained backed-up relaunch passed.
 Installed asset content was verified. Post-relaunch window captures returned black,
 so live visual acceptance of this follow-up remains unconfirmed. Android unchanged.
+
+Action alignment follow-up: Controls side is now persisted and passed into native
+Import/Cancel layout instead of inferred from typography. Card overflow and
+confirmation groups follow the same side; View more uses a smaller button scale.
+Filter width reserves the complete Needs you counter, and narrower toolbars split
+at 340 logical pixels. Tests cover both action sides, saved state, zero/one-/three-
+digit counters, and the actual native import action container. Native qualification
+and the maintained backed-up relaunch passed. The earlier black capture was caused
+by window coordinates outside the current logical monitor bounds; repositioning
+only Miilo resolved it. Live inspection confirmed five factory rows, smaller
+right-aligned View more, and the complete Needs you (0) label. Private captures
+remain outside source. Android unchanged.

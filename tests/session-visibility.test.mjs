@@ -91,7 +91,7 @@ assert.equal(orbitTile.render().filter(n=>n.kind==='Canvas'&&n.p.height===82).le
 for (const width of [240, 260, 900]) {
   const layout = scene(fixture(), {}, {screenWidth:width}).render();
   const combined = layout.filter(n => n.kind === 'Row' && [...walk(n)].some(c => c.p?.text === 'All work') && [...walk(n)].some(c => c.p?.text === 'Compact'));
-  assert.equal(combined.length > 0, width >= 280, 'Toolbar grouping must follow the actual viewport');
+  assert.equal(combined.length > 0, width >= 340, 'Toolbar grouping must follow the actual viewport');
 }
 
 // Settings replace work content, then return to the same inspected task.
@@ -136,3 +136,21 @@ assert.equal(preference.get('detailTaskLimit'),5);
 preference.set('detailTaskLimit',8);
 const restored = scene(factory,preference.instance.persisted());
 assert.equal(restored.get('detailTaskLimit'),8,'Detail preference survives a new surface instance');
+
+// Action alignment follows the persisted controls preference, in both directions.
+for (const leftHanded of [false,true]) {
+  const actions = scene(factory,{leftHanded}), nodes = actions.render();
+  const row = nodes.find(n=>n.kind==='Row'&&n.c?.some(c=>c.kind==='Button'&&c.p.text==='View more'));
+  assert(row);
+  assert.equal(row.c[leftHanded?row.c.length-1:0].kind,'Spacer');
+  const button = row.c.find(c=>c.kind==='Button');
+  assert(button.p.scale < 1);
+  assert.equal(actions.instance.persisted().leftHanded,leftHanded);
+}
+for (const count of [0,9,100]) {
+  const inventory = structuredClone(factory);
+  inventory.snapshot.workItems = Array.from({length:Math.max(1,count)},(_,i)=>({...factory.snapshot.workItems[0],_key:'decision'+i,id:'decision'+i,attention:i<count?'approval':'none'}));
+  const filters = scene(inventory).render().find(n=>n.kind==='Box'&&n.c?.some(c=>c.p?.text===`Needs you (${count})`));
+  assert(filters,'Filter retains its complete label and counter');
+  assert(filters.p.width >= 104,'Filter reserves label and counter space');
+}

@@ -74,6 +74,7 @@ FloatingWindow {
         }
         LocalImport {
             id: importer
+            leftHanded: { var revision = surface.widget.generation; return surface.viewValue("leftHanded") === true }
             anchors.fill: surface
             widget: surface.widget
             theme: root.interactionTheme

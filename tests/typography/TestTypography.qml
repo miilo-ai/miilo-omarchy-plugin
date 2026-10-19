@@ -50,6 +50,12 @@ Item {
             importer.controller.agents = [{name:"Codex with a very long setup name", locations:["/tmp/long/path"], observationSupported:true}];
         }
         function cleanup() { console.log("TYPE_CASE", qtest_results.functionName, qtest_results.failed ? "FAILED" : "passed") }
+        function test_import_actions_follow_control_side() {
+            var actions = findChild(importer,"importActions"); verify(actions);
+            importer.leftHanded = false; compare(actions.layoutDirection,Qt.RightToLeft);
+            importer.leftHanded = true; compare(actions.layoutDirection,Qt.LeftToRight);
+            importer.leftHanded = false;
+        }
         function test_nested_tile_and_task_clicks() {
             clickableTile.visible = true;
             wait(50);
