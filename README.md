@@ -185,3 +185,5 @@ Existing work/consent rules remain unchanged; native qualification is still requ
 Development and preview tooling: [toolchain guide](docs/development-toolchain.md).
 
 Release scope and remaining validation: [release status](docs/release-status.md).
+
+Native integration rules: [Omarchy integration guide](docs/omarchy-integration-guide.md), including plain-text rendering and renderer security checks.

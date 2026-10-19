@@ -1,0 +1,69 @@
+diff --git a/vendor/owl/OwlNode.qml b/vendor/owl/OwlNode.qml
+index 51922e5..911736a 100644
+--- a/vendor/owl/OwlNode.qml
++++ b/vendor/owl/OwlNode.qml
+@@ -541,6 +541,7 @@ Item {
+         id: label
+         anchors.centerIn: parent
+         text: root.p.text === undefined || root.p.text === null ? "…" : String(root.p.text)
++        textFormat: Text.PlainText
+         color: root.p.color || (root.widget ? root.widget.ink("accent") : "white")
+         font.pixelSize: root.typography.size("body")
+         font.family: root.family("mono")
+@@ -714,6 +715,7 @@ Item {
+           Text {
+             anchors.centerIn: parent
+             text: "Import local agents"
++            textFormat: Text.PlainText
+             color: root.widget.ink("foreground")
+           }
+           MouseArea { anchors.fill: parent; onClicked: root.widget.configureLocal() }
+@@ -814,6 +816,7 @@ Item {
+           verticalAlignment: Text.AlignVCenter
+           visible: field.text === ""
+           text: root.p.placeholder || ""
++          textFormat: Text.PlainText
+           color: root.widget ? root.widget.ink("muted") : "grey"
+           font: field.font
+         }
+diff --git a/vendor/owl/OwlTerminal.qml b/vendor/owl/OwlTerminal.qml
+index 7b93d32..d3d1fac 100644
+--- a/vendor/owl/OwlTerminal.qml
++++ b/vendor/owl/OwlTerminal.qml
+@@ -129,6 +129,7 @@ Rectangle {
+       required property int index
+       width: output.width
+       text: root.lines[index] || " "
++      textFormat: Text.PlainText
+       color: root.widget ? root.widget.ink("foreground") : "white"
+       font: metrics.font
+       wrapMode: Text.WrapAnywhere
+@@ -157,6 +158,7 @@ Rectangle {
+         delegate: Text {
+           required property var modelData
+           text: modelData.label
++          textFormat: Text.PlainText
+           color: root.widget ? root.widget.ink("accent") : "white"
+           font.family: root.widget ? root.widget.monoFamily : "monospace"
+           font.pixelSize: root.fontSize
+@@ -197,6 +199,7 @@ Rectangle {
+         anchors.fill: parent
+         visible: field.text === "" && !field.activeFocus
+         text: "$ tap to type"
++        textFormat: Text.PlainText
+         color: root.widget ? root.widget.ink("muted") : "grey"
+         font: field.font
+       }
+diff --git a/vendor/owl/UPSTREAM.md b/vendor/owl/UPSTREAM.md
+index d1261de..34ec7f0 100644
+--- a/vendor/owl/UPSTREAM.md
++++ b/vendor/owl/UPSTREAM.md
+@@ -20,3 +20,8 @@ Miilo-authored additions. Android Compose/Omalauncher is a separate renderer and
+ requires its own host integration and on-device acceptance.
+ Canvas explicitly selects Canvas.Image: Qt 6 ignores FramebufferObject. This
+ corrects the previous GPU-path comment; native performance still needs measurement.
++
++Security patch: all runtime Text labels, input placeholders and terminal output
++use Text.PlainText. Provider-controlled strings remain literal and cannot cause
++inline image fetches through automatic rich-text detection. See
++patches/plain-text-labels.patch for the renderer changes.

@@ -18,3 +18,8 @@ For local build/update/relaunch work, read `skills/miilo-desktop/SKILL.md` and u
 `tools/dev-relaunch.sh`. This workflow preserves the canonical native layout;
 the legacy widgets installer does not install the native crew UI. The skill
 does not override the active filesystem, network or desktop-socket permissions.
+
+Before changing QML text, renderer imports or display controls, read
+`docs/omarchy-integration-guide.md`. Untrusted display strings must use explicit
+plain-text rendering. Run source guards and the native positive-control network
+canary; preserve the shared renderer fix and vendored patch/hash provenance.

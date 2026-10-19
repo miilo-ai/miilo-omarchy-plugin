@@ -17,3 +17,13 @@ checks, tests and preview capture. Use Rust for application behavior, Node built
 for portable development tooling, shell orchestration and native Qt for rendering.
 Run `node tools/check-no-python.cjs`; do not bypass it or replace acceptance with a
 static image. Historical evidence remains dated and is not rewritten as a new run.
+
+## Untrusted presentation data
+
+Provider/agent names, task/action labels, evidence, placeholders, errors and terminal
+output must render literally. Qt text surfaces use Text.PlainText (or the existing
+TypeText component); never rely on automatic rich-text detection. Preserve stored
+evidence unchanged. New renderer changes require source guards and a native
+loopback image-request canary with a positive control. Keep shared and vendored
+fixes aligned with reproducible patches and source hashes. See
+`docs/omarchy-integration-guide.md`.
