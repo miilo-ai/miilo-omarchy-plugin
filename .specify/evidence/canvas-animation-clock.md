@@ -7,10 +7,12 @@ retain its evaluated value while the layout reported `readsTime: false`.
 Snapshot refresh rebuilt the closure and caused visible jumps. Layout expressions
 that independently read time could mask the defect.
 
-The frame handler now rebuilds deferred drawing closures when the instance,
-root tree, or expanded-screen tree reads time. The native regression fixture
-checks consecutive position advances without a snapshot refresh. It fails against
-the original renderer and passes against the corrected renderer.
+The initial correction rebuilt deferred drawing closures when the clock advanced.
+The rendering-performance implementation supersedes that approach with tracked
+local-expression invalidation, so canvas-only motion retains its layout tree.
+The native regression fixture checks consecutive position advances without a
+snapshot refresh. It fails against the original renderer and passes with the
+tracked-cache correction. See rendering-performance.md for current A/B results.
 
 ## Validation
 

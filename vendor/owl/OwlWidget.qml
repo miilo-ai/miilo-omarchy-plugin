@@ -287,9 +287,8 @@ Item {
     onTriggered: {
       root.instance.frame(elapsedTime)
       root.frame++
-      // Deferred canvas draws also read time through cached component-local lets.
-      // Rebuild those closures even when the layout itself did not read the clock.
-      if (root.instance.readsTime || (root.tree && root.tree.readsTime)
+      // Canvas-local clocks invalidate lazily without rebuilding static layout.
+      if ((root.tree && root.tree.readsTime)
           || (root.screenTree && root.screenTree.readsTime)) root.render()
     }
   }
