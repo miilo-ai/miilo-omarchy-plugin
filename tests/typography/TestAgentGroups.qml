@@ -22,7 +22,7 @@ Item {
         onCompletedChanged: if (completed) console.log(qtest_results.failCount === 0 ? "MIILO_GROUPS_OK" : "MIILO_GROUPS_FAILED")
         function test_kind_roundtrip() {
             var choice = findChild(editor, "groupKind"); verify(choice);
-            var kinds = ["all", "codex", "cursor", "opencode", "devin", "claude"];
+            var kinds = ["all", "codex", "cursor", "opencode", "devin", "claude", "grok", "hermes"];
             for (var i = 0; i < kinds.length; i++) {
                 controller.draft = ({kind:kinds[i]});
                 compare(choice.currentIndex, i);
