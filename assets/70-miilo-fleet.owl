@@ -725,7 +725,7 @@ widget "miilo" {
   component ViewModes() {
     Row { gap: 4
         Box { width: linux ? 56 : 62; height: tabHeight; align: center; radius: 6; background: observatoryView != "orbit" ? alpha(accent, 0.09) : transparent; onTap: { observatoryView = "quiet"; expandedSystem = ""; workflowActor = ""; query = "" } Text { text: "Compact"; fill: width; align: center; fontSize: 11; maxLines: 1; color: observatoryView != "orbit" ? accent : muted } }
-        Box { width: linux ? 42 : 48; height: tabHeight; align: center; radius: 6; background: observatoryView == "orbit" ? alpha(accent, 0.09) : transparent; onTap: { observatoryView = "orbit"; orbitPage = 0 } Text { text: "Detail"; fill: width; align: center; fontSize: 11; maxLines: 1; color: observatoryView == "orbit" ? accent : muted } }
+        Box { width: linux ? 42 : 48; height: tabHeight; align: center; radius: 6; background: observatoryView == "orbit" ? alpha(accent, 0.09) : transparent; onTap: { observatoryView = "orbit"; expandedSystem = ""; workflowActor = ""; inspectionView = ""; orbitPage = 0 } Text { text: "Detail"; fill: width; align: center; fontSize: 11; maxLines: 1; color: observatoryView == "orbit" ? accent : muted } }
     }
   }
   component WorkViewToolbar(count) {

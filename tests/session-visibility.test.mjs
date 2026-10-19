@@ -154,3 +154,10 @@ for (const count of [0,9,100]) {
   assert(filters,'Filter retains its complete label and counter');
   assert(filters.p.width >= 104,'Filter reserves label and counter space');
 }
+
+const modeSwitch = scene(factory,{observatoryView:'quiet',expandedSystem:'factory',workflowActor:'builder',inspectionView:'quiet'});
+modeSwitch.render().find(n=>n.kind==='Box'&&n.c?.some(c=>c.p?.text==='Detail')).h.onTap(0,0);
+assert.equal(modeSwitch.get('expandedSystem'),'');
+assert.equal(modeSwitch.get('workflowActor'),'');
+assert.equal(modeSwitch.get('inspectionView'),'');
+assert(modeSwitch.render().some(n=>n.kind==='Canvas'&&n.p.height===82),'First Detail activation must restore the overview');

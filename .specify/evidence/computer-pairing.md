@@ -62,3 +62,10 @@ by window coordinates outside the current logical monitor bounds; repositioning
 only Miilo resolved it. Live inspection confirmed five factory rows, smaller
 right-aligned View more, and the complete Needs you (0) label. Private captures
 remain outside source. Android unchanged.
+
+The same first-activation Detail navigation correction is applied natively: entering
+Detail explicitly clears the previous system, actor and inspection context. The
+regression starts with an open Compact system and verifies a single Detail
+activation produces the overview. Source/provenance checks and the maintained
+native check/install/relaunch passed; the installed handler was verified. This
+follow-up does not alter the previously accepted desktop robot sizing or controls.
