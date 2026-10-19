@@ -111,8 +111,8 @@ const fleetFixture = fixture(); fleetFixture.snapshot.actors.forEach(a => a.stat
 for (const width of [240, 360, 600, 960]) {
   const compact = scene(fleetFixture,{observatoryView:'quiet'},{screenWidth:width}).render().find(n => n.kind === 'Grid');
   assert(compact); assert.equal(compact.p.columns,Math.max(1,Math.min(4,Math.floor((width-18)/88))));
-  const detail = scene(fleetFixture,{observatoryView:'orbit'},{screenWidth:width}).render().find(n => n.kind === 'Grid');
-  assert(detail); assert.equal(detail.p.columns,Math.max(1,Math.min(4,Math.floor((width-14)/190))));
+  const detail = scene(fleetFixture,{observatoryView:'orbit'},{screenWidth:width}).render().find(n => n.kind === 'Row' && n.c?.some(c=>c.kind==='Column'&&c.p.weight===1));
+  assert(detail); assert.equal(detail.c.length,Math.max(1,Math.min(4,Math.floor((width-14)/190))));
 }
 
 // Detail limits hide rows, never observations; View more opens the full system.
@@ -165,7 +165,7 @@ assert(modeSwitch.render().some(n=>n.kind==='Canvas'&&n.p.height===82),'First De
 // Both fleets remain centered even when the one-card group is narrower than the viewport.
 for (const mode of ['quiet','orbit']) for (const width of [360,760,1200]) {
   const nodes = scene(factory,{observatoryView:mode},{screenWidth:width}).render();
-  const centered = nodes.find(n=>n.kind==='Box'&&n.p.fill==='width'&&n.p.align==='top'&&n.c?.some(c=>c.kind==='Grid'));
+  const centered = nodes.find(n=>n.kind==='Box'&&n.p.fill==='width'&&n.p.align==='top'&&n.c?.some(c=>c.kind==='Grid'||c.kind==='Row'&&c.c?.some(l=>l.kind==='Column'&&l.p.weight===1)));
   assert(centered,'Fleet must have a centered viewport container');
-  assert(centered.c.find(c=>c.kind==='Grid').p.width<=width);
+  assert(centered.c.find(c=>c.kind==='Grid'||c.kind==='Row').p.width<=width);
 }

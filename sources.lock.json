@@ -5,7 +5,7 @@
     {
       "source": "70-miilo-fleet.owl",
       "path": "assets/70-miilo-fleet.owl",
-      "sha256": "6cc43536795ad1c061087728594722a9af7196147adc52a5eb9f765ace679c35",
+      "sha256": "fa7a684d62f6bddd2dadd7b8e376f0820d6f33e4247b21305a9e0bb04044fcfe",
       "patches": [
         "patches/presentation-consistency.patch",
         "patches/desktop-density.patch",
@@ -17,7 +17,8 @@
         "patches/detail-task-limit.patch",
         "patches/action-alignment.patch",
         "patches/detail-navigation.patch",
-        "patches/grid-centering.patch"
+        "patches/grid-centering.patch",
+        "patches/detail-masonry.patch"
       ]
     },
     {

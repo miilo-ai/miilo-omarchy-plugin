@@ -85,3 +85,11 @@ with the Omarchy testing agent.
 ## Quiet navigation
 
 Quiet starts with the compact robot fleet. Select a robot for its system task list, then select a task for evidence and supported actions. Use Back to return to the fleet. The native window requests a compact size for the fleet and a larger viewport for task inspection; actual placement and resizing belong to the compositor.
+
+Detail uses equal-width masonry columns. Active/attention systems lead the
+ordering, with stable provider IDs as the tie-breaker. Cards are distributed
+across columns in that order and stack independently, so a tall factory does not
+reserve empty space beneath an adjacent short card. Task counts alone do not
+rebalance columns. Activity-group changes and viewport changes may reposition
+cards; Compact retains its regular grid. Keyboard traversal follows the rendered
+columns from top to bottom.

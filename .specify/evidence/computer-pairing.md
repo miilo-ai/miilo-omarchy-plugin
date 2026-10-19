@@ -77,3 +77,13 @@ measure actual grid positions in both modes at 360/760 logical pixels; the
 keyboard/geometry fixture and native check/install/relaunch passed. The actual
 desktop window was visually inspected with balanced Detail margins. Source
 provenance and the existing viewport/navigation regressions passed.
+
+Detail masonry follow-up: equal-width independent columns retain centered outer
+margins and ten-pixel gaps. Active/attention providers sort before dormant ones;
+IDs stabilize ordering within each activity class. Tests prove that changing task
+counts and incoming provider order does not reshuffle columns, and that activity
+promotion moves a system to the top. The actual native fixture measures equal
+column widths and verifies a short column's second card begins before the tall
+column's second card. Keyboard, native package/canary/typography, installation and
+relaunch passed. The populated live window showed active sessions/factory at the
+top with independently stacked shorter cards. Compact was unchanged.
