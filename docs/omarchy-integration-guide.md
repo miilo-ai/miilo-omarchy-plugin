@@ -89,3 +89,8 @@ Run the retained-invalidation test and native canvas-clock fixture after rendere
 changes. Compare native evaluator cost, frame intervals and whole-shell CPU
 separately; a faster evaluator does not prove lower total CPU use or 60 FPS.
 Keep synthetic profiling scenes free of real transcripts, credentials and actions.
+
+The Qt renderer defaults to a 30 FPS paint budget. Always pass elapsed time into
+the interpreter; never count accepted paints as animation time or replay missed
+frames in a burst. State/input invalidation remains immediate. Keep the native
+paint-budget and wall-clock-speed assertions in the canvas-clock fixture.

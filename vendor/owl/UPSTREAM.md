@@ -27,3 +27,7 @@ inline image fetches through automatic rich-text detection. See
 patches/plain-text-labels.patch for the renderer changes.
 
 Animation performance patch: retain component-local expressions and invalidate time-dependent values lazily; reuse unchanged canvas display lists; skip painting clipped/hidden canvases. Layout clocks remain separate from drawing clocks. Native regression coverage includes continuous clocks, static paint suppression, scrolling and resize.
+
+Paint-budget patch: animation painting defaults to 30 FPS while clocks continue
+using elapsed time. Source updates and input invalidation remain immediate. See
+patches/paint-budget.patch and the native clock-speed/paint-budget regression.

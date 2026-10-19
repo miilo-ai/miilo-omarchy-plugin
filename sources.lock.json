@@ -5,11 +5,12 @@
     {
       "source": "70-miilo-fleet.owl",
       "path": "assets/70-miilo-fleet.owl",
-      "sha256": "da08c98ccef0d93b428e58e084f94755af9f13faf460fa80a818615eda354e35",
+      "sha256": "b53464f9a6e3a47aa74f28574eb8fda5df6a58cd343b7c120300f4d1791f8c6b",
       "patches": [
         "patches/presentation-consistency.patch",
         "patches/desktop-density.patch",
-        "patches/rendering-performance.patch"
+        "patches/rendering-performance.patch",
+        "patches/orbit-sampling.patch"
       ]
     },
     {
@@ -73,15 +74,16 @@
     {
       "source": "desktop/runtime/OwlWidget.qml",
       "path": "vendor/owl/OwlWidget.qml",
-      "sha256": "cae07cd160e3351228fbe314a84fd419bff8b1292ea77066807e5ae6db98e367",
+      "sha256": "b48804fd390e4e0cb6ff2dfff7f556e97eac78e3482e0ddb9ea2a58ece0a2608",
       "patches": [
-        "patches/rendering-performance.patch"
+        "patches/rendering-performance.patch",
+        "patches/paint-budget.patch"
       ]
     },
     {
       "source": "desktop/runtime/UPSTREAM.md",
       "path": "vendor/owl/UPSTREAM.md",
-      "sha256": "03d139492bcf059df4ebaf1de8ab8bf83b6c33790f296c95a431aca70bcdd9b2",
+      "sha256": "eb4fe89d3ce9f981d5f3895c5fea6915035303905ba9f2f08d2e3f97413457a6",
       "patches": [
         "patches/plain-text-labels.patch",
         "patches/rendering-performance.patch"
