@@ -6,12 +6,13 @@ trap 'rm -rf -- "$scratch"' EXIT
 mkdir "$scratch/runtime"
 chmod 700 "$scratch/runtime"
 # Each suite owns its offscreen window so popups cannot steal another suite's input.
-for fixture in TestTypography TestDesktopToolbar TestDesktopSettings TestAgentGroups; do
+for fixture in TestTypography TestDesktopToolbar TestDesktopSettings TestAgentGroups TestRobotKeyboard; do
   case "$fixture" in
     TestTypography) marker=MIILO_TYPOGRAPHY_OK ;;
     TestDesktopToolbar) marker=MIILO_TOOLBAR_OK ;;
     TestDesktopSettings) marker=MIILO_SETTINGS_OK ;;
     TestAgentGroups) marker=MIILO_GROUPS_OK ;;
+    TestRobotKeyboard) marker=MIILO_ROBOT_KEYBOARD_OK ;;
   esac
   cat > "$scratch/shell.qml" <<QML
 import Quickshell

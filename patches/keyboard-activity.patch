@@ -1,0 +1,58 @@
+diff --git a/assets/70-miilo-fleet.owl b/assets/70-miilo-fleet.owl
+index becb4c6..a0c1ff0 100644
+--- a/assets/70-miilo-fleet.owl
++++ b/assets/70-miilo-fleet.owl
+@@ -274,7 +274,7 @@ widget "miilo" {
+           align: center
+           let rowInk = w.lifecycle == "failed" ? mix(red, foreground, 0.15) : w.attention != "none" ? accent : foreground
+           OrbitStateIcon { phase: w.phase; attention: w.attention; offline: false; failed: w.lifecycle == "failed"; ink: rowInk }
+-          Text { text: w.title; weight: 1; fontSize: linux ? 10 : 16; maxLines: 1; color: rowInk; offset: [0, 2] }
++          Text { text: get(w.extensions ?? {}, "dev.miilo.session", null) != null && trim(w.summary ?? "") != "" ? w.summary : w.title; weight: 1; fontSize: linux ? 10 : 16; maxLines: 1; color: rowInk; offset: [0, 2] }
+           Text { text: "›"; width: 10; fontSize: linux ? 10 : 14; color: muted }
+         }
+         if showSystem { Text { text: get(find(allProviders, p => p.id == w.providerId), "name", "System"); fontSize: linux ? 10 : 14; color: muted; maxLines: 1 } }
+@@ -772,7 +772,7 @@ widget "miilo" {
+           let rowInk = offline ? muted : w.lifecycle == "failed" ? mix(red, foreground, 0.15) : w.attention != "none" ? accent : w.phase == "verifying" ? mix(cyan, foreground, 0.4) : foreground
+           OrbitStateIcon { phase: w.phase; attention: w.attention; offline: offline; failed: w.lifecycle == "failed"; ink: rowInk }
+           // Match visible title glyphs to the icon center; Qt line leading sits above it.
+-          Text { text: w.title; weight: 1; fontSize: linux ? 10 : 11; maxLines: 1; color: rowInk; offset: [0, 2] }
++          Text { text: get(w.extensions ?? {}, "dev.miilo.session", null) != null && trim(w.summary ?? "") != "" ? w.summary : w.title; weight: 1; fontSize: linux ? 10 : 11; maxLines: 1; color: rowInk; offset: [0, 2] }
+         }
+       }
+       if len(items) > 8 { Button { text: "+${len(items) - 8} ${len(items) == 9 ? "task" : "tasks"} · inspect system"; onTap: { inspectionView = "orbit"; expandedSystem = provider.id; workflowActor = ""; pageSize = 12 } } }
+diff --git a/vendor/owl/OwlNode.qml b/vendor/owl/OwlNode.qml
+index 911736a..3e0576d 100644
+--- a/vendor/owl/OwlNode.qml
++++ b/vendor/owl/OwlNode.qml
+@@ -100,13 +100,14 @@ Item {
+ 
+   // ------------------------------------------------------------- content
+   Rectangle {
+-    anchors.left: parent.left
+-    anchors.verticalCenter: parent.verticalCenter
+-    width: 3
+-    height: Math.min(24 * root.dp, root.height)
++    objectName: "owlKeyboardFocus"
++    anchors.fill: parent
+     z: 100
+-    visible: root.activeFocus
+-    color: root.widget ? root.widget.ink("accent") : "white"
++    visible: root.activeFocus && root.activeFocusOnTab
++    color: "transparent"
++    radius: L.num(root.p.radius, 0) * root.dp
++    border.width: 2 * root.dp
++    border.color: root.widget ? root.widget.ink("accent") : "white"
+   }
+ 
+   Loader {
+diff --git a/vendor/owl/UPSTREAM.md b/vendor/owl/UPSTREAM.md
+index 0da77be..426f897 100644
+--- a/vendor/owl/UPSTREAM.md
++++ b/vendor/owl/UPSTREAM.md
+@@ -31,3 +31,6 @@ Animation performance patch: retain component-local expressions and invalidate t
+ Paint-budget patch: animation painting defaults to 30 FPS while clocks continue
+ using elapsed time. Source updates and input invalidation remain immediate. See
+ patches/paint-budget.patch and the native clock-speed/paint-budget regression.
++
++Keyboard focus patch: interactive OWL nodes retain their existing Tab and
++Enter/Space activation, with a full themed outline instead of a small edge mark.

@@ -33,7 +33,7 @@ See the release-status guide for validation scope and remaining platform checks.
 ## Install
 
 Requires Omarchy Quattro with its plugin commands, Quickshell/Qt, Nerd Font icons,
-`miilo-owl` 1.5.0 from miilo-owl-widgets, and `miilo-local` 0.3.0 from miilo-cli
+`miilo-owl` 1.7.0 from miilo-owl-widgets, and `miilo-local` 0.4.0 from miilo-cli
 for local session onboarding. Put both binaries on the shell's PATH first.
 Download the matching helper and CLI binaries from their GitHub Releases.
 
@@ -187,3 +187,10 @@ Development and preview tooling: [toolchain guide](docs/development-toolchain.md
 Release scope and remaining validation: [release status](docs/release-status.md).
 
 Native integration rules: [Omarchy integration guide](docs/omarchy-integration-guide.md), including plain-text rendering and renderer security checks.
+
+## Pair another computer
+
+Use **Miilo menu → Pair computer** to enter a private invitation from a computer
+running `miilo local share`. Compare both codes and approve on the host before
+selecting systems. This grants read-only observation of selected sessions, never
+agent execution or approval authority. See the [pairing guide](https://github.com/miilo-ai/miilo-owl-widgets/blob/main/docs/computer-pairing.md).

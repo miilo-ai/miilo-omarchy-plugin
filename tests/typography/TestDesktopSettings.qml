@@ -20,7 +20,7 @@ Item {
     QtObject {
         id: state
         property var widget: palette
-        property var values: ({robotMotion:"full",robotPace:"normal",robotPersonality:"expressive",leftHanded:false,previewRobots:false,robotColors:[],actors:[],selectableProviders:[],system:""})
+        property var values: ({detailTaskLimit:5,robotMotion:"full",robotPace:"normal",robotPersonality:"expressive",leftHanded:false,previewRobots:false,robotColors:[],actors:[],selectableProviders:[],system:""})
         function viewValue(name) { return values[name] }
         function setViewState(name, value) { var next = Object.assign({}, values); next[name] = value; values = next; palette.generation++ }
     }
@@ -41,6 +41,14 @@ Item {
             compare(robot.motion,"reduced");
             var clock = robot.clock; wait(60); compare(robot.clock,clock);
             loading.visible = false; compare(robot.active,false);
+        }
+        function test_detail_task_limit() {
+            var limit = findChild(panel,"detailTaskLimitSetting"); verify(limit);
+            compare(limit.currentIndex,1);
+            limit.currentIndex = 3; limit.activated(3);
+            compare(state.values.detailTaskLimit,10);
+            limit.currentIndex = 1; limit.activated(1);
+            compare(state.values.detailTaskLimit,5);
         }
         function test_preferences_write_existing_state() {
             var motion = findChild(panel,"robotMotionSetting"); verify(motion);
@@ -65,6 +73,15 @@ Item {
             compare(overview.remote[0].name,"Workshop factory");
             tryVerify(() => findChild(overview,"connectionName") !== null);
             compare(findChild(overview,"connectionName").text,"Workshop factory");
+        }
+        function test_pairing_is_explicit_and_isolated() {
+            panel.section = "pair";
+            tryCompare(findChild(panel,"pairNavigation"),"selected",true);
+            verify(!findChild(panel,"setupTerminalLoader").active);
+            panel.width = 320;
+            var navigation = findChild(panel,"settingsNavigation");
+            navigation.currentIndex = 4; navigation.activated(4);
+            compare(panel.section,"pair");
         }
         function test_sections_and_narrow_navigation() {
             panel.section = "chat";

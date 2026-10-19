@@ -31,3 +31,6 @@ Animation performance patch: retain component-local expressions and invalidate t
 Paint-budget patch: animation painting defaults to 30 FPS while clocks continue
 using elapsed time. Source updates and input invalidation remain immediate. See
 patches/paint-budget.patch and the native clock-speed/paint-budget regression.
+
+Keyboard focus patch: interactive OWL nodes retain their existing Tab and
+Enter/Space activation, with a full themed outline instead of a small edge mark.

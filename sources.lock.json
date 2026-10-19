@@ -5,12 +5,20 @@
     {
       "source": "70-miilo-fleet.owl",
       "path": "assets/70-miilo-fleet.owl",
-      "sha256": "b53464f9a6e3a47aa74f28574eb8fda5df6a58cd343b7c120300f4d1791f8c6b",
+      "sha256": "fa7a684d62f6bddd2dadd7b8e376f0820d6f33e4247b21305a9e0bb04044fcfe",
       "patches": [
         "patches/presentation-consistency.patch",
         "patches/desktop-density.patch",
         "patches/rendering-performance.patch",
-        "patches/orbit-sampling.patch"
+        "patches/orbit-sampling.patch",
+        "patches/computer-pairing.patch",
+        "patches/keyboard-activity.patch",
+        "patches/desktop-robot-scale.patch",
+        "patches/detail-task-limit.patch",
+        "patches/action-alignment.patch",
+        "patches/detail-navigation.patch",
+        "patches/grid-centering.patch",
+        "patches/detail-masonry.patch"
       ]
     },
     {
@@ -50,10 +58,11 @@
     {
       "source": "desktop/runtime/OwlNode.qml",
       "path": "vendor/owl/OwlNode.qml",
-      "sha256": "a8032fb30a291f994cf9558dcb75fabb12ddf4aad066c2c5835518e518c7a222",
+      "sha256": "e3551f3fa22cc827b1b1775cc175256b18139123c96c53d07da4da9d1b09d498",
       "patches": [
         "patches/presentation-consistency.patch",
-        "patches/plain-text-labels.patch"
+        "patches/plain-text-labels.patch",
+        "patches/keyboard-activity.patch"
       ]
     },
     {
@@ -83,10 +92,11 @@
     {
       "source": "desktop/runtime/UPSTREAM.md",
       "path": "vendor/owl/UPSTREAM.md",
-      "sha256": "eb4fe89d3ce9f981d5f3895c5fea6915035303905ba9f2f08d2e3f97413457a6",
+      "sha256": "dcc059d5273b181f7376d5d893c84a96f8631995ee3bb43ffd58748c857d36fe",
       "patches": [
         "patches/plain-text-labels.patch",
-        "patches/rendering-performance.patch"
+        "patches/rendering-performance.patch",
+        "patches/keyboard-activity.patch"
       ]
     },
     {

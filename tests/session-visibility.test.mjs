@@ -34,7 +34,7 @@ assert.deepEqual(s.get('actors').map(a=>a._key),['a8'],'Observed working session
 assert.deepEqual(s.get('selectableProviders').map(p=>p.id),['p8']);
 assert.equal(s.get('allActors').filter(a=>a.status==='resting').length,12,'Never fake activity');
 assert.equal(s.get('provs').length,1);
-assert.equal(s.render().filter(n=>n.kind==='Canvas'&&n.p.height===164).length,1,'Only visible session gets an Orbit field');
+assert.equal(s.render().filter(n=>n.kind==='Canvas'&&n.p.height===82).length,1,'Only visible session gets an Orbit field');
 assert.equal(s.get('systemsOpen'),false,'Menu starts collapsed');
 // The native header owns navigation; its state drives the same selector projection.
 s.set('systemsOpen',true);
@@ -85,13 +85,13 @@ orbitTile.set('observatoryView','quiet');
 orbitTile.render().find(n=>n.p?.text==='Back').h.onTap(0,0);
 assert.equal(orbitTile.get('observatoryView'),'orbit','Back restores the entry mode explicitly');
 assert.equal(orbitTile.get('expandedSystem'),'');
-assert.equal(orbitTile.render().filter(n=>n.kind==='Canvas'&&n.p.height===164).length,1);
+assert.equal(orbitTile.render().filter(n=>n.kind==='Canvas'&&n.p.height===82).length,1);
 
 // Narrow desktop windows wrap filters and display modes into separate rows.
 for (const width of [240, 260, 900]) {
   const layout = scene(fixture(), {}, {screenWidth:width}).render();
   const combined = layout.filter(n => n.kind === 'Row' && [...walk(n)].some(c => c.p?.text === 'All work') && [...walk(n)].some(c => c.p?.text === 'Compact'));
-  assert.equal(combined.length > 0, width >= 280, 'Toolbar grouping must follow the actual viewport');
+  assert.equal(combined.length > 0, width >= 340, 'Toolbar grouping must follow the actual viewport');
 }
 
 // Settings replace work content, then return to the same inspected task.
@@ -111,6 +111,61 @@ const fleetFixture = fixture(); fleetFixture.snapshot.actors.forEach(a => a.stat
 for (const width of [240, 360, 600, 960]) {
   const compact = scene(fleetFixture,{observatoryView:'quiet'},{screenWidth:width}).render().find(n => n.kind === 'Grid');
   assert(compact); assert.equal(compact.p.columns,Math.max(1,Math.min(4,Math.floor((width-18)/88))));
-  const detail = scene(fleetFixture,{observatoryView:'orbit'},{screenWidth:width}).render().find(n => n.kind === 'Grid');
-  assert(detail); assert.equal(detail.p.columns,Math.max(1,Math.min(3,Math.floor((width-14)/218))));
+  const detail = scene(fleetFixture,{observatoryView:'orbit'},{screenWidth:width}).render().find(n => n.kind === 'Row' && n.c?.some(c=>c.kind==='Column'&&c.p.weight===1));
+  assert(detail); assert.equal(detail.c.length,Math.max(1,Math.min(4,Math.floor((width-14)/190))));
+}
+
+// Detail limits hide rows, never observations; View more opens the full system.
+const factory = fixture();
+factory.snapshot.providers = [{id:'factory',name:'Example Factory',health:'healthy'}];
+factory.snapshot.actors = [{_key:'builder',id:'builder',providerId:'factory',name:'Builder',status:'working',health:'healthy'}];
+factory.snapshot.workItems = Array.from({length:12},(_,i)=>({_key:`task${i}`,id:`task${i}`,providerId:'factory',title:`Factory task ${i}`,lifecycle:'active',phase:'implementing',attention:'none',_actorKeys:['builder'],_revisionKey:'r1',actions:[]}));
+for (const [saved, count] of [[{},5],[{detailTaskLimit:3},3],[{detailTaskLimit:8},8],[{detailTaskLimit:10},10],[{detailTaskLimit:999},5]]) {
+  const detail = scene(factory,saved), nodes = detail.render();
+  assert.equal(nodes.filter(n=>n.kind==='Text'&&String(n.p.text).startsWith('Factory task ')).length,count);
+  assert.equal(detail.get('allWorks').length,12,'Hidden rows must preserve the complete observation');
+  const more = nodes.find(n=>n.kind==='Button'&&n.p.text==='View more');
+  assert(more,'Overflow uses a concise standard button');
+  more.h.onTap(0,0);
+  assert.equal(detail.get('expandedSystem'),'factory');
+  assert.equal(detail.get('pageSize'),12);
+  assert(detail.render().some(n=>n.p?.text==='Factory task 9'),'Expanded system includes tasks beyond the card limit');
+}
+const preference = scene(factory);
+assert.equal(preference.get('detailTaskLimit'),5);
+preference.set('detailTaskLimit',8);
+const restored = scene(factory,preference.instance.persisted());
+assert.equal(restored.get('detailTaskLimit'),8,'Detail preference survives a new surface instance');
+
+// Action alignment follows the persisted controls preference, in both directions.
+for (const leftHanded of [false,true]) {
+  const actions = scene(factory,{leftHanded}), nodes = actions.render();
+  const row = nodes.find(n=>n.kind==='Row'&&n.c?.some(c=>c.kind==='Button'&&c.p.text==='View more'));
+  assert(row);
+  assert.equal(row.c[leftHanded?row.c.length-1:0].kind,'Spacer');
+  const button = row.c.find(c=>c.kind==='Button');
+  assert(button.p.scale < 1);
+  assert.equal(actions.instance.persisted().leftHanded,leftHanded);
+}
+for (const count of [0,9,100]) {
+  const inventory = structuredClone(factory);
+  inventory.snapshot.workItems = Array.from({length:Math.max(1,count)},(_,i)=>({...factory.snapshot.workItems[0],_key:'decision'+i,id:'decision'+i,attention:i<count?'approval':'none'}));
+  const filters = scene(inventory).render().find(n=>n.kind==='Box'&&n.c?.some(c=>c.p?.text===`Needs you (${count})`));
+  assert(filters,'Filter retains its complete label and counter');
+  assert(filters.p.width >= 104,'Filter reserves label and counter space');
+}
+
+const modeSwitch = scene(factory,{observatoryView:'quiet',expandedSystem:'factory',workflowActor:'builder',inspectionView:'quiet'});
+modeSwitch.render().find(n=>n.kind==='Box'&&n.c?.some(c=>c.p?.text==='Detail')).h.onTap(0,0);
+assert.equal(modeSwitch.get('expandedSystem'),'');
+assert.equal(modeSwitch.get('workflowActor'),'');
+assert.equal(modeSwitch.get('inspectionView'),'');
+assert(modeSwitch.render().some(n=>n.kind==='Canvas'&&n.p.height===82),'First Detail activation must restore the overview');
+
+// Both fleets remain centered even when the one-card group is narrower than the viewport.
+for (const mode of ['quiet','orbit']) for (const width of [360,760,1200]) {
+  const nodes = scene(factory,{observatoryView:mode},{screenWidth:width}).render();
+  const centered = nodes.find(n=>n.kind==='Box'&&n.p.fill==='width'&&n.p.align==='top'&&n.c?.some(c=>c.kind==='Grid'||c.kind==='Row'&&c.c?.some(l=>l.kind==='Column'&&l.p.weight===1)));
+  assert(centered,'Fleet must have a centered viewport container');
+  assert(centered.c.find(c=>c.kind==='Grid'||c.kind==='Row').p.width<=width);
 }
