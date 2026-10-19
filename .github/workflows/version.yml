@@ -1,0 +1,75 @@
+name: Version and tag
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Manually authorize release while automatic publication is paused
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: version-main
+  cancel-in-progress: false
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.plan.outputs.tag }}
+      new: ${{ steps.plan.outputs.new_version }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+      - id: plan
+        run: node tools/release-plan.cjs
+  tag:
+    needs: version
+    if: needs.version.outputs.new == 'true' && ((github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.MIILO_RELEASE_ENABLED != 'false') || inputs.publish == true)
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: write
+      actions: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      TAG: ${{ needs.version.outputs.tag }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+      - run: make check
+      - name: Require published runtime dependencies
+        run: |
+          gh release view v0.3.0 --repo miilo-ai/miilo-cli
+          gh release view v1.5.0 --repo miilo-ai/miilo-owl-widgets
+      - name: Create immutable tag and dispatch source release
+        run: |
+          set -euo pipefail
+          test "$TAG" = "v$(node -p 'require("./manifest.json").version')"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          gh auth setup-git
+          if git show-ref --verify --quiet "refs/tags/$TAG"; then
+            test "$(git rev-parse "$TAG^{commit}")" = "$GITHUB_SHA"
+          else
+            git tag -a "$TAG" -m "Release $TAG" "$GITHUB_SHA"
+            git push origin "$TAG"
+          fi
+          gh workflow run release.yml --ref "$TAG" -f tag="$TAG" -f publish=true
+  no-release:
+    needs: [version, tag]
+    if: always() && needs.tag.result == 'skipped'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo 'No release has been made; version is already tagged or automatic publication is paused.' >> "$GITHUB_STEP_SUMMARY"

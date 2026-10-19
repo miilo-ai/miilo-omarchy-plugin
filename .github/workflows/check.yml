@@ -12,4 +12,4 @@ jobs:
           node-version: 22
       - run: make check
       - name: Native qualification status
-        run: echo 'Native Omarchy acceptance is a separate recorded gate. No release has been made.'
+        run: echo 'Source checks passed. Native Omarchy acceptance is separate; publication is reported by Version and tag / Source release.'
