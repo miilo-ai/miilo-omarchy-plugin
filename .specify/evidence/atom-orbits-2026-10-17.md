@@ -1,5 +1,8 @@
 # Native asset integration — atom Orbit
 
+> Historical validation record. Results apply only to the revision and environment recorded below; they do not describe current release readiness.
+
+
 Canonical widget revision: 0951319. The plugin pins the full immutable revision
 in sources.lock.json and copies the generated fleet/portrait assets unchanged.
 All vendored runtime files match that revision, including the integrated

@@ -1,5 +1,8 @@
 # Uninstall validation — 2026-10-18
 
+> Historical validation record. Results apply only to the revision and environment recorded below; they do not describe current release readiness.
+
+
 Current outcome: the two reproduced lifecycle races were corrected in
 `8f4bbfe8140f7405164791a9ee488762cb71c582` and passed the physical retest below.
 Earlier failure records are retained as historical evidence. Broader marketplace

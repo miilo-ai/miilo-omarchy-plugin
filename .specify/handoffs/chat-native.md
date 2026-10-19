@@ -1,5 +1,8 @@
 # Native chat handoff — CHAT-001
 
+> Retained design record. Unchecked historical milestones are not a current release checklist. See docs/release-status.md for current scope and outstanding validation.
+
+
 Read specs/003-launcher-chat/spec.md and specs/004-launcher-voice/spec.md under
 .specify. SDK text contracts and the shared miilo-owl helper are implemented;
 the graphical chat panel is not. Do not claim chat is visible in the plugin yet.

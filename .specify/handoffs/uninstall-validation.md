@@ -1,5 +1,8 @@
 # Native uninstall acceptance handoff
 
+> Retained design record. Unchecked historical milestones are not a current release checklist. See docs/release-status.md for current scope and outstanding validation.
+
+
 Implementation scope: Omarchy integration removal only. Shared helper/CLI binaries,
 private settings, credentials, backups and independent collectors are retained.
 No purge or automatic observer-unit deletion is implemented. Do not claim full

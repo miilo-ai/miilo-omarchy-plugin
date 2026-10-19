@@ -1,5 +1,8 @@
 # Desktop acceptance test pass — 2026-10-17
 
+> Historical validation record. Results apply only to the revision and environment recorded below; they do not describe current release readiness.
+
+
 Native baseline `36bbc13`, widgets `953eef9`, SDK `25c140d`, CLI `8d293d5`.
 New work is on `chore/desktop-acceptance` in native and widgets repositories.
 No new main commits, installed update, user migration, collector lifecycle

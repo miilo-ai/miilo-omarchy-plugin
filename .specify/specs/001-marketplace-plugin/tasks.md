@@ -1,5 +1,8 @@
 # Tasks
 
+> Retained design record. Unchecked historical milestones are not a current release checklist. See docs/release-status.md for current scope and outstanding validation.
+
+
 - [x] Clone empty destination without importing another repository's history.
 - [x] Extract reviewed renderer/assets and preserve all upstream licenses.
 - [x] Record source revision, per-file hashes and local palette alias patch.

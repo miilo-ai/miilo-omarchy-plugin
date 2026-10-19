@@ -1,5 +1,8 @@
 # Proposed presentation layout
 
+> Retained design record. Unchecked historical milestones are not a current release checklist. See docs/release-status.md for current scope and outstanding validation.
+
+
 Status: implemented; portable validation recorded. Native qualification pending.
 
 ```text

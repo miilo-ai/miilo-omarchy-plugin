@@ -1,5 +1,8 @@
 # Source checkpoint
 
+> Historical validation record. Results apply only to the revision and environment recorded below; they do not describe current release readiness.
+
+
 Prepared on macOS from the source revision in `sources.lock.json`. No Git history
 from widgets was copied. Root entry points and local assets are self-contained;
 miilo-owl and miilo-local are explicit external dependencies.

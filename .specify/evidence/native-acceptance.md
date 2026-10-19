@@ -1,5 +1,8 @@
 # Native acceptance checkpoint — 2026-10-17
 
+> Historical validation record. Results apply only to the revision and environment recorded below; they do not describe current release readiness.
+
+
 Partial qualification only. Plugin source: `40be809`; shared widgets: `0951319`.
 No installed update, restart, enrollment or preference change occurred.
 

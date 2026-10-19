@@ -1,5 +1,8 @@
 # Native agent handoff
 
+> Retained design record. Unchecked historical milestones are not a current release checklist. See docs/release-status.md for current scope and outstanding validation.
+
+
 Work in `miilo-ai/miilo-omarchy-plugin`. The canonical development branch is `main`.
 Do not reset your existing work. Review and port relevant newer QML changes with
 attribution. The canonical marketplace ID is `io.miilo.bar`; the default manifest

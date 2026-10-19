@@ -1,5 +1,8 @@
 # Active session visibility — 2026-10-17
 
+> Historical validation record. Results apply only to the revision and environment recorded below; they do not describe current release readiness.
+
+
 Inactive enrolled sessions can crowd the fleet and increase rendering work.
 Read-only aggregate inspection found fresh local observation with one working
 session and twelve resting sessions; the working session was ninth in the cache.

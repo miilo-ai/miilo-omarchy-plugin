@@ -1,5 +1,8 @@
 # Orbit / Crew local candidate — 2026-10-17
 
+> Historical validation record. Results apply only to the revision and environment recorded below; they do not describe current release readiness.
+
+
 Source: shared widget revision in sources.lock.json, candidate plugin commit history.
 New authored UI modules are each below 200 lines. No controller/command policy changes.
 

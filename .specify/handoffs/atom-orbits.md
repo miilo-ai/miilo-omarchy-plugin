@@ -1,5 +1,8 @@
 # Atom Orbit — native testing handoff
 
+> Retained design record. Unchecked historical milestones are not a current release checklist. See docs/release-status.md for current scope and outstanding validation.
+
+
 Pull current main in the widget and plugin repositories after preserving your
 local changes. Plugin sources.lock.json pins the exact tested shared asset; do
 not regenerate from an older widget checkout or overwrite canonical native UI.
