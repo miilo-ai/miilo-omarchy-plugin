@@ -15,8 +15,8 @@ Read both official guides before changing the runtime contract:
 This repository owns native QML, manifest/lifecycle, shell styling, screenshots,
 and native acceptance. Widgets owns miilo-owl and shared OWL/evaluator design.
 CLI owns miilo-local; SDK owns domain state. Do not move any of these engines into
-the plugin. Use only the declared dependencies. Use CLI/SDK candidates 0.2.0
-and helper 1.4.0 from coordinated `codex/standalone-runtime` branches.
+the plugin. Use only the declared dependencies. Use CLI 0.3.0 and helper 1.5.0 for the seven-agent observation contract.
+The SDK remains at the dependency revision declared by those packages.
 
 Use existing authorized GitHub access while private; no publishing token belongs
 in QML, repository URLs or screenshots. Record exact revisions and binary hashes.

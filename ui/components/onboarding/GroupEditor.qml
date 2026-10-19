@@ -8,12 +8,14 @@ import "controls" as Controls
 
 ScrollView {
     id: view
+    objectName: "agentGroupEditor"
     required property var controller
     required property var widget
     required property var theme
     readonly property var context: view
+    readonly property var agentKinds: ["all", "codex", "cursor", "opencode", "devin", "claude", "grok", "hermes"]
     function focusEditor() { groupName.forceActiveFocus() }
-    function rule() { return {name:groupName.text.trim(),folder:groupFolder.text.trim(),pattern:groupPattern.text.trim(),kind:["all","codex","cursor"][groupKind.currentIndex],future:futureMatches.checked} }
+    function rule() { return {name:groupName.text.trim(),folder:groupFolder.text.trim(),pattern:groupPattern.text.trim(),kind:view.agentKinds[groupKind.currentIndex],future:futureMatches.checked} }
     Layout.fillWidth: true
     Layout.fillHeight: true
     contentWidth: availableWidth
@@ -24,7 +26,7 @@ ScrollView {
         Controls.Field { context: view; id: groupName; objectName: "groupName"; text: view.controller.draft.name || ""; placeholderText: "Group name"; Accessible.name: "Group name" }
         Controls.Field { context: view; id: groupFolder; objectName: "groupFolder"; text: view.controller.draft.folder || ""; placeholderText: "Absolute folder, e.g. /home/me/Work"; Accessible.name: "Group folder" }
         Controls.Field { context: view; id: groupPattern; objectName: "groupPattern"; text: view.controller.draft.pattern || ""; placeholderText: "Project pattern (blank matches all)"; Accessible.name: "Project pattern" }
-        Controls.Choice { context: view; id: groupKind; objectName: "groupKind"; currentIndex: ["all","codex","cursor"].indexOf(view.controller.draft.kind || "all"); model: ["All supported agents", "Codex", "Cursor"]; Accessible.name: "Agent type" }
+        Controls.Choice { context: view; id: groupKind; objectName: "groupKind"; currentIndex: Math.max(0, view.agentKinds.indexOf(view.controller.draft.kind || "all")); model: ["All supported agents", "Codex", "Cursor", "OpenCode", "Devin CLI", "Claude Code", "Grok CLI", "Hermes"]; Accessible.name: "Agent type" }
         CheckBox {
             id: futureMatches
             objectName: "futureMatches"
