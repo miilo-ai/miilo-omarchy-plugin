@@ -161,3 +161,11 @@ assert.equal(modeSwitch.get('expandedSystem'),'');
 assert.equal(modeSwitch.get('workflowActor'),'');
 assert.equal(modeSwitch.get('inspectionView'),'');
 assert(modeSwitch.render().some(n=>n.kind==='Canvas'&&n.p.height===82),'First Detail activation must restore the overview');
+
+// Both fleets remain centered even when the one-card group is narrower than the viewport.
+for (const mode of ['quiet','orbit']) for (const width of [360,760,1200]) {
+  const nodes = scene(factory,{observatoryView:mode},{screenWidth:width}).render();
+  const centered = nodes.find(n=>n.kind==='Box'&&n.p.fill==='width'&&n.p.align==='top'&&n.c?.some(c=>c.kind==='Grid'));
+  assert(centered,'Fleet must have a centered viewport container');
+  assert(centered.c.find(c=>c.kind==='Grid').p.width<=width);
+}

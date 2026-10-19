@@ -69,3 +69,11 @@ regression starts with an open Compact system and verifies a single Detail
 activation produces the overview. Source/provenance checks and the maintained
 native check/install/relaunch passed; the installed handler was verified. This
 follow-up does not alter the previously accepted desktop robot sizing or controls.
+
+Fleet centering: Compact and Detail place their explicitly sized grids in a
+full-width top-centered container. This preserves card geometry and gives equal
+outer margins when a fleet is narrower than the viewport. Native Qt assertions
+measure actual grid positions in both modes at 360/760 logical pixels; the
+keyboard/geometry fixture and native check/install/relaunch passed. The actual
+desktop window was visually inspected with balanced Detail margins. Source
+provenance and the existing viewport/navigation regressions passed.

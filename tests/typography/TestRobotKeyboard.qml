@@ -14,6 +14,11 @@ Item {
   for(var i=0;i<item.children.length;i++){var found=card(item.children[i]);if(found)return found;}
   return null;
  }
+ function gridNode(item) {
+  if(item.node && item.kind === "Grid") return item;
+  for(var i=0;i<item.children.length;i++){var found=gridNode(item.children[i]);if(found)return found;}
+  return null;
+ }
  function value(name) {return subject.instance.read(subject.program.globals.findIndex(g=>g.name===name));}
  TestCase {
   name: "RobotKeyboard"; when: root.source !== ""
@@ -32,6 +37,17 @@ Item {
    subject.instance.setState(subject.program.globals.findIndex(g=>g.name==="expandedSystem"), "");wait(80);
    robot=root.card(tree);verify(robot);robot.forceActiveFocus();keyClick(Qt.Key_Space);
    tryVerify(()=>root.value("expandedSystem")==="p1");
+   subject.instance.setState(subject.program.globals.findIndex(g=>g.name==="expandedSystem"), "");
+   for(var mode of ["quiet","orbit"]) for(var width of [360,760]) {
+    root.width=width;subject.width=width;subject.screenWidth=width;
+    subject.instance.setState(subject.program.globals.findIndex(g=>g.name==="observatoryView"),mode);wait(100);
+    var grid=root.gridNode(tree);verify(grid,"Grid remains rendered in "+mode);
+    var container=grid.parent;
+    while(container && !(container.node && container.kind==="Box" && container.p.align==="top")) container=container.parent;
+    verify(container,"Grid has a centered content container");
+    var left=grid.mapToItem(container,0,0).x;
+    verify(Math.abs(left-(container.width-grid.width)/2)<1,"Native "+mode+" margins are equal");
+   }
    compare(subject.problems.length,0);
   }
  }
