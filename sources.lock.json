@@ -5,10 +5,11 @@
     {
       "source": "70-miilo-fleet.owl",
       "path": "assets/70-miilo-fleet.owl",
-      "sha256": "17b035b895b011be042fc728ea5fb86d44b83b54261d2c06b1e3945e53cd4814",
+      "sha256": "da08c98ccef0d93b428e58e084f94755af9f13faf460fa80a818615eda354e35",
       "patches": [
         "patches/presentation-consistency.patch",
-        "patches/desktop-density.patch"
+        "patches/desktop-density.patch",
+        "patches/rendering-performance.patch"
       ]
     },
     {
@@ -20,14 +21,18 @@
     {
       "source": "desktop/runtime/Owl.js",
       "path": "vendor/owl/Owl.js",
-      "sha256": "502d8649d29e0c7ad552d40d95225f8fd21b4507938678c683fa3a7c5049dff4",
-      "patches": []
+      "sha256": "a0485d8c02111d4d042b17de6d11550b6817ea27783ed8d085b94a885deef865",
+      "patches": [
+        "patches/rendering-performance.patch"
+      ]
     },
     {
       "source": "desktop/runtime/OwlCanvas.qml",
       "path": "vendor/owl/OwlCanvas.qml",
-      "sha256": "7d21e813fa00974b95c67bf6a0c4cdfb76156d6e7e7a883dd4996dd460b7ece7",
-      "patches": []
+      "sha256": "523b9bd0270ce010629b9a2ed2334e38fcd3343f40f271b652f0441940174c18",
+      "patches": [
+        "patches/rendering-performance.patch"
+      ]
     },
     {
       "source": "desktop/runtime/OwlHost.qml",
@@ -68,15 +73,18 @@
     {
       "source": "desktop/runtime/OwlWidget.qml",
       "path": "vendor/owl/OwlWidget.qml",
-      "sha256": "81a614b6e3943cb08854435ada11b819d6e2db43c969769f5659720fde3e9b9b",
-      "patches": []
+      "sha256": "cae07cd160e3351228fbe314a84fd419bff8b1292ea77066807e5ae6db98e367",
+      "patches": [
+        "patches/rendering-performance.patch"
+      ]
     },
     {
       "source": "desktop/runtime/UPSTREAM.md",
       "path": "vendor/owl/UPSTREAM.md",
-      "sha256": "3d482415423d8e69f323f1981725e99f1649c5f1f49816bab26242f53d08e52f",
+      "sha256": "03d139492bcf059df4ebaf1de8ab8bf83b6c33790f296c95a431aca70bcdd9b2",
       "patches": [
-        "patches/plain-text-labels.patch"
+        "patches/plain-text-labels.patch",
+        "patches/rendering-performance.patch"
       ]
     },
     {
@@ -94,9 +102,10 @@
     {
       "source": "desktop/RobotProgram.js",
       "path": "assets/RobotProgram.js",
-      "sha256": "f32488c236de948de0495ca8032d8d69cff35277733b83b5b9a849f210e72cbd",
+      "sha256": "936532f481500fe07a2f602c5cab41993efd2dd35de84e6de911f034a40933a1",
       "patches": [
-        "patches/presentation-consistency.patch"
+        "patches/presentation-consistency.patch",
+        "patches/rendering-performance.patch"
       ]
     },
     {

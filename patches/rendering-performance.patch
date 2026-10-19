@@ -1,0 +1,284 @@
+diff --git a/assets/70-miilo-fleet.owl b/assets/70-miilo-fleet.owl
+index 4319d17..2d170de 100644
+--- a/assets/70-miilo-fleet.owl
++++ b/assets/70-miilo-fleet.owl
+@@ -499,7 +499,7 @@ widget "miilo" {
+     if len(systems) > providerLimit { Button { text: "More systems"; onTap: providerLimit = providerLimit + 5 } }
+   }
+ 
+-  component Bot(agent, s, lookX = 0, lookY = 0, slot = -1, alert = "", anchored = false) {
++  component Bot(agent, s, lookX = 0, lookY = 0, slot = -1, alert = "", anchored = false, neighbors = []) {
+     Canvas {
+       width: s
+       height: s
+@@ -524,8 +524,9 @@ widget "miilo" {
+       let phase = (slot >= 0 ? slot : max(indexOf(actors, agent), 0)) * 0.8
+       let glanceTime = (clock + max(slot, 0) * 3.7) % 17
+       let glance = expressive && !unavailable && !resting && glanceTime < 2 ? pow(sin(glanceTime / 2 * 3.14159), 2) : 0
+-      let eyeX = lookX * r * 0.2 * glance
+-      let eyeY = lookY * r * 0.16 * glance + (wistful ? r * 0.14 : 0)
++      let neighbor = len(neighbors) > 0 ? neighbors[floor((time + max(slot, 0) * 3.7) / 17) % len(neighbors)] : {x: lookX, y: lookY}
++      let eyeX = neighbor.x * r * 0.2 * glance
++      let eyeY = neighbor.y * r * 0.16 * glance + (wistful ? r * 0.14 : 0)
+       let blinking = motion && !unavailable && (clock + phase) % 5.8 < 0.16
+       let wink = expressive && !blocked && !focused && !unavailable && !resting && (clock + phase) % 29 > 27.8 && (clock + phase) % 29 < 28.05
+       let led = unavailable ? muted : failed || agent.health == "degraded" ? red : resting ? alpha(ink, 0.55) : ink
+@@ -613,7 +614,10 @@ widget "miilo" {
+   }
+ 
+   // Deterministic atom planes: the robot occupies an always-open nucleus.
+-  component OrbitField(items, anchor, offline, energized, slot = 0, alert = "", fit = 0.85, fieldSize = 164, spread = 1, lookX = 0, lookY = 0) {
++  // Unit samples are immutable; only the projected axes change each frame.
++  let orbitHalfRails = [-1, 1].map(side => range(65).map(i => {x: cos((side == 1 ? i : i + 64) * pi / 64), y: sin((side == 1 ? i : i + 64) * pi / 64)}))
++
++  component OrbitField(items, anchor, offline, energized, slot = 0, alert = "", fit = 0.85, fieldSize = 164, spread = 1, lookX = 0, lookY = 0, neighbors = []) {
+     let dormant = !energized && contains(["idle", "resting", "ready"], anchor.status)
+     let moving = robotMotion == "full" && !offline && !dormant
+     let clock = moving ? time * robotSpeed : 0
+@@ -652,7 +656,13 @@ widget "miilo" {
+         for side in [-1, 1] {
+           let depth = side == 1 ? 1 : 0.84
+           for plane in planes {
+-            let rail = range(65).map(i => {x: cos((side == 1 ? i : i + 64) * pi / 64) * plane.radius, y: sin((side == 1 ? i : i + 64) * pi / 64) * plane.rise}).map(p => [cx + p.x * cos(plane.tilt) - p.y * sin(plane.tilt), cy + p.x * sin(plane.tilt) + p.y * cos(plane.tilt)])
++            let axisCos = cos(plane.tilt)
++            let axisSin = sin(plane.tilt)
++            let horizontalX = plane.radius * axisCos
++            let horizontalY = plane.radius * axisSin
++            let verticalX = plane.rise * axisSin
++            let verticalY = plane.rise * axisCos
++            let rail = orbitHalfRails[side == 1 ? 1 : 0].map(p => [cx + p.x * horizontalX - p.y * verticalX, cy + p.x * horizontalY + p.y * verticalY])
+             if !offline && !dormant {
+               // Portable soft neon: layered strokes, no platform blur dependency.
+               path(rail, stroke: alpha(accent, 0.04 * depth), width: 5, cap: round)
+@@ -691,13 +701,13 @@ widget "miilo" {
+       Box {
+         fill: true
+         align: center
+-        Bot { agent: anchor; s: 112 * fit; lookX: lookX; lookY: lookY; slot: slot; anchored: true; alert: alert }
++        Bot { agent: anchor; s: 112 * fit; lookX: lookX; lookY: lookY; slot: slot; anchored: true; alert: alert; neighbors: neighbors }
+       }
+     }
+   }
+ 
+-  component CompactOrbit(agent, items, s = 100, slot = 0, offline = false, alert = "", lookX = 0, lookY = 0) {
+-    OrbitField { items: items.take(6); anchor: agent; offline: offline; energized: any(items, w => w.lifecycle == "active") || contains(["working", "running"], agent.status); slot: slot; alert: alert; fit: max(0.1, (s - 6) / 220); fieldSize: max(24, s * 0.82); spread: 0.84; lookX: lookX; lookY: lookY }
++  component CompactOrbit(agent, items, s = 100, slot = 0, offline = false, alert = "", lookX = 0, lookY = 0, neighbors = []) {
++    OrbitField { items: items.take(6); anchor: agent; offline: offline; energized: any(items, w => w.lifecycle == "active") || contains(["working", "running"], agent.status); slot: slot; alert: alert; fit: max(0.1, (s - 6) / 220); fieldSize: max(24, s * 0.82); spread: 0.84; lookX: lookX; lookY: lookY; neighbors: neighbors }
+   }
+ 
+   // Presentation only: labels and provider action policy remain authoritative.
+@@ -925,7 +935,6 @@ widget "miilo" {
+             {x: 0, y: -1, valid: slot >= columns},
+             {x: 0, y: 1, valid: slot + columns < visibleCount}
+           ].filter(n => n.valid)
+-          let neighbor = len(neighbors) > 0 ? neighbors[floor((time + slot * 3.7) / 17) % len(neighbors)] : {x: 0, y: 0}
+ 
+           let owned = live.filter(w => contains(w._actorKeys ?? [], a._key))
+           let errors = any(owned, w => w.lifecycle == "failed") || contains(["failed", "error"], a.status)
+@@ -940,7 +949,7 @@ widget "miilo" {
+               width: robotSize + 10
+               height: max(24, (robotSize + 10) * 0.82)
+               align: center
+-              CompactOrbit { agent: a; items: owned; s: robotSize + 10; lookX: neighbor.x; lookY: neighbor.y; slot: slot; offline: offline; alert: offline ? "" : errors ? "!!" : warning ? "?!" : "" }
++              CompactOrbit { agent: a; items: owned; s: robotSize + 10; neighbors: neighbors; slot: slot; offline: offline; alert: offline ? "" : errors ? "!!" : warning ? "?!" : "" }
+               Box {
+                 width: max(1, robotSize - 6)
+                 height: max(1, robotSize * 0.92 - 6)
+diff --git a/assets/RobotProgram.js b/assets/RobotProgram.js
+index 46b2c4f..4955de5 100644
+--- a/assets/RobotProgram.js
++++ b/assets/RobotProgram.js
+@@ -1,3 +1,3 @@
+ .pragma library
+ // Generated from shared robot.inc, appearance.inc and palette. Do not edit.
+-var source = "widget \"miilo-portrait\" {\n size: 1x1\n  // Presentation preferences only: never alter observations or action authority.\n  state robotMotion = \"full\" persist\n  state robotPace = \"normal\" persist\n  state robotPersonality = \"expressive\" persist\n  let robotSpeed = robotPace == \"slow\" ? 0.7 : robotPace == \"lively\" ? 1.3 : 1\n  component RobotAppearance() {\n    Text { text: \"Robot personality\"; style: small; color: muted }\n    Flow {\n      gap: 6\n      for option in [\"calm\", \"expressive\"] {\n        Button { text: option == \"calm\" ? \"Calm\" : \"Expressive\"; color: robotPersonality == option ? accent : muted; onTap: robotPersonality = option }\n      }\n    }\n    Text { text: \"Motion\"; style: small; color: muted }\n    Flow {\n      gap: 6\n      for option in [\"full\", \"reduced\", \"off\"] {\n        Button { text: option == \"full\" ? \"Full\" : option == \"reduced\" ? \"Reduced\" : \"Off\"; color: robotMotion == option ? accent : muted; onTap: robotMotion = option }\n      }\n    }\n    if robotMotion != \"off\" {\n      Flow {\n        gap: 6\n        for option in [\"slow\", \"normal\", \"lively\"] {\n          Button { text: option == \"slow\" ? \"Slow\" : option == \"lively\" ? \"Lively\" : \"Normal\"; color: robotPace == option ? accent : muted; onTap: robotPace = option }\n        }\n      }\n    }\n  }\n\n state portraitAgent = {_key: \"welcome\", name: \"Miilo\", status: \"ready\", health: \"healthy\"}\n state portraitSize = 64\n state portraitAnchored = false\n state robotColors = []\n let actors = [portraitAgent]\n let works = []\n let robotPalette = [\n    {name: \"Blue\", value: blue ?? accent}, {name: \"Green\", value: green ?? accent},\n    {name: \"Purple\", value: purple ?? magenta ?? accent}, {name: \"Orange\", value: orange ?? accent},\n    {name: \"Cyan\", value: cyan ?? accent}, {name: \"Red\", value: red ?? accent}\n ]\n  component Bot(agent, s, lookX = 0, lookY = 0, slot = -1, alert = \"\", anchored = false) {\n    Canvas {\n      width: s\n      height: s\n      let automatic = abs(sum(split(agent._key ?? agent.id ?? agent.name ?? \"\", \"\").map(c => indexOf(split(\"0123456789abcdef\", \"\"), c)))) % len(robotPalette)\n      let chosen = get(find(robotColors, p => p.key == (agent._key ?? \"\")), \"color\", automatic)\n      let ink = mix(robotPalette[chosen % len(robotPalette)].value, foreground, 0.12)\n      let motion = robotMotion != \"off\"\n      let expressive = robotPersonality != \"calm\" && robotMotion == \"full\"\n      let clock = motion ? time * robotSpeed : 0\n      let unavailable = contains([\"offline\", \"unreachable\", \"disconnected\"], agent.status) || contains([\"offline\", \"unreachable\", \"unknown\"], agent.health)\n      let owned = works.filter(w => contains(w._actorKeys ?? [], agent._key ?? \"\"))\n      let failed = alert == \"!!\" || agent.status == \"failed\" || agent.status == \"error\" || any(owned, w => w.lifecycle == \"failed\")\n      let focused = !unavailable && !failed && (agent.status == \"reviewing\" || any(owned, w => w.lifecycle == \"active\" && contains([\"verifying\", \"reviewing\"], w.phase)))\n      let blocked = alert != \"\" || contains([\"blocked\", \"failed\"], agent.status) || any(works, w => contains(w._actorKeys ?? [], agent._key ?? \"\") && (w.lifecycle == \"failed\" || w.attention != \"none\"))\n      let expressionAlert = unavailable ? \"\" : failed ? \"!!\" : blocked ? \"?!\" : \"\"\n      let wistful = expressive && !unavailable && blocked && (clock + max(slot, 0) * 3.7) % 23 < 2.5\n      let cx = width / 2\n      let cy = height * (anchored ? 0.5 : 0.48)\n      let r = min(width, height) * 0.27\n      let on = !unavailable && !failed && contains([\"working\", \"running\"], agent.status)\n      let resting = !unavailable && contains([\"idle\", \"resting\"], agent.status) && agent.health == \"healthy\" && !blocked\n      let phase = (slot >= 0 ? slot : max(indexOf(actors, agent), 0)) * 0.8\n      let glanceTime = (clock + max(slot, 0) * 3.7) % 17\n      let glance = expressive && !unavailable && !resting && glanceTime < 2 ? pow(sin(glanceTime / 2 * 3.14159), 2) : 0\n      let eyeX = lookX * r * 0.2 * glance\n      let eyeY = lookY * r * 0.16 * glance + (wistful ? r * 0.14 : 0)\n      let blinking = motion && !unavailable && (clock + phase) % 5.8 < 0.16\n      let wink = expressive && !blocked && !focused && !unavailable && !resting && (clock + phase) % 29 > 27.8 && (clock + phase) % 29 < 28.05\n      let led = unavailable ? muted : failed || agent.health == \"degraded\" ? red : resting ? alpha(ink, 0.55) : ink\n      let bob = on && expressive && !anchored ? sin(clock * 1.8 + phase) * 1.2 : 0\n      let y = cy + bob\n      // A soft halo, rounded shell, inset visor, and two luminous eyes.\n      if on && expressive {\n        circle(cx, y, r * 1.6, fill: alpha(ink, 0.07 + 0.03 * sin(clock * 2)))\n      }\n      line(cx, y - r, cx, y - r * 1.35, stroke: alpha(led, 0.6), width: 1.5)\n      circle(cx, y - r * 1.48, r * 0.12, fill: led)\n      rect(cx - r * 1.25, y - r * 0.25, r * 0.22, r * 0.55, radius: 2, fill: alpha(ink, 0.55))\n      rect(cx + r * 1.03, y - r * 0.25, r * 0.22, r * 0.55, radius: 2, fill: alpha(ink, 0.55))\n      rect(cx - r, y - r * 0.8, r * 2, r * 1.6, radius: r * 0.55, fill: mix(background, ink, 0.28), stroke: alpha(ink, 0.65), width: 1)\n      rect(cx - r * 0.76, y - r * 0.48, r * 1.52, r * 0.86, radius: r * 0.3, fill: alpha(background, 0.9))\n      if unavailable {\n        for side in [-1, 1] {\n          let ex = cx + side * r * 0.34\n          line(ex - r * 0.1, y - r * 0.17, ex + r * 0.1, y + r * 0.03, stroke: led, width: 1.5, cap: round)\n          line(ex + r * 0.1, y - r * 0.17, ex - r * 0.1, y + r * 0.03, stroke: led, width: 1.5, cap: round)\n        }\n      } else if failed {\n        circle(cx - r * 0.34, y - r * 0.06, r * 0.21, fill: ink)\n        circle(cx + r * 0.34, y - r * 0.06, r * 0.14, fill: ink)\n      } else if wistful {\n        line(cx - r * 0.48 + eyeX, y + r * 0.08, cx - r * 0.2 + eyeX, y + r * 0.17, stroke: led, width: 1.8, cap: round)\n        line(cx + r * 0.2 + eyeX, y + r * 0.17, cx + r * 0.48 + eyeX, y + r * 0.08, stroke: led, width: 1.8, cap: round)\n      } else if resting || blinking {\n        line(cx - r * 0.5, y, cx - r * 0.2, y, stroke: led, width: 1.5, cap: round)\n        line(cx + r * 0.2, y, cx + r * 0.5, y, stroke: led, width: 1.5, cap: round)\n      } else if focused {\n        rect(cx - r * 0.53 + eyeX, y - r * 0.1, r * 0.32, r * 0.12, radius: 1, fill: led)\n        rect(cx + r * 0.21 + eyeX, y - r * 0.1, r * 0.32, r * 0.12, radius: 1, fill: led)\n      } else if wink {\n        line(cx - r * 0.5, y, cx - r * 0.2, y, stroke: led, width: 1.5, cap: round)\n        circle(cx + r * 0.34, y - r * 0.06, r * 0.14, fill: led)\n      } else {\n        circle(cx - r * 0.34 + eyeX, y - r * 0.06 + eyeY, r * 0.14, fill: led)\n        circle(cx + r * 0.34 + eyeX, y - r * 0.06 + eyeY, r * 0.14, fill: led)\n      }\n      if expressionAlert != \"\" {\n        let markSize = min(s * 0.34, max(19.2, s * 0.288))\n        let markX = cx + r * 0.88 - 8\n        let markY = y - r * 0.7 - 7\n        if expressionAlert == \"!!\" {\n          text(\"!\", markX, markY, size: markSize, bold: true, color: mix(red, foreground, 0.15))\n          text(\"!\", markX + markSize * 0.3, markY, size: markSize, bold: true, color: mix(red, foreground, 0.15))\n        } else {\n          text(expressionAlert, markX, markY, size: markSize, bold: true, color: mix(orange, foreground, 0.2))\n        }\n      }\n      if resting {\n        // Keep the drifting letters inside the compact robot canvas.\n        for i in range(2) {\n          let drift = (motion && robotMotion == \"full\" ? clock * 0.28 + i * 0.5 : 0.2 + i * 0.4) % 1\n          text(\"z\", cx + r * (0.8 + drift * 0.55), y - r * (0.65 + drift * 0.8), size: max(9, s * 0.12) + drift * 2, bold: true, color: alpha(mix(ink, foreground, 0.8), 0.9 * (1 - drift * drift)))\n        }\n      }\n      if failed || wistful { path([[cx - r * 0.18, y + r * 0.62], [cx, y + r * 0.52], [cx + r * 0.18, y + r * 0.62]], stroke: alpha(ink, 0.6), width: 1.5) }\n      else { line(cx - r * 0.18, y + r * 0.56, cx + r * 0.18, y + r * 0.56, stroke: alpha(ink, 0.6), width: 1.5) }\n      rect(cx - r * 0.48, y + r, r * 0.96, r * 0.24, radius: 2, fill: alpha(ink, 0.35))\n    }\n  }\n\n Bot { agent: portraitAgent; s: portraitSize; anchored: portraitAnchored }\n}\n";
++var source = "widget \"miilo-portrait\" {\n size: 1x1\n  // Presentation preferences only: never alter observations or action authority.\n  state robotMotion = \"full\" persist\n  state robotPace = \"normal\" persist\n  state robotPersonality = \"expressive\" persist\n  let robotSpeed = robotPace == \"slow\" ? 0.7 : robotPace == \"lively\" ? 1.3 : 1\n  component RobotAppearance() {\n    Text { text: \"Personality\"; style: small; color: muted }\n    Flow {\n      gap: 6\n      for option in [\"calm\", \"expressive\"] {\n        Button { height: 44; text: option == \"calm\" ? \"Calm\" : \"Expressive\"; background: alpha(accent, robotPersonality == option ? 0.14 : 0); color: robotPersonality == option ? accent : muted; onTap: robotPersonality = option }\n      }\n    }\n    Text { text: \"Motion\"; style: small; color: muted }\n    Flow {\n      gap: 6\n      for option in [\"full\", \"reduced\", \"off\"] {\n        Button { height: 44; text: option == \"full\" ? \"Full\" : option == \"reduced\" ? \"Reduced\" : \"Off\"; background: alpha(accent, robotMotion == option ? 0.14 : 0); color: robotMotion == option ? accent : muted; onTap: robotMotion = option }\n      }\n    }\n    if robotMotion != \"off\" {\n      Text { text: \"Pace\"; fontSize: 12; color: muted }\n      Flow {\n        gap: 6\n        for option in [\"slow\", \"normal\", \"lively\"] {\n          Button { height: 44; text: option == \"slow\" ? \"Slow\" : option == \"lively\" ? \"Lively\" : \"Normal\"; background: alpha(accent, robotPace == option ? 0.14 : 0); color: robotPace == option ? accent : muted; onTap: robotPace = option }\n        }\n      }\n    }\n  }\n\n state portraitAgent = {_key: \"welcome\", name: \"Miilo\", status: \"ready\", health: \"healthy\"}\n state portraitSize = 64\n state portraitAnchored = false\n state robotColors = []\n let actors = [portraitAgent]\n let works = []\n let robotPalette = [\n    {name: \"Blue\", value: blue ?? accent}, {name: \"Green\", value: green ?? accent},\n    {name: \"Purple\", value: purple ?? magenta ?? accent}, {name: \"Orange\", value: orange ?? accent},\n    {name: \"Cyan\", value: cyan ?? accent}, {name: \"Red\", value: red ?? accent}\n ]\n  component Bot(agent, s, lookX = 0, lookY = 0, slot = -1, alert = \"\", anchored = false, neighbors = []) {\n    Canvas {\n      width: s\n      height: s\n      let automatic = abs(sum(split(agent._key ?? agent.id ?? agent.name ?? \"\", \"\").map(c => indexOf(split(\"0123456789abcdef\", \"\"), c)))) % len(robotPalette)\n      let chosen = get(find(robotColors, p => p.key == (agent._key ?? \"\")), \"color\", automatic)\n      let ink = mix(robotPalette[chosen % len(robotPalette)].value, foreground, 0.12)\n      let motion = robotMotion != \"off\"\n      let expressive = robotPersonality != \"calm\" && robotMotion == \"full\"\n      let clock = motion ? time * robotSpeed : 0\n      let unavailable = contains([\"offline\", \"unreachable\", \"disconnected\"], agent.status) || contains([\"offline\", \"unreachable\", \"unknown\"], agent.health)\n      let owned = works.filter(w => contains(w._actorKeys ?? [], agent._key ?? \"\"))\n      let failed = alert == \"!!\" || agent.status == \"failed\" || agent.status == \"error\" || any(owned, w => w.lifecycle == \"failed\")\n      let focused = !unavailable && !failed && (agent.status == \"reviewing\" || any(owned, w => w.lifecycle == \"active\" && contains([\"verifying\", \"reviewing\"], w.phase)))\n      let blocked = alert != \"\" || contains([\"blocked\", \"failed\"], agent.status) || any(works, w => contains(w._actorKeys ?? [], agent._key ?? \"\") && (w.lifecycle == \"failed\" || w.attention != \"none\"))\n      let expressionAlert = unavailable ? \"\" : failed ? \"!!\" : blocked ? \"?!\" : \"\"\n      let wistful = expressive && !unavailable && blocked && (clock + max(slot, 0) * 3.7) % 23 < 2.5\n      let cx = width / 2\n      let cy = height * (anchored ? 0.5 : 0.48)\n      let r = min(width, height) * 0.27\n      let on = !unavailable && !failed && contains([\"working\", \"running\"], agent.status)\n      let resting = !unavailable && contains([\"idle\", \"resting\"], agent.status) && agent.health == \"healthy\" && !blocked\n      let phase = (slot >= 0 ? slot : max(indexOf(actors, agent), 0)) * 0.8\n      let glanceTime = (clock + max(slot, 0) * 3.7) % 17\n      let glance = expressive && !unavailable && !resting && glanceTime < 2 ? pow(sin(glanceTime / 2 * 3.14159), 2) : 0\n      let neighbor = len(neighbors) > 0 ? neighbors[floor((time + max(slot, 0) * 3.7) / 17) % len(neighbors)] : {x: lookX, y: lookY}\n      let eyeX = neighbor.x * r * 0.2 * glance\n      let eyeY = neighbor.y * r * 0.16 * glance + (wistful ? r * 0.14 : 0)\n      let blinking = motion && !unavailable && (clock + phase) % 5.8 < 0.16\n      let wink = expressive && !blocked && !focused && !unavailable && !resting && (clock + phase) % 29 > 27.8 && (clock + phase) % 29 < 28.05\n      let led = unavailable ? muted : failed || agent.health == \"degraded\" ? red : resting ? alpha(ink, 0.55) : ink\n      let bob = on && expressive && !anchored ? sin(clock * 1.8 + phase) * 1.2 : 0\n      let y = cy + bob\n      // A soft halo, rounded shell, inset visor, and two luminous eyes.\n      if on && expressive {\n        circle(cx, y, r * 1.6, fill: alpha(ink, 0.07 + 0.03 * sin(clock * 2)))\n      }\n      line(cx, y - r, cx, y - r * 1.35, stroke: alpha(led, 0.6), width: 1.5)\n      circle(cx, y - r * 1.48, r * 0.12, fill: led)\n      rect(cx - r * 1.25, y - r * 0.25, r * 0.22, r * 0.55, radius: 2, fill: alpha(ink, 0.55))\n      rect(cx + r * 1.03, y - r * 0.25, r * 0.22, r * 0.55, radius: 2, fill: alpha(ink, 0.55))\n      rect(cx - r, y - r * 0.8, r * 2, r * 1.6, radius: r * 0.55, fill: mix(background, ink, 0.28), stroke: alpha(ink, 0.65), width: 1)\n      rect(cx - r * 0.76, y - r * 0.48, r * 1.52, r * 0.86, radius: r * 0.3, fill: alpha(background, 0.9))\n      if unavailable {\n        for side in [-1, 1] {\n          let ex = cx + side * r * 0.34\n          line(ex - r * 0.1, y - r * 0.17, ex + r * 0.1, y + r * 0.03, stroke: led, width: 1.5, cap: round)\n          line(ex + r * 0.1, y - r * 0.17, ex - r * 0.1, y + r * 0.03, stroke: led, width: 1.5, cap: round)\n        }\n      } else if failed {\n        circle(cx - r * 0.34, y - r * 0.06, r * 0.21, fill: ink)\n        circle(cx + r * 0.34, y - r * 0.06, r * 0.14, fill: ink)\n      } else if wistful {\n        line(cx - r * 0.48 + eyeX, y + r * 0.08, cx - r * 0.2 + eyeX, y + r * 0.17, stroke: led, width: 1.8, cap: round)\n        line(cx + r * 0.2 + eyeX, y + r * 0.17, cx + r * 0.48 + eyeX, y + r * 0.08, stroke: led, width: 1.8, cap: round)\n      } else if resting || blinking {\n        line(cx - r * 0.5, y, cx - r * 0.2, y, stroke: led, width: 1.5, cap: round)\n        line(cx + r * 0.2, y, cx + r * 0.5, y, stroke: led, width: 1.5, cap: round)\n      } else if focused {\n        rect(cx - r * 0.53 + eyeX, y - r * 0.1, r * 0.32, r * 0.12, radius: 1, fill: led)\n        rect(cx + r * 0.21 + eyeX, y - r * 0.1, r * 0.32, r * 0.12, radius: 1, fill: led)\n      } else if wink {\n        line(cx - r * 0.5, y, cx - r * 0.2, y, stroke: led, width: 1.5, cap: round)\n        circle(cx + r * 0.34, y - r * 0.06, r * 0.14, fill: led)\n      } else {\n        circle(cx - r * 0.34 + eyeX, y - r * 0.06 + eyeY, r * 0.14, fill: led)\n        circle(cx + r * 0.34 + eyeX, y - r * 0.06 + eyeY, r * 0.14, fill: led)\n      }\n      if expressionAlert != \"\" {\n        let markSize = min(s * 0.34, max(19.2, s * 0.288))\n        let markX = cx + r * 0.88 - 8\n        let markY = y - r * 0.7 - 7\n        if expressionAlert == \"!!\" {\n          text(\"!\", markX, markY, size: markSize, bold: true, color: mix(red, foreground, 0.15))\n          text(\"!\", markX + markSize * 0.3, markY, size: markSize, bold: true, color: mix(red, foreground, 0.15))\n        } else {\n          text(expressionAlert, markX, markY, size: markSize, bold: true, color: mix(orange, foreground, 0.2))\n        }\n      }\n      if resting {\n        // Keep the drifting letters inside the compact robot canvas.\n        for i in range(2) {\n          let drift = (motion && robotMotion == \"full\" ? clock * 0.28 + i * 0.5 : 0.2 + i * 0.4) % 1\n          text(\"z\", cx + r * (0.8 + drift * 0.55), y - r * (0.65 + drift * 0.8), size: max(9, s * 0.12) + drift * 2, bold: true, color: alpha(mix(ink, foreground, 0.8), 0.9 * (1 - drift * drift)))\n        }\n      }\n      if failed || wistful { path([[cx - r * 0.18, y + r * 0.62], [cx, y + r * 0.52], [cx + r * 0.18, y + r * 0.62]], stroke: alpha(ink, 0.6), width: 1.5) }\n      else { line(cx - r * 0.18, y + r * 0.56, cx + r * 0.18, y + r * 0.56, stroke: alpha(ink, 0.6), width: 1.5) }\n      rect(cx - r * 0.48, y + r, r * 0.96, r * 0.24, radius: 2, fill: alpha(ink, 0.35))\n    }\n  }\n\n Bot { agent: portraitAgent; s: portraitSize; anchored: portraitAnchored }\n}\n";
+diff --git a/vendor/owl/Owl.js b/vendor/owl/Owl.js
+index 91d2dfb..9194658 100644
+--- a/vendor/owl/Owl.js
++++ b/vendor/owl/Owl.js
+@@ -1703,7 +1703,7 @@ function Env(host, parent, slots) {
+   this.slots = slots
+ }
+ 
+-function Lazy(ev) { this.ev = ev }
++function Lazy(ev) { this.ev = ev; this.cached = false; this.dynamic = false; this.revision = -1; this.tick = -1 }
+ 
+ Env.prototype = {
+   local: function(depth, i) {
+@@ -1711,8 +1711,9 @@ Env.prototype = {
+     for (var d = 0; d < depth; d++) e = e.parent
+     var v = e.slots[i]
+     if (v instanceof Lazy) {
+-      v = run(v.ev, e)
+-      e.slots[i] = v
++      // Preserve the expression so a deferred Canvas can refresh only its clock.
++      if (e.host.local) return e.host.local(v, e)
++      return run(v.ev, e)
+     }
+     return v === undefined ? null : v
+   },
+@@ -2513,6 +2514,8 @@ function Instance(program, host, persisted) {
+   this.letTime = []
+   this.sampled = []
+   this.time = 0
++  this.revision = 0
++  this.tick = 0
+   this.tracking = []
+   this.readsTime = false
+   this.triggerLast = []
+@@ -2556,6 +2559,7 @@ Instance.prototype = {
+     return {
+       budget: budget,
+       read: function(slot) { return self.read(slot) },
++      local: function(value, env) { return self.local(value, env) },
+       write: function(slot, v) { self.write(slot, v) },
+       theme: function(name) { return self.host.theme(name) },
+       time: function() {
+@@ -2581,6 +2585,21 @@ Instance.prototype = {
+     }
+   },
+ 
++  local: function(value, env) {
++    if (!value.cached || value.revision !== this.revision || (value.dynamic && value.tick !== this.tick)) {
++      var dependency = { time: false }
++      this.tracking.push(dependency)
++      try { value.value = run(value.ev, env) }
++      finally { this.tracking.pop() }
++      value.cached = true
++      value.dynamic = dependency.time
++      value.revision = this.revision
++      value.tick = this.tick
++    }
++    if (value.dynamic) this.markTime()
++    return value.value === undefined ? null : value.value
++  },
++
+   markTime: function() {
+     this.readsTime = true
+     for (var i = 0; i < this.tracking.length; i++) this.tracking[i].time = true
+@@ -2617,6 +2636,7 @@ Instance.prototype = {
+   },
+ 
+   invalidate: function() {
++    this.revision++
+     for (var i = 0; i < this.letCache.length; i++) this.letCache[i] = undefined
+   },
+ 
+@@ -2666,6 +2686,7 @@ Instance.prototype = {
+ 
+   // A frame of an animated widget: `time` moved, so whatever read it is stale.
+   frame: function(seconds) {
++    if (this.time !== seconds) this.tick++
+     this.time = seconds
+     for (var i = 0; i < this.letCache.length; i++) if (this.letTime[i]) this.letCache[i] = undefined
+   },
+@@ -2837,7 +2858,21 @@ Instance.prototype = {
+       var node = { kind: n.kind, p: props, h: handlers, a: anim, c: [] }
+       if (n.kind === "Canvas") {
+         var drawn = n.children
+-        node.draw = function(width, height) { return self.draw(drawn, env, width, height) }
++        var cache = { revision: -1, tick: -1, width: -1, height: -1, operations: null }
++        node.draw = function(width, height) {
++          if (cache.revision !== self.revision || cache.width !== width || cache.height !== height
++              || (node.draw.readsTime && cache.tick !== self.tick)) {
++            var dependency = { time: false }
++            self.tracking.push(dependency)
++            try { cache.operations = self.draw(drawn, env, width, height) }
++            finally { self.tracking.pop() }
++            node.draw.readsTime = dependency.time
++            cache.revision = self.revision; cache.tick = self.tick
++            cache.width = width; cache.height = height
++          }
++          if (node.draw.readsTime) self.markTime()
++          return cache.operations
++        }
+       } else {
+         this.nodes(n.children, env, node.c)
+       }
+diff --git a/vendor/owl/OwlCanvas.qml b/vendor/owl/OwlCanvas.qml
+index 9734532..c1b434b 100644
+--- a/vendor/owl/OwlCanvas.qml
++++ b/vendor/owl/OwlCanvas.qml
+@@ -26,9 +26,39 @@ Canvas {
+   renderTarget: Canvas.Image
+   renderStrategy: Canvas.Cooperative
+ 
+-  readonly property var deps: [root.draw, root.width, root.height, root.widget ? root.widget.frame : 0,
++  property bool animated: true
++  property bool dirty: true
++  function inViewport() {
++    if (!root.visible || !root.widget || !root.widget.active || width <= 0 || height <= 0) return false
++    for (var parent = root.parent; parent; parent = parent.parent) {
++      if (!parent.visible || parent.opacity === 0) return false
++      if (parent.clip || parent === root.widget) {
++        var bounds = root.mapToItem(parent, Qt.rect(0, 0, root.width, root.height))
++        if (bounds.x + bounds.width <= 0 || bounds.y + bounds.height <= 0
++            || bounds.x >= parent.width || bounds.y >= parent.height) return false
++      }
++    }
++    return true
++  }
++  // Track ancestor geometry so static widgets resume on scroll without a clock.
++  readonly property var viewportGeometry: {
++    var geometry = [root.x, root.y, root.width, root.height]
++    for (var item = root.parent; item; item = item.parent)
++      geometry.push(item.x, item.y, item.width, item.height, item.scale, item.rotation,
++                    item.clip, item.visible, item.opacity)
++    return geometry
++  }
++  onViewportGeometryChanged: root.schedule()
++  function schedule() { if ((root.dirty || root.animated) && root.inViewport()) root.requestPaint() }
++  readonly property var deps: [root.draw, root.width, root.height,
+     root.widget ? root.widget.palette : null]
+-  onDepsChanged: root.requestPaint()
++  onDepsChanged: { root.dirty = true; root.animated = true; root.schedule() }
++  onVisibleChanged: if (visible) root.schedule()
++  Connections {
++    target: root.widget
++    function onFrameChanged() { root.schedule() }
++    function onActiveChanged() { root.schedule() }
++  }
+ 
+   // Images a drawing call names load asynchronously; the frame that asked
+   // for one skips it and the next frame, after onImageLoaded, has it.
+@@ -44,11 +74,14 @@ Canvas {
+   onImageLoaded: root.requestPaint()
+ 
+   onPaint: {
++    if (!root.inViewport()) return
+     var ctx = getContext("2d")
+     ctx.reset()
+     if (!root.draw || width <= 0 || height <= 0) return
+     ctx.scale(root.dp, root.dp)
+     var ops = root.draw(width / root.dp, height / root.dp)
++    root.animated = root.draw.readsTime !== false
++    root.dirty = false
+     L.paint(ctx, ops, { foreground: root.widget ? root.widget.ink("foreground") : "white" },
+       root.widget ? root.widget.sansFamily : "sans-serif", root.images)
+   }
+diff --git a/vendor/owl/OwlWidget.qml b/vendor/owl/OwlWidget.qml
+index 59f60aa..84bd4d3 100644
+--- a/vendor/owl/OwlWidget.qml
++++ b/vendor/owl/OwlWidget.qml
+@@ -287,7 +287,9 @@ Item {
+     onTriggered: {
+       root.instance.frame(elapsedTime)
+       root.frame++
+-      if (root.tree && root.tree.readsTime) root.render()
++      // Canvas-local clocks invalidate lazily without rebuilding static layout.
++      if ((root.tree && root.tree.readsTime)
++          || (root.screenTree && root.screenTree.readsTime)) root.render()
+     }
+   }
+ 
+diff --git a/vendor/owl/UPSTREAM.md b/vendor/owl/UPSTREAM.md
+index 34ec7f0..374050e 100644
+--- a/vendor/owl/UPSTREAM.md
++++ b/vendor/owl/UPSTREAM.md
+@@ -25,3 +25,5 @@ Security patch: all runtime Text labels, input placeholders and terminal output
+ use Text.PlainText. Provider-controlled strings remain literal and cannot cause
+ inline image fetches through automatic rich-text detection. See
+ patches/plain-text-labels.patch for the renderer changes.
++
++Animation performance patch: retain component-local expressions and invalidate time-dependent values lazily; reuse unchanged canvas display lists; skip painting clipped/hidden canvases. Layout clocks remain separate from drawing clocks. Native regression coverage includes continuous clocks, static paint suppression, scrolling and resize.

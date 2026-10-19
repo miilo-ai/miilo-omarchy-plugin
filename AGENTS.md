@@ -23,3 +23,6 @@ Before changing QML text, renderer imports or display controls, read
 `docs/omarchy-integration-guide.md`. Untrusted display strings must use explicit
 plain-text rendering. Run source guards and the native positive-control network
 canary; preserve the shared renderer fix and vendored patch/hash provenance.
+
+For renderer changes, follow `docs/omarchy-integration-guide.md`, including the
+plain-text canary, retained-clock and static-scroll regression gates.

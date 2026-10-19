@@ -1,5 +1,6 @@
 .PHONY: check check-native check-typography
 check:
+	node tools/test-render-invalidation.cjs
 	node tools/check-no-python.cjs
 	node --test tools/no-python.test.cjs
 	node tools/check.cjs
@@ -24,6 +25,15 @@ check-native: check
 render-design:
 	node tools/render-crew.cjs
 
+.PHONY: check-canvas-clock
+check-canvas-clock:
+	node tools/test-canvas-clock.cjs
+
+check-typography: check-canvas-clock
 .PHONY: check-plain-text
 check-plain-text:
 	node tools/test-plain-text.cjs
+
+.PHONY: benchmark-rendering
+benchmark-rendering:
+	node tools/benchmark-native-rendering.cjs
