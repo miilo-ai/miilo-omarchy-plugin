@@ -41,3 +41,12 @@ regressions pass. Full native qualification and the maintained backed-up relaunc
 passed; the actual workspace-1 window was visually inspected at its current narrow
 size. This is a native plugin presentation patch; Android widget sources and
 rendering were not changed by the density follow-up.
+
+Detail task-limit follow-up: native cards default to five visible tasks, with
+persisted Appearance choices of 3/5/8/10. Overflow uses the standard themed
+“View more” button and opens the full system list. Evaluator tests cover default,
+overrides, invalid-value fallback, persistence and access to hidden observations.
+The actual Qt settings control is exercised in the native settings fixture.
+`make check-native check-typography` and the maintained backed-up relaunch passed.
+Installed asset content was verified. Post-relaunch window captures returned black,
+so live visual acceptance of this follow-up remains unconfirmed. Android unchanged.

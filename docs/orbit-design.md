@@ -2,6 +2,11 @@
 
 The plugin consumes the shared Orbit widget asset pinned in sources.lock.json.
 The expanded view offers Compact/Detail; saved quiet/orbit values remain compatible.
+Detail cards show five tasks by default. In Appearance, “Tasks per card” can be
+set to 3, 5, 8 or 10; the preference persists across restarts. “View more” opens
+the complete system work list without removing any observations. This setting
+affects native desktop Detail cards, independently of Compact mode.
+
 Full/Reduced/Off remain independent motion settings. No helper protocol change or
 new CLI binary is required by this presentation increment.
 

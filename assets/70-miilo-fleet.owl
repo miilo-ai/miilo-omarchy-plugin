@@ -39,6 +39,7 @@ widget "miilo" {
   state systemsOpen = false
   state setupOpen = false
   state setupSection = "systems"
+  state detailTaskLimit = 5 persist
   state pageSize = 5
   state agentLimit = 5
   state needsOnly = false
@@ -746,7 +747,8 @@ widget "miilo" {
     let errors = any(items, w => w.lifecycle == "failed") || any(team, a => contains(["failed", "error"], a.status))
     let warning = any(items, w => w.attention != "none") || any(team, a => a.status == "blocked")
     let mark = offline ? "" : errors ? "!!" : warning ? "?!" : ""
-    let current = items.sortBy(w => w._key).take(8)
+    let visibleLimit = contains([3, 5, 8, 10], detailTaskLimit) ? detailTaskLimit : 5
+    let current = items.sortBy(w => w._key).take(visibleLimit)
     Column {
       fill: width
       padding: 10
@@ -775,7 +777,7 @@ widget "miilo" {
           Text { text: get(w.extensions ?? {}, "dev.miilo.session", null) != null && trim(w.summary ?? "") != "" ? w.summary : w.title; weight: 1; fontSize: linux ? 10 : 11; maxLines: 1; color: rowInk; offset: [0, 2] }
         }
       }
-      if len(items) > 8 { Button { text: "+${len(items) - 8} ${len(items) == 9 ? "task" : "tasks"} · inspect system"; onTap: { inspectionView = "orbit"; expandedSystem = provider.id; workflowActor = ""; pageSize = 12 } } }
+      if len(items) > visibleLimit { Button { text: "View more"; color: accent; onTap: { inspectionView = "orbit"; expandedSystem = provider.id; workflowActor = ""; pageSize = 12 } } }
     }
   }
   component OrbitView(list) {

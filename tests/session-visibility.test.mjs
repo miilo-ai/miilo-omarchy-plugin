@@ -114,3 +114,25 @@ for (const width of [240, 360, 600, 960]) {
   const detail = scene(fleetFixture,{observatoryView:'orbit'},{screenWidth:width}).render().find(n => n.kind === 'Grid');
   assert(detail); assert.equal(detail.p.columns,Math.max(1,Math.min(4,Math.floor((width-14)/190))));
 }
+
+// Detail limits hide rows, never observations; View more opens the full system.
+const factory = fixture();
+factory.snapshot.providers = [{id:'factory',name:'Example Factory',health:'healthy'}];
+factory.snapshot.actors = [{_key:'builder',id:'builder',providerId:'factory',name:'Builder',status:'working',health:'healthy'}];
+factory.snapshot.workItems = Array.from({length:12},(_,i)=>({_key:`task${i}`,id:`task${i}`,providerId:'factory',title:`Factory task ${i}`,lifecycle:'active',phase:'implementing',attention:'none',_actorKeys:['builder'],_revisionKey:'r1',actions:[]}));
+for (const [saved, count] of [[{},5],[{detailTaskLimit:3},3],[{detailTaskLimit:8},8],[{detailTaskLimit:10},10],[{detailTaskLimit:999},5]]) {
+  const detail = scene(factory,saved), nodes = detail.render();
+  assert.equal(nodes.filter(n=>n.kind==='Text'&&String(n.p.text).startsWith('Factory task ')).length,count);
+  assert.equal(detail.get('allWorks').length,12,'Hidden rows must preserve the complete observation');
+  const more = nodes.find(n=>n.kind==='Button'&&n.p.text==='View more');
+  assert(more,'Overflow uses a concise standard button');
+  more.h.onTap(0,0);
+  assert.equal(detail.get('expandedSystem'),'factory');
+  assert.equal(detail.get('pageSize'),12);
+  assert(detail.render().some(n=>n.p?.text==='Factory task 9'),'Expanded system includes tasks beyond the card limit');
+}
+const preference = scene(factory);
+assert.equal(preference.get('detailTaskLimit'),5);
+preference.set('detailTaskLimit',8);
+const restored = scene(factory,preference.instance.persisted());
+assert.equal(restored.get('detailTaskLimit'),8,'Detail preference survives a new surface instance');
