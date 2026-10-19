@@ -12,8 +12,8 @@ FocusScope {
     readonly property var widget: surface.widget
     property string section: "appearance"
     property bool configuring: false
-    readonly property var sections: ["appearance", "filters", "systems", "chat"]
-    readonly property var labels: ["Appearance", "Systems", "Connections", "Chat model"]
+    readonly property var sections: ["appearance", "filters", "systems", "chat", "pair"]
+    readonly property var labels: ["Appearance", "Systems", "Connections", "Chat model", "Pair computer"]
     readonly property bool wide: width >= 440
     signal closed()
     function read(name) { var revision = widget.generation; return surface.viewValue(name) }
@@ -74,16 +74,16 @@ FocusScope {
                     }
                     ConnectionsOverview { objectName: "connectionsOverview"; context: root; visible: root.section === "systems"; Layout.fillWidth: true }
                     ColumnLayout {
-                        visible: root.section === "systems" || root.section === "chat"
+                        visible: root.section === "systems" || root.section === "chat" || root.section === "pair"
                         Layout.fillWidth: true; spacing: 8
-                        TypeText { typography: root.theme.typography; role: "small"; Layout.fillWidth: true; text: root.section === "chat" ? "Configure your model endpoint and credential reference." : "Connect a remote system using its endpoint and an @credential-file reference."; color: root.theme.foreground }
+                        TypeText { typography: root.theme.typography; role: "small"; Layout.fillWidth: true; text: root.section === "chat" ? "Configure your model endpoint and credential reference." : root.section === "pair" ? "Create an invitation on the sharing computer with miilo local pair invite. Compare both codes before host approval. Only selected observations are shared." : "Connect a remote system using its endpoint and an @credential-file reference."; color: root.theme.foreground }
                         Controls.Action { context: root; text: root.configuring ? "Close setup" : "Configure"; primary: true; onClicked: root.configuring = !root.configuring }
                         Loader {
                             objectName: "setupTerminalLoader"
                             Layout.fillWidth: true; Layout.preferredHeight: active ? Math.max(180, root.height * 0.6) : 0
                             active: root.visible && root.configuring
                             sourceComponent: Component {
-                                Owl.OwlTerminal { widget: root.widget; sessionActive: root.visible; node: ({p:{command:root.section === "chat" ? "miilo-owl chat-setup" : "miilo-owl setup"}}) }
+                                Owl.OwlTerminal { widget: root.widget; sessionActive: root.visible; node: ({p:{command:root.section === "pair" ? "miilo-owl pair" : root.section === "chat" ? "miilo-owl chat-setup" : "miilo-owl setup"}}) }
                             }
                         }
                     }

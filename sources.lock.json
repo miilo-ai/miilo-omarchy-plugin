@@ -5,12 +5,13 @@
     {
       "source": "70-miilo-fleet.owl",
       "path": "assets/70-miilo-fleet.owl",
-      "sha256": "b53464f9a6e3a47aa74f28574eb8fda5df6a58cd343b7c120300f4d1791f8c6b",
+      "sha256": "a1e2e905e865479fc785f5489efdc199e2fa490f5875dcda0b7da4905f7c7504",
       "patches": [
         "patches/presentation-consistency.patch",
         "patches/desktop-density.patch",
         "patches/rendering-performance.patch",
-        "patches/orbit-sampling.patch"
+        "patches/orbit-sampling.patch",
+        "patches/computer-pairing.patch"
       ]
     },
     {

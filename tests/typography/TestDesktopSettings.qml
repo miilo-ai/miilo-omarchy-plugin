@@ -66,6 +66,15 @@ Item {
             tryVerify(() => findChild(overview,"connectionName") !== null);
             compare(findChild(overview,"connectionName").text,"Workshop factory");
         }
+        function test_pairing_is_explicit_and_isolated() {
+            panel.section = "pair";
+            tryCompare(findChild(panel,"pairNavigation"),"selected",true);
+            verify(!findChild(panel,"setupTerminalLoader").active);
+            panel.width = 320;
+            var navigation = findChild(panel,"settingsNavigation");
+            navigation.currentIndex = 4; navigation.activated(4);
+            compare(panel.section,"pair");
+        }
         function test_sections_and_narrow_navigation() {
             panel.section = "chat";
             tryCompare(findChild(panel,"chatNavigation"),"selected",true);
