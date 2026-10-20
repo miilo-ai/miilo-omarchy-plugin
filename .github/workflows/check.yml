@@ -10,6 +10,10 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: 22
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+        with:
+          toolchain: 1.96.1
+          components: rustfmt, clippy
       - run: make check
       - name: Native qualification status
         run: echo 'Source checks passed. Native Omarchy acceptance is separate; publication is reported by Version and tag / Source release.'

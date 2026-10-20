@@ -1,5 +1,5 @@
 .PHONY: check check-native check-typography
-check:
+check: check-preview-toolchain
 	node tools/test-render-invalidation.cjs
 	node tools/check-no-python.cjs
 	node --test tools/no-python.test.cjs
@@ -37,3 +37,14 @@ check-plain-text:
 .PHONY: benchmark-rendering
 benchmark-rendering:
 	node tools/benchmark-native-rendering.cjs
+
+.PHONY: check-preview-toolchain check-preview
+check-preview-toolchain:
+	node tools/check-preview-toolchain.cjs
+	node --test tools/preview-toolchain.test.cjs
+	cargo fmt --manifest-path tools/qt-preview/Cargo.toml --check
+	cargo test --locked --manifest-path tools/qt-preview/Cargo.toml
+	cargo clippy --locked --manifest-path tools/qt-preview/Cargo.toml --all-targets -- -D warnings
+
+check-preview: check-preview-toolchain
+	node --test tools/preview-capture.test.cjs

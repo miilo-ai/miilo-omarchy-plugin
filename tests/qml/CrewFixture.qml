@@ -7,6 +7,7 @@ import "../../ui/components/onboarding" as Crew
 import "../../ui/components" as UI
 Window {
  id: root; width: 680; height: 480; visible: true
+ Rectangle { anchors.fill: parent; color: root.color; z: -1 }
  property bool light: false
  color: light ? "#faf5ee" : "#16151d"
  QtObject { id: fakeWidget; property int frame:0; property var instance: ({read:i => i === 0 ? Owl.fromJson([{key:"welcome",color:2}]) : "off"}); property var program: ({globals:[{name:"robotColors"},{name:"robotMotion"}]})
