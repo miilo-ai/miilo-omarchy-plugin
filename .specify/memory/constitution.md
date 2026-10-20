@@ -27,3 +27,8 @@ evidence unchanged. New renderer changes require source guards and a native
 loopback image-request canary with a positive control. Keep shared and vendored
 fixes aligned with reproducible patches and source hashes. See
 `docs/omarchy-integration-guide.md`.
+
+Preview tooling uses a Rust coordinator and installed qmltestrunner with QML tests.
+Do not add authored C/C++, CMake projects, or Rust Qt bindings that compile generated
+C++ to the preview tool. Qt/Quickshell remain upstream platform dependencies.
+Run make check-preview; fixture acceptance does not qualify a live shell or phone.
