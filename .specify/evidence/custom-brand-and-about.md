@@ -53,3 +53,21 @@ completed successfully. This was not a running-shell crash.
 The live overview also reported one unavailable configured endpoint. This does
 not qualify that endpoint as healthy; connection or provider availability was
 not changed or repaired by this presentation update.
+
+## October 24 PR review
+
+The final adaptive Compact patch is retained in source provenance and checked
+with 60 population/viewport scenarios: 1–20 systems, narrow/wide windows,
+height bounds and the four-column cap. No observation or action contract changed.
+`make check-native check-brand check-typography` passed on Linux with the installed
+Omarchy/Quickshell runtime, including plain-text positive-control, configuration,
+keyboard, retained-clock and animation-budget checks. The isolated Qt Orbit
+fixture also passed. These checks used a separate source snapshot and preserved
+unrelated workstation source edits.
+
+Live shell acceptance retained the configured systems and displayed the custom
+wordmark, adaptive Compact fleet and About version 0.4.1. About was reached by
+keyboard; one live shell process remained after the maintained relaunch.
+Validation used the matching helper 1.7.1 and already installed CLI 0.4.0.
+No CLI/SDK implementation change is part of this update. The header now uses the
+same 10 px horizontal inset as Settings content.
