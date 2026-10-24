@@ -194,3 +194,17 @@ Use **Miilo menu → Pair computer** to enter a private invitation from a comput
 running `miilo local share`. Compare both codes and approve on the host before
 selecting systems. This grants read-only observation of selected sessions, never
 agent execution or approval authority. See the [pairing guide](https://github.com/miilo-ai/miilo-owl-widgets/blob/main/docs/computer-pairing.md).
+
+### About and branding
+
+The dashboard uses Miilo's custom wordmark; the bar uses its simplified robot
+symbol. Both follow the shell foreground color. Settings → About shows the
+installed plugin version, observation and optional model-use disclosures, and
+links to miilo.tech and GitHub Sponsors. Opening About does not contact those
+websites or start a model request; external links open only when selected.
+
+Run `make check-brand` with Qt Quick Test installed for offscreen vector checks
+at 16–128 px, theme changes and transparent visor rendering. The existing native
+settings tests cover About navigation and manifest-version loading. Complete
+`make check-native check-typography` on Omarchy before release; local vector
+checks do not qualify shell integration.

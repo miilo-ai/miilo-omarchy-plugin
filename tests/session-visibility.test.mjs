@@ -34,7 +34,7 @@ assert.deepEqual(s.get('actors').map(a=>a._key),['a8'],'Observed working session
 assert.deepEqual(s.get('selectableProviders').map(p=>p.id),['p8']);
 assert.equal(s.get('allActors').filter(a=>a.status==='resting').length,12,'Never fake activity');
 assert.equal(s.get('provs').length,1);
-assert.equal(s.render().filter(n=>n.kind==='Canvas'&&n.p.height===82).length,1,'Only visible session gets an Orbit field');
+assert.equal(s.render().filter(n=>n.kind==='Canvas'&&n.p.height>=82&&n.p.height<=140).length,1,'Only visible session gets an Orbit field');
 assert.equal(s.get('systemsOpen'),false,'Menu starts collapsed');
 // The native header owns navigation; its state drives the same selector projection.
 s.set('systemsOpen',true);
@@ -85,7 +85,7 @@ orbitTile.set('observatoryView','quiet');
 orbitTile.render().find(n=>n.p?.text==='Back').h.onTap(0,0);
 assert.equal(orbitTile.get('observatoryView'),'orbit','Back restores the entry mode explicitly');
 assert.equal(orbitTile.get('expandedSystem'),'');
-assert.equal(orbitTile.render().filter(n=>n.kind==='Canvas'&&n.p.height===82).length,1);
+assert.equal(orbitTile.render().filter(n=>n.kind==='Canvas'&&n.p.height>=82&&n.p.height<=140).length,1);
 
 // Narrow desktop windows wrap filters and display modes into separate rows.
 for (const width of [240, 260, 900]) {
@@ -160,7 +160,7 @@ modeSwitch.render().find(n=>n.kind==='Box'&&n.c?.some(c=>c.p?.text==='Detail')).
 assert.equal(modeSwitch.get('expandedSystem'),'');
 assert.equal(modeSwitch.get('workflowActor'),'');
 assert.equal(modeSwitch.get('inspectionView'),'');
-assert(modeSwitch.render().some(n=>n.kind==='Canvas'&&n.p.height===82),'First Detail activation must restore the overview');
+assert(modeSwitch.render().some(n=>n.kind==='Canvas'&&n.p.height>=82&&n.p.height<=140),'First Detail activation must restore the overview');
 
 // Both fleets remain centered even when the one-card group is narrower than the viewport.
 for (const mode of ['quiet','orbit']) for (const width of [360,760,1200]) {
@@ -169,3 +169,8 @@ for (const mode of ['quiet','orbit']) for (const width of [360,760,1200]) {
   assert(centered,'Fleet must have a centered viewport container');
   assert(centered.c.find(c=>c.kind==='Grid'||c.kind==='Row').p.width<=width);
 }
+
+const narrowOrbit = scene(factory, {}, {screenWidth:360}).render().find(n=>n.kind==='Canvas'&&n.p.height>=82&&n.p.height<=140);
+const wideOrbit = scene(factory, {}, {screenWidth:1200}).render().find(n=>n.kind==='Canvas'&&n.p.height>=82&&n.p.height<=140);
+assert.equal(narrowOrbit.p.height,82,'Narrow windows retain compact portraits');
+assert(wideOrbit.p.height>narrowOrbit.p.height,'Larger windows grow the portrait and its orbit together');

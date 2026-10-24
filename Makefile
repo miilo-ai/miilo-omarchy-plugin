@@ -48,3 +48,7 @@ check-preview-toolchain:
 
 check-preview: check-preview-toolchain
 	node --test tools/preview-capture.test.cjs
+
+.PHONY: check-brand
+check-brand:
+	QT_QPA_PLATFORM=offscreen QT_QUICK_BACKEND=software qmltestrunner -input tests/brand -o -,txt

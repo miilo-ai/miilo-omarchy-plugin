@@ -41,7 +41,7 @@ Item {
             verify(action.implicitHeight < 26);
             typeSystem.profile = "phone"; wait(10); verify(action.implicitHeight >= 48);
             typeSystem.profile = "desktop"; groups.model = [];
-            var robot = findChild(toolbar, "titleRobot"); verify(robot); compare(robot.accent, theme.foreground); compare(robot.highContrast, true); compare(robot.colors.blue, 0xffb9d9ff);
+            var wordmark = findChild(toolbar, "titleWordmark"); verify(wordmark); compare(wordmark.ink, theme.foreground); compare(findChild(toolbar, "titleRobot"), null);
         }
         function test_session_context_only_when_needed() {
             sessions.grouped = [{name:"codex / /example", rule:null, sessions:[]}];
@@ -77,6 +77,14 @@ Item {
             menu.forceActiveFocus(); keyClick(Qt.Key_Space);
             wait(30); keyClick(Qt.Key_Down); keyClick(Qt.Key_Down); keyClick(Qt.Key_Down); keyClick(Qt.Key_Return);
             tryCompare(settingsSpy, "count", 1); compare(settingsSpy.signalArguments[0][0], "systems");
+        }
+        function test_about_menu_keyboard_navigation() {
+            settingsSpy.clear();
+            var menu = findChild(toolbar, "systemMenuButton");
+            menu.forceActiveFocus(); keyClick(Qt.Key_Space); wait(30);
+            for (var i = 0; i < 6; i++) keyClick(Qt.Key_Down);
+            keyClick(Qt.Key_Return);
+            tryCompare(settingsSpy, "count", 1); compare(settingsSpy.signalArguments[0][0], "about");
         }
         function test_add_menu_keyboard_navigation() {
             var add = findChild(toolbar, "addSystemButton");

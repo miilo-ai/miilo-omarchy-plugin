@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import "onboarding" as Crew
 
 RowLayout {
     id: root
@@ -14,23 +13,13 @@ RowLayout {
     signal settingsRequested(string section)
     signal systemsRequested()
     spacing: 4
-    Crew.RobotPortrait {
-        objectName: "titleRobot"
+    MiiloWordmark {
+        objectName: "titleWordmark"
         ink: root.theme.foreground
-        accent: root.theme.foreground
-        highContrast: true
-        accentOnly: true
-        Layout.preferredWidth: 28
-        Layout.preferredHeight: 28
-        motion: "reduced"
+        Layout.preferredWidth: 86
+        Layout.preferredHeight: 34
     }
-    TypeText {
-        typography: root.theme.typography
-        role: "title"
-        text: "Miilo"
-        color: root.theme.foreground
-        Layout.fillWidth: true
-    }
+    Item { Layout.fillWidth: true }
     ToolbarButton {
         id: addButton
         objectName: "addSystemButton"
@@ -64,6 +53,7 @@ RowLayout {
             MenuItem { text: "Connections"; checkable: true; autoExclusive: true; checked: root.activeSection === "systems"; onTriggered: root.settingsRequested("systems") }
             MenuItem { text: "Pair computer"; checkable: true; autoExclusive: true; checked: root.activeSection === "pair"; onTriggered: root.settingsRequested("pair") }
             MenuItem { text: "Chat model"; checkable: true; autoExclusive: true; checked: root.activeSection === "chat"; onTriggered: root.settingsRequested("chat") }
+            MenuItem { text: "About"; checkable: true; autoExclusive: true; checked: root.activeSection === "about"; onTriggered: root.settingsRequested("about") }
         }
     }
     function focusAdd() { addButton.forceActiveFocus() }

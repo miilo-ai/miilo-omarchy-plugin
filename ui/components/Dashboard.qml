@@ -36,7 +36,7 @@ FloatingWindow {
             color: surface.widget.ink("background")
             DesktopToolbar {
                 id: headerContent
-                anchors { left: parent.left; right: parent.right; top: parent.top; margins: 6 }
+                anchors { left: parent.left; right: parent.right; top: parent.top; leftMargin: 10; rightMargin: 10; topMargin: 6 }
                 theme: root.interactionTheme
                 activeSection: root.showingSettings ? settingsPanel.section : ""
                 busy: importer.busy
