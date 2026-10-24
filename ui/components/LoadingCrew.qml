@@ -14,13 +14,14 @@ ColumnLayout {
         return slot < 0 ? "reduced" : String(widget.instance.read(slot));
     }
     InteractionTheme { id: fallbackTheme; widget: root.widget }
+    readonly property real portraitSize: Math.max(56, Math.min(104, width * 0.16))
     spacing: 6
     Crew.RobotPortrait {
         objectName: "loadingRobot"
         widget: root.widget
         ink: root.theme.foreground; accent: root.theme.accent
         accentOnly: true; motion: root.motion; active: root.visible
-        Layout.preferredWidth: 56; Layout.preferredHeight: 56
+        Layout.preferredWidth: root.portraitSize; Layout.preferredHeight: root.portraitSize
         Layout.alignment: Qt.AlignHCenter
     }
     TypeText {

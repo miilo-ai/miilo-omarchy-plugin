@@ -742,7 +742,7 @@ widget "miilo" {
       }
     }
   }
-  component OrbitCluster(provider, items, slot = 0, fit = 0.85) {
+  component OrbitCluster(provider, items, slot = 0, fit = 0.85, portraitScale = 0.5) {
     let team = actors.filter(a => a.providerId == provider.id)
     let offline = contains(["offline", "unreachable", "unknown", "stale"], provider.health ?? "") || contains(["offline", "unreachable", "stale"], provider.status ?? "") || any(team, a => contains(["offline", "unreachable", "unknown"], a.health ?? ""))
     let representative = len(team) > 0 ? team[0] : {_key: provider.id, providerId: provider.id, name: provider.name, status: "ready", health: "unknown"}
@@ -765,7 +765,7 @@ widget "miilo" {
         Text { text: provider.name; weight: 1; fontSize: 11; maxLines: 1 }
         Text { text: offline ? "Unavailable" : "${len(items)} ${len(items) == 1 ? "task" : "tasks"}"; width: 60; align: end; fontSize: 10; color: muted; maxLines: 1 }
       }
-      OrbitField { items: current; anchor: anchor; offline: offline; energized: any(items, w => w.lifecycle == "active"); slot: slot; alert: mark; fit: fit * 0.5; fieldSize: 82 }
+      OrbitField { items: current; anchor: anchor; offline: offline; energized: any(items, w => w.lifecycle == "active"); slot: slot; alert: mark; fit: fit * portraitScale; fieldSize: 164 * portraitScale }
       if len(items) == 0 { Text { text: offline ? "Waiting for a fresh observation" : "No tasks in flight"; style: small; color: muted } }
       for w in current key w._key {
         Row {
@@ -799,7 +799,7 @@ widget "miilo" {
       fill: width
       align: top
       Row {
-        width: min(max(screenWidth - 24, 100), columns * 240 + (columns - 1) * 10)
+        width: min(max(screenWidth - 24, 100), columns * clamp(screenWidth / 3, 240, 320) + (columns - 1) * 10)
         align: start
         gap: 10
         for lane in range(columns) key lane {
@@ -807,7 +807,7 @@ widget "miilo" {
             weight: 1
             gap: 10
             for p, i in systems.filter((p, i) => i >= page * 6 && i < (page + 1) * 6).filter((p, i) => i % columns == lane) key p.id {
-              OrbitCluster { provider: p; items: list.filter(w => w.providerId == p.id); slot: indexOf(allProviders.map(q => q.id), p.id); fit: min(0.85, ((min(max(screenWidth - 24, 100), columns * 240 + (columns - 1) * 10) - (columns - 1) * 10) / columns - 20) / 270) }
+              OrbitCluster { provider: p; items: list.filter(w => w.providerId == p.id); slot: indexOf(allProviders.map(q => q.id), p.id); fit: min(0.85, ((min(max(screenWidth - 24, 100), columns * clamp(screenWidth / 3, 240, 320) + (columns - 1) * 10) - (columns - 1) * 10) / columns - 20) / 270); portraitScale: clamp((screenWidth - 420) / 800 + 0.5, 0.5, 0.85) }
             }
           }
         }
@@ -870,7 +870,7 @@ widget "miilo" {
             align: center
             gap: 2
             onTap: { inspectionView = "quiet"; expandedSystem = p.id; workflowActor = ""; selectedActor = ""; pageSize = 5; agentsOpen = false }
-            QuietPortrait { provider: p; items: live.filter(w => w.providerId == p.id); s: min(128, max(48, (screenWidth - 24 - (columns - 1) * 6) / columns)) * 0.5 }
+            QuietPortrait { provider: p; items: live.filter(w => w.providerId == p.id); s: clamp((screenWidth - 24 - (columns - 1) * 6) / columns * 0.5, 24, 104) }
             Text { text: replace(p.name, "-", " "); width: max(48, (screenWidth - 24 - (columns - 1) * 8) / columns); height: 28; align: center; fontSize: 10; maxLines: 2 }
           }
         }
