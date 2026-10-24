@@ -44,19 +44,28 @@ ColumnLayout {
         text: "Removing the plugin preserves your connections and observation data. Revoke remote access at its source when a device is no longer trusted."
         color: root.context.theme.foreground; Layout.fillWidth: true
     }
-    AboutLink {
-        objectName: "aboutWebsite"
-        context: root.context; text: "miilo.tech"
-        onClicked: Qt.openUrlExternally("https://miilo.tech/")
-    }
     TypeText {
+        objectName: "aboutSupportCopy"
         typography: root.context.theme.typography; role: "small"
         text: "Help fund Miilo’s development."
         color: root.context.theme.foreground; Layout.fillWidth: true
     }
-    AboutLink {
-        objectName: "aboutSponsor"
-        context: root.context; text: "Sponsor Miilo"
-        onClicked: Qt.openUrlExternally("https://github.com/sponsors/miilo-ai")
+    GridLayout {
+        objectName: "aboutLinks"
+        columns: root.width >= website.implicitWidth + sponsor.implicitWidth + columnSpacing ? 2 : 1
+        columnSpacing: 8; rowSpacing: 8
+        Layout.alignment: root.context.read("leftHanded") === true ? Qt.AlignLeft : Qt.AlignRight
+        AboutLink {
+            id: website
+            objectName: "aboutWebsite"
+            context: root.context; text: "miilo.tech"
+            onClicked: Qt.openUrlExternally("https://miilo.tech/")
+        }
+        AboutLink {
+            id: sponsor
+            objectName: "aboutSponsor"
+            context: root.context; text: "Sponsor Miilo"
+            onClicked: Qt.openUrlExternally("https://github.com/sponsors/miilo-ai")
+        }
     }
 }

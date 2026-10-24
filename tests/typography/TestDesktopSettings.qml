@@ -96,6 +96,10 @@ Item {
                 verify(findChild(link, "linkIcon").width >= 18);
             }
             verify(!findChild(panel,"setupTerminalLoader").active);
+            var links = findChild(panel, "aboutLinks");
+            compare(links.columns, 2);
+            compare(findChild(panel, "aboutWebsite").y, findChild(panel, "aboutSponsor").y);
+            verify(findChild(panel, "aboutSupportCopy").y < links.y);
             panel.width = 320;
             var navigation = findChild(panel,"settingsNavigation");
             navigation.currentIndex = panel.sections.indexOf("about"); navigation.activated(navigation.currentIndex);
