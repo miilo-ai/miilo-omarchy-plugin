@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell.Io
-import "onboarding/controls" as Controls
 
 ColumnLayout {
     id: root
@@ -45,9 +44,9 @@ ColumnLayout {
         text: "Removing the plugin preserves your connections and observation data. Revoke remote access at its source when a device is no longer trusted."
         color: root.context.theme.foreground; Layout.fillWidth: true
     }
-    Controls.Action {
+    AboutLink {
         objectName: "aboutWebsite"
-        context: root.context; text: "More at miilo.tech ↗"
+        context: root.context; text: "miilo.tech"
         onClicked: Qt.openUrlExternally("https://miilo.tech/")
     }
     TypeText {
@@ -55,9 +54,9 @@ ColumnLayout {
         text: "Help fund Miilo’s development."
         color: root.context.theme.foreground; Layout.fillWidth: true
     }
-    Controls.Action {
+    AboutLink {
         objectName: "aboutSponsor"
-        context: root.context; text: "Sponsor Miilo ↗"
+        context: root.context; text: "Sponsor Miilo"
         onClicked: Qt.openUrlExternally("https://github.com/sponsors/miilo-ai")
     }
 }

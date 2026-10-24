@@ -90,6 +90,11 @@ Item {
             tryVerify(() => /^Omarchy plugin · \d+\.\d+\.\d+$/.test(version.text));
             verify(findChild(panel,"aboutWebsite").visible);
             verify(findChild(panel,"aboutSponsor").visible);
+            for (var name of ["aboutWebsite", "aboutSponsor"]) {
+                var link = findChild(panel, name);
+                compare(link.text.indexOf("↗"), -1);
+                verify(findChild(link, "linkIcon").width >= 18);
+            }
             verify(!findChild(panel,"setupTerminalLoader").active);
             panel.width = 320;
             var navigation = findChild(panel,"settingsNavigation");
