@@ -3,7 +3,7 @@ import Quickshell
 import Quickshell.Io
 import qs.Ui as Ui
 import qs.Commons as Commons
-import "../components/onboarding" as Crew
+import "../components" as Miilo
 
 Ui.BarWidget {
     id: root
@@ -30,13 +30,9 @@ Ui.BarWidget {
         Accessible.onPressAction: root.toggle()
         iconComponent: Component {
             Item {
-                Crew.RobotPortrait {
+                Miilo.MiiloSymbol {
                     anchors.fill: parent
                     ink: button.foreground
-                    accent: button.foreground
-                    highContrast: true
-                    accentOnly: true
-                    motion: "off"
                 }
                 Rectangle {
                     anchors.top: parent.top; anchors.right: parent.right

@@ -83,6 +83,19 @@ Item {
             navigation.currentIndex = 4; navigation.activated(4);
             compare(panel.section,"pair");
         }
+        function test_about_navigation_and_version() {
+            panel.section = "about";
+            tryCompare(findChild(panel,"aboutNavigation"),"selected",true);
+            var version = findChild(panel,"pluginVersionLabel"); verify(version);
+            tryVerify(() => /^Omarchy plugin · \d+\.\d+\.\d+$/.test(version.text));
+            verify(findChild(panel,"aboutWebsite").visible);
+            verify(findChild(panel,"aboutSponsor").visible);
+            verify(!findChild(panel,"setupTerminalLoader").active);
+            panel.width = 320;
+            var navigation = findChild(panel,"settingsNavigation");
+            navigation.currentIndex = panel.sections.indexOf("about"); navigation.activated(navigation.currentIndex);
+            compare(panel.section,"about");
+        }
         function test_sections_and_narrow_navigation() {
             panel.section = "chat";
             tryCompare(findChild(panel,"chatNavigation"),"selected",true);

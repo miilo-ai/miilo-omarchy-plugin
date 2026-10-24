@@ -12,8 +12,8 @@ FocusScope {
     readonly property var widget: surface.widget
     property string section: "appearance"
     property bool configuring: false
-    readonly property var sections: ["appearance", "filters", "systems", "chat", "pair"]
-    readonly property var labels: ["Appearance", "Systems", "Connections", "Chat model", "Pair computer"]
+    readonly property var sections: ["appearance", "filters", "systems", "chat", "pair", "about"]
+    readonly property var labels: ["Appearance", "Systems", "Connections", "Chat model", "Pair computer", "About"]
     readonly property bool wide: width >= 440
     signal closed()
     function read(name) { var revision = widget.generation; return surface.viewValue(name) }
@@ -60,6 +60,7 @@ FocusScope {
                 ColumnLayout {
                     width: scroll.availableWidth; spacing: 12
                     TypeText { typography: root.theme.typography; role: "body"; text: root.labels[root.sections.indexOf(root.section)]; color: root.theme.foreground; font.weight: Font.DemiBold; Layout.fillWidth: true }
+                    AboutSettings { context: root; visible: root.section === "about"; Layout.fillWidth: true }
                     AppearanceSettings { context: root; visible: root.section === "appearance"; Layout.fillWidth: true }
                     ColumnLayout {
                         visible: root.section === "filters"; Layout.fillWidth: true; spacing: 8
