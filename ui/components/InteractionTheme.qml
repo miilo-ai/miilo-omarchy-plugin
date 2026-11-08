@@ -7,6 +7,15 @@ QtObject {
     property QtObject fallbackTypography: Owl.MiiloTypography {}
     property var typography: widget && widget.typography ? widget.typography : fallbackTypography
     property var widget
+    property bool reduceMotion: false
+    property real gap: 8
+    property real sectionGap: gap * 2
+    property real radius: 4
+    property real controlHeight: 28
+    property color surface: widget.ink("background")
+    readonly property color inset: Qt.tint(surface, wash(foreground, 0.025))
+    readonly property color line: wash(foreground, 0.11)
+    function duration(ms) {return reduceMotion?0:ms;}
     function tint(name, opacity) {
         return wash(widget.ink(name), opacity);
     }

@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "id": "io.miilo.bar",
-  "name": "Miilo",
-  "version": "0.4.1",
+  "name": "Miilo One",
+  "version": "0.5.0",
   "author": "Viratec Interactive LLC",
   "license": "MIT",
   "description": "Animated agents and a searchable work dashboard in the Omarchy bar.",
@@ -13,7 +13,7 @@
     "barWidget": "ui/shell/BarWidget.qml"
   },
   "barWidget": {
-    "displayName": "Miilo",
+    "displayName": "Miilo One",
     "category": "AI",
     "allowMultiple": false,
     "defaultSection": "right"

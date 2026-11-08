@@ -29,9 +29,14 @@ for (const width of [240, 360, 600, 960, 1600]) for (const height of [400, 800])
   assert(grid.p.width <= width, 'Compact fleet must fit the viewport');
   for (const portrait of portraits) {
     assert(Number.isFinite(portrait.p.height) && portrait.p.height >= 24);
-    assert(portrait.p.height <= height * 0.24, 'Portraits respect the available viewport height');
+    const rows = Math.ceil(count / grid.p.columns);
+    assert(portrait.p.height <= Math.max(24, (height - 24) / rows - 36), 'Portraits reserve row space for names and gaps');
+    assert(portrait.p.height <= 200, 'Sparse fleets retain a bounded presentation size');
     assert(portrait.p.height <= (width - 24 - (grid.p.columns - 1) * 6) / grid.p.columns, 'Portraits fit their columns');
   }
 }
 assert(fleet(2, 960, 1000).portraits[0].p.height > fleet(20, 960, 1000).portraits[0].p.height, 'Small fleets grow while dense fleets stay compact');
-console.log('Adaptive fleet passed: 60 viewport/population cases, column/height bounds, no hidden systems or actions.');
+assert(fleet(3, 710, 320).portraits[0].p.height >= 160, 'Three systems fill the usable width of the actual compact window');
+assert(fleet(3, 710, 320).portraits[0].p.height > fleet(3, 710, 160).portraits[0].p.height, 'Window height constrains compact portraits');
+assert(fleet(3, 710, 320).portraits[0].p.height > fleet(20, 710, 320).portraits[0].p.height, 'Adding systems shrinks portraits to fit rows');
+console.log('Adaptive fleet passed: 60 viewport/population cases, actual three-system window, row/column bounds, no hidden systems or actions.');

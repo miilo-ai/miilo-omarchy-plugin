@@ -10,21 +10,21 @@ ComboBox {
     Layout.minimumWidth: 0
     Layout.preferredWidth: 180
     Layout.fillWidth: true
-    implicitHeight: context.theme.typography.controlHeight(contentItem.implicitHeight, 4)
+    implicitHeight: Math.max(context.theme.controlHeight,context.theme.typography.controlHeight(contentItem.implicitHeight, 8))
     verticalPadding: 2
     focusPolicy: Qt.StrongFocus
     leftPadding: 8
     rightPadding: indicator.visible ? 24 : 8
     background: Rectangle {
-        color: control.down ? context.theme.pressedFill : control.activeFocus ? context.theme.focusFill : control.hovered ? context.theme.hoverFill : context.widget.ink("lighter_background")
-        border.color: context.theme.border
+        color: context.theme.inset
+        radius: context.theme.radius
+        border.color: control.activeFocus ? context.theme.accent : context.theme.line
         border.width: 1
-        Rectangle { anchors.bottom: parent.bottom; anchors.horizontalCenter: parent.horizontalCenter; width: parent.width - 16; height: 2; visible: control.activeFocus; color: context.theme.accent }
     }
     contentItem: Miilo.TypeText { typography: context.theme.typography;
         text: control.count ? control.displayText : "No saved groups"
         color: !control.enabled ? context.widget.ink("muted") : control.activeFocus ? context.theme.focusText : context.theme.foreground
-        role: "label"
+        role: "body"
         verticalAlignment: Text.AlignVCenter
         wrapMode: Text.Wrap
     }
@@ -48,13 +48,13 @@ ComboBox {
         required property var modelData
         required property int index
         width: control.width
-        implicitHeight: context.theme.typography.controlHeight(contentItem.implicitHeight, 4)
+        implicitHeight: Math.max(context.theme.controlHeight,context.theme.typography.controlHeight(contentItem.implicitHeight, 8))
         topPadding: 2; bottomPadding: 2
         highlighted: control.highlightedIndex === index
         contentItem: Miilo.TypeText { typography: context.theme.typography;
             text: option.modelData
             color: option.highlighted ? context.theme.focusText : context.theme.foreground
-            role: "label"
+            role: "body"
             verticalAlignment: Text.AlignVCenter
             wrapMode: Text.Wrap
         }
@@ -76,7 +76,8 @@ ComboBox {
         }
         background: Rectangle {
             color: context.widget.ink("background")
-            border.color: context.widget.ink("accent")
+            radius: context.theme.radius
+            border.color: context.theme.line
             border.width: 1
         }
     }

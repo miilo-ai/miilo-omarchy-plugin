@@ -25,6 +25,7 @@ Item {
         node: ({kind:"Text", p:{text:"A multiline answer with fallback glyphs: العربية 日本語. Text must wrap and remain readable.", style:"body"},h:{},a:{},c:[]})
     }
     Miilo.TypeText { id: plain; typography: typeSystem; width: 240; text: "<b>Evidence stays literal</b>" }
+    Owl.OwlNode {id:moreButton;x:650;y:20;width:84;height:24;widget:palette;node:({kind:"Button",p:{text:"View more",width:84,height:24,scale:.85},h:{},a:{},c:[]})}
     Crew.RobotPortrait { id: portrait; width: 64; height: 64; motion: "reduced"; active: true }
     Owl.OwlNode {
         id: clickableTile
@@ -55,6 +56,13 @@ Item {
             importer.leftHanded = false; compare(actions.layoutDirection,Qt.RightToLeft);
             importer.leftHanded = true; compare(actions.layoutDirection,Qt.LeftToRight);
             importer.leftHanded = false;
+        }
+        function test_scaled_button_retains_border_and_centered_label() {
+            const border=findChild(moreButton,"owlButtonBorder"),label=findChild(moreButton,"owlButtonLabel");
+            verify(border&&label);
+            fuzzyCompare(border.border.width*moreButton.scale,1,.001);
+            compare(border.antialiasing,true);
+            fuzzyCompare(label.y+label.height/2,border.y+border.height/2,.001);
         }
         function test_nested_tile_and_task_clicks() {
             clickableTile.visible = true;

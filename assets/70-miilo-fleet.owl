@@ -6,6 +6,7 @@ widget "miilo" {
   minSize: 3x2
   padding: 8
   // Presentation preferences only: never alter observations or action authority.
+  state nativeControls = false
   state robotMotion = "full" persist
   state robotPace = "normal" persist
   state robotPersonality = "expressive" persist
@@ -872,7 +873,7 @@ widget "miilo" {
             align: center
             gap: 2
             onTap: { inspectionView = "quiet"; expandedSystem = p.id; workflowActor = ""; selectedActor = ""; pageSize = 5; agentsOpen = false }
-            QuietPortrait { provider: p; items: live.filter(w => w.providerId == p.id); s: clamp(min((screenWidth - 24 - (columns - 1) * 6) / columns * clamp(2 / max(1, len(systems)), 0.5, 1), screenHeight * 0.24), 24, len(systems) <= 2 ? 200 : 104) }
+            QuietPortrait { provider: p; items: live.filter(w => w.providerId == p.id); s: clamp(min((screenWidth - 24 - (columns - 1) * 6) / columns, max(0, screenHeight - 24) / rows - 36), 24, 200) }
             Text { text: replace(p.name, "-", " "); width: max(48, (screenWidth - 24 - (columns - 1) * 8) / columns); height: 28; align: center; fontSize: 10; maxLines: 2 }
           }
         }
@@ -1011,7 +1012,7 @@ widget "miilo" {
         if setupSection == "appearance" { RobotColors { } }
       } else {
       Setup { }
-      if focused == null && actor == null { Search { placeholder: "Search systems, agents or work" } }
+      if !nativeControls && focused == null && actor == null { Search { placeholder: "Search systems, agents or work" } }
       if focused != null {
         WorkDetail { }
       } else if actor != null {
@@ -1030,7 +1031,7 @@ widget "miilo" {
       } else {
         let actionable = works.filter(w => w.attention != "none" || any(attention, a => a._workKey == w._key))
         let visible = (needle == "" ? live : searched).filter(w => !needsOnly || any(actionable, a => a._key == w._key)).sortBy(w => any(actionable, a => a._key == w._key) ? 0 : w.lifecycle == "active" ? 1 : 2)
-        WorkViewToolbar { count: len(actionable) }
+        if !nativeControls { WorkViewToolbar { count: len(actionable) } }
         if observatoryView == "orbit" && expandedSystem != "" && any(provs, p => p.id == expandedSystem) {
           QuietSystemTasks { provider: find(provs, p => p.id == expandedSystem); list: visible }
         } else if observatoryView == "orbit" {

@@ -6,8 +6,10 @@ ToolButton {
     required property var theme
     required property string kind
     required property string label
-    implicitWidth: 26
-    implicitHeight: 26
+    property bool circular: false
+    property bool selected: false
+    implicitWidth: theme.typography.profile==="phone"?48:theme.controlHeight
+    implicitHeight: implicitWidth
     padding: 5
     focusPolicy: Qt.StrongFocus
     Accessible.name: label
@@ -15,9 +17,9 @@ ToolButton {
     ToolTip.text: label
     ToolTip.delay: 500
     background: Rectangle {
-        radius: 4
-        color: control.down ? control.theme.pressedFill : control.activeFocus ? control.theme.focusFill : control.hovered ? control.theme.hoverFill : "transparent"
-        border.width: control.activeFocus ? 1 : 0
+        radius: control.circular ? height / 2 : control.theme.radius
+        color: control.selected ? control.theme.selectedFill : control.down ? control.theme.pressedFill : control.activeFocus ? control.theme.focusFill : control.hovered ? control.theme.hoverFill : "transparent"
+        border.width: control.activeFocus || control.selected ? 1 : 0
         border.color: control.theme.accent
     }
     contentItem: Canvas {
@@ -29,6 +31,14 @@ ToolButton {
             c.save(); c.scale(width / 16, height / 16); c.beginPath();
             if (control.kind === "add") {
                 c.moveTo(8, 3); c.lineTo(8, 13); c.moveTo(3, 8); c.lineTo(13, 8);
+            } else if(control.kind==="search") {
+                c.arc(6.5,6.5,4,0,Math.PI*2);c.moveTo(9.5,9.5);c.lineTo(13.5,13.5);
+            } else if (control.kind === "voice") {
+                c.moveTo(5, 5); c.arc(8, 5, 3, Math.PI, 0); c.lineTo(11, 8); c.arc(8, 8, 3, 0, Math.PI); c.closePath(); c.moveTo(3, 7); c.lineTo(3, 8); c.arc(8, 8, 5, Math.PI, 0, true); c.moveTo(8, 13); c.lineTo(8, 15);
+            } else if (control.kind === "stop") {
+                c.rect(4, 4, 8, 8);
+            } else if (control.kind === "back") {
+                c.moveTo(8, 3); c.lineTo(3, 8); c.lineTo(8, 13); c.moveTo(3, 8); c.lineTo(13, 8);
             } else if (control.kind === "refresh") {
                 c.arc(8, 8, 5, -0.6, 4.6); c.moveTo(13, 2); c.lineTo(13, 6); c.lineTo(9, 6);
             } else {

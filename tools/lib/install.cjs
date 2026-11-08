@@ -17,6 +17,7 @@ function install(root,args) {
   const parent=path.dirname(root),owlVersion=manifestVersion(path.join(parent,'miilo-owl-widgets/helper/Cargo.toml'),'package');
   const cliVersion=manifestVersion(path.join(parent,'miilo-cli/Cargo.toml'),'workspace.package');
   version(args.helper,'miilo-owl '+owlVersion);version(args.local,'miilo-local '+cliVersion);
+  if(args.monitor)version(args.monitor,'miilo-live-monitor 0.1.0');
   if(args.cli)version(args.cli,'miilo '+cliVersion);
   const target=path.resolve(args.pluginDir);noLinks(target);noLinks(args.stateDir);
   if(exists(path.join(target,'.git')))throw Error('Installed plugin is a Git checkout; reconcile before replacing');
@@ -25,6 +26,7 @@ function install(root,args) {
   managed.push('LICENSE','sources.lock.json','uninstall.sh','manifest.json');
   for(const relative of managed){safeFile(root,relative);noLinks(path.join(target,relative));}
   const binaries=[['miilo-owl',args.helper],['miilo-local',args.local]];
+  if(args.monitor){noLinks(path.join(args.binDir,'miilo-live-monitor'));}
   if(args.cli)binaries.push(['miilo',args.cli]);
   if(args.installBinaries)for(const [name]of binaries)noLinks(path.join(args.binDir,name));
   fs.mkdirSync(args.stateDir,{recursive:true});
@@ -32,10 +34,12 @@ function install(root,args) {
   console.log('Backup: '+backup);
   if(exists(target))fs.cpSync(target,path.join(backup,'io.miilo.bar'),{recursive:true,dereference:false});
   if(args.installBinaries)for(const [name]of binaries)if(exists(path.join(args.binDir,name)))fs.copyFileSync(path.join(args.binDir,name),path.join(backup,name));
+  if(args.monitor&&exists(path.join(args.binDir,'miilo-live-monitor')))fs.copyFileSync(path.join(args.binDir,'miilo-live-monitor'),path.join(backup,'miilo-live-monitor'));
   fs.mkdirSync(target,{recursive:true});
   // The entry manifest is last so its UI exists before switching the entry point.
   for(const relative of managed)atomicCopy(path.join(root,relative),path.join(target,relative));
   if(args.installBinaries)for(const [name,source]of binaries)atomicCopy(source,path.join(args.binDir,name),true);
+  if(args.monitor){atomicCopy(args.monitor,path.join(args.binDir,'miilo-live-monitor'),true);if(digest(args.monitor)!==digest(path.join(args.binDir,'miilo-live-monitor')))throw Error('Monitor checksum mismatch');}
   for(const relative of managed)if(digest(path.join(target,relative))!==digest(path.join(root,relative)))throw Error('Installed file mismatch: '+relative);
   if(args.installBinaries)for(const [name,source]of binaries)if(digest(path.join(args.binDir,name))!==digest(source))throw Error('Installed binary mismatch: '+name);
   const git=args.gitMetadata||((...gitArgs)=>execFileSync('git',['-C',root,...gitArgs],{encoding:'utf8',timeout:10000}).trim());

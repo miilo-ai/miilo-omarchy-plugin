@@ -37,8 +37,10 @@ if "$rebuild"; then
     local_binary="$workspace/miilo-cli/target/debug/miilo-local"
     cli_binary="$workspace/miilo-cli/target/debug/miilo"
 fi
+run cargo build --locked --manifest-path "$root/tools/live-monitor/Cargo.toml" --bin miilo-live-monitor
+monitor_dir="${CARGO_TARGET_DIR:-$root/tools/live-monitor/target}"
 run make -C "$root" check-native check-typography
-install_args=(--helper "$helper" --local "$local_binary")
+install_args=(--monitor "$monitor_dir/debug/miilo-live-monitor" --helper "$helper" --local "$local_binary")
 if "$rebuild"; then install_args+=(--install-binaries --cli "$cli_binary"); fi
 run "$node_bin" "$root/tools/install-dev-plugin.cjs" "${install_args[@]}"
 if "$migrate_config"; then run "$HOME/.local/bin/miilo" config migrate; fi

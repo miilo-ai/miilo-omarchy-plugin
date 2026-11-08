@@ -5,7 +5,7 @@
     {
       "source": "70-miilo-fleet.owl",
       "path": "assets/70-miilo-fleet.owl",
-      "sha256": "92369743fa3b484aa7c67ec1b482da0c5ff1e8b61cece5183f861a5be9a49308",
+      "sha256": "9da8b67c8c29cf73f910b81271bc82584c63ef5526bb4cd27f4f0af0f7b52959",
       "patches": [
         "patches/presentation-consistency.patch",
         "patches/desktop-density.patch",
@@ -20,7 +20,9 @@
         "patches/grid-centering.patch",
         "patches/detail-masonry.patch",
         "patches/responsive-portrait-scale.patch",
-        "patches/adaptive-fleet-scale.patch"
+        "patches/adaptive-fleet-scale.patch",
+        "patches/native-overview-controls.patch",
+        "patches/viewport-fleet-capacity.patch"
       ]
     },
     {
@@ -60,11 +62,12 @@
     {
       "source": "desktop/runtime/OwlNode.qml",
       "path": "vendor/owl/OwlNode.qml",
-      "sha256": "e3551f3fa22cc827b1b1775cc175256b18139123c96c53d07da4da9d1b09d498",
+      "sha256": "005b06e252a8524aab59b5750bdde2198c88860671f77453e73de7d625d89aff",
       "patches": [
         "patches/presentation-consistency.patch",
         "patches/plain-text-labels.patch",
-        "patches/keyboard-activity.patch"
+        "patches/keyboard-activity.patch",
+        "patches/button-pixel-border.patch"
       ]
     },
     {
@@ -85,10 +88,11 @@
     {
       "source": "desktop/runtime/OwlWidget.qml",
       "path": "vendor/owl/OwlWidget.qml",
-      "sha256": "b48804fd390e4e0cb6ff2dfff7f556e97eac78e3482e0ddb9ea2a58ece0a2608",
+      "sha256": "a86c53745a8168d553e8b6aef3dfb646fd9a039bfd4c40e3188ca490643a22da",
       "patches": [
         "patches/rendering-performance.patch",
-        "patches/paint-budget.patch"
+        "patches/paint-budget.patch",
+        "patches/native-reduced-motion.patch"
       ]
     },
     {

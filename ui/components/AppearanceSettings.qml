@@ -10,18 +10,18 @@ ColumnLayout {
     readonly property var agents: context.read("actors") || []
     readonly property string agentKey: agents[agentIndex] ? agents[agentIndex]._key : ""
     readonly property var overrides: context.read("robotColors") || []
-    spacing: 10
+    spacing: root.context.theme.gap * 1.5
     SettingsChoice { context: root.context; label: "Tasks per card"; stateKey: "detailTaskLimit"; options: ["3", "5 (default)", "8", "10"]; values: [3, 5, 8, 10] }
     SettingsChoice { context: root.context; label: "Personality"; stateKey: "robotPersonality"; options: ["Calm", "Expressive"]; values: ["calm", "expressive"] }
     SettingsChoice { context: root.context; label: "Motion"; stateKey: "robotMotion"; options: ["Full", "Reduced", "Off"]; values: ["full", "reduced", "off"] }
     SettingsChoice { context: root.context; visible: root.context.read("robotMotion") !== "off"; label: "Pace"; stateKey: "robotPace"; options: ["Slow", "Normal", "Lively"]; values: ["slow", "normal", "lively"] }
-    SettingsChoice { context: root.context; label: "Controls"; stateKey: "leftHanded"; options: ["Right handed", "Left handed"]; values: [false, true] }
-    SettingsChoice { context: root.context; label: "Preview robots"; stateKey: "previewRobots"; options: ["Hidden", "Shown"]; values: [false, true] }
+    Controls.Toggle {context:root.context;text:"Left-handed controls";checked:root.context.read("leftHanded")===true;onClicked:root.context.write("leftHanded",checked)}
+    Controls.Toggle {context:root.context;text:"Preview robots";checked:root.context.read("previewRobots")===true;onClicked:root.context.write("previewRobots",checked)}
     TypeText {
         typography: root.context.theme.typography; role: "body"
         text: "Robot colors"; color: root.context.theme.foreground
         font.weight: Font.DemiBold
-        Layout.topMargin: 6
+        Layout.topMargin: 16
     }
     Controls.Choice {
         context: root.context; Layout.fillWidth: true
