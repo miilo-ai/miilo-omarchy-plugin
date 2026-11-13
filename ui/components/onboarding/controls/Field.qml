@@ -16,7 +16,10 @@ TextField {
     font.family: context.theme.typography.family
     font.pixelSize: context.theme.typography.size("body")
     implicitHeight: Math.max(context.theme.controlHeight, context.theme.typography.controlHeight(contentHeight, topPadding + bottomPadding))
-    padding: context.theme.gap
+    leftPadding: context.theme.gap
+    rightPadding: context.theme.gap
+    topPadding: 2
+    bottomPadding: 2
     selectByMouse: true
     background: Rectangle {
         color: context.theme.inset

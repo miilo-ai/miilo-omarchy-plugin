@@ -55,8 +55,8 @@ jobs:
       - run: make check check-live check-voice
       - name: Require published runtime dependencies
         run: |
-          gh release view v0.3.0 --repo miilo-ai/miilo-cli
-          gh release view v1.5.0 --repo miilo-ai/miilo-owl-widgets
+          gh release view v0.4.0 --repo miilo-ai/miilo-cli
+          gh release view v1.7.1 --repo miilo-ai/miilo-owl-widgets
       - name: Create immutable tag and dispatch source release
         run: |
           set -euo pipefail

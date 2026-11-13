@@ -55,7 +55,7 @@ a separate, explicit [native appearance opt-in](docs/native-appearance.md).
 ## Install
 
 Requires Omarchy Quattro with its plugin commands, Quickshell/Qt, Nerd Font icons,
-`miilo-owl` 1.7.0 from miilo-owl-widgets, and `miilo-local` 0.4.0 from miilo-cli
+`miilo-owl` 1.7.1 from miilo-owl-widgets, and `miilo-local` 0.4.0 from miilo-cli
 for local session onboarding. Put both binaries on the shell's PATH first.
 Download the matching helper and CLI binaries from their GitHub Releases.
 

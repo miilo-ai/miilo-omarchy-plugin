@@ -19,5 +19,5 @@ test('automatic tagging follows source checks and explicitly dispatches the tag'
  assert(text.includes('gh workflow run release.yml --ref "$TAG"'));
  assert(!text.includes('--force'));
  assert(text.includes("vars.MIILO_RELEASE_ENABLED != 'false'"));
- assert(text.includes('gh release view v1.5.0 --repo miilo-ai/miilo-owl-widgets'));
+ assert(text.includes('gh release view v1.7.1 --repo miilo-ai/miilo-owl-widgets'));
 });
