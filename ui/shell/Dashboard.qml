@@ -6,6 +6,8 @@ import "../components" as Miilo
 Item {
     id: root
     property bool opened: false
+    property bool sessionUnlocked: false
+    readonly property var voiceSession: dashboard.voiceSession
     property var liveController: null
     property var observationFeed: null
     readonly property bool focused: dashboard.applicationFocused
@@ -21,28 +23,13 @@ Item {
     Connections {target:dashboard.surface.widget;function onGenerationChanged(){Qt.callLater(root.locateWork);}}
     Miilo.Dashboard {
         id: dashboard
+        sessionUnlocked: root.sessionUnlocked
         textScale: Style.font.body / 12
         textFamily: Style.font.family
         liveController:root.liveController
         observationFeed:root.observationFeed
-        surface.hostThemeRevision: String(Commons.Color.background)+String(Commons.Color.foreground)+String(Commons.Color.accent)
-        interactionTheme: Miilo.InteractionTheme {
-            widget: dashboard.surface.widget
-            reduceMotion:Style.reduceMotion
-            gap:Style.spacing.controlGap
-            radius:Style.cornerRadius
-            controlHeight:Style.spacing.controlHeight
-            surface: Commons.Color.popups.background
-            foreground: Commons.Color.popups.text
-            accent: Commons.Color.accent
-            border: Style.normalBorderColor
-            hoverFill: Style.hoverFill
-            focusFill: Commons.Color.menu.selectedBackground
-            focusText: Commons.Color.menu.selectedText
-            selectedFill: Style.selectedFill
-            pressedFill: Style.pressedFill
-            selectionFill: Style.selectionFillFor(Commons.Color.foreground, Commons.Color.accent)
-        }
+        surface.hostThemeRevision: JSON.stringify(Commons.Color.shellValues)+String(Commons.Color.background)+String(Commons.Color.foreground)+String(Commons.Color.accent)+String(Commons.Color.muted)
+        interactionTheme: Theme { widget: dashboard.surface.widget }
         visible: root.opened
         onVisibleChanged: if (!visible) root.opened = false
     }

@@ -9,26 +9,43 @@ FocusScope {
     required property var theme
     required property var surface
     property var target: null
+    property bool sessionUnlocked: false
+    property bool loadVoiceSettings: true
+    property alias handsFree: handsFree
+    VoiceSession {
+        id: handsFree
+        objectName: "chat-hands-free"
+        permitted: root.visible && consent.checked
+        unlocked: root.sessionUnlocked
+        paused: session.busy || voice.owned
+        loadSavedSettings: root.loadVoiceSettings
+        onTranscript: text => { if (consent.checked && !session.busy) session.send(text); }
+    }
+    VoiceOptions {
+        id: voiceOptions; objectName: "chat-voice-options"; parent: root
+        context: root.context; voice: handsFree; consent: consent.checked
+        onProviderSettingsRequested: voice.settings()
+        onEnableRequested: { consent.checked = true; Qt.callLater(() => handsFree.arm()); }
+    }
     readonly property var context: ({theme: theme, widget: surface.widget})
     signal closed()
     Keys.onEscapePressed: { voice.cancel(); root.closed(); }
-    onVisibleChanged: if (!visible) { consent.checked = false; voice.cancel(); }
-    onTargetChanged: { consent.checked = false; voice.cancel(); }
-    Rectangle { anchors.fill: parent; color: root.surface.widget.ink("background") }
+    onVisibleChanged: if (!visible) { handsFree.disarm(); consent.checked = false; voice.cancel(); }
+    onTargetChanged: { handsFree.disarm(); consent.checked = false; voice.cancel(); }
     ChatSession { id: session; objectName: "chat-session"; active: root.visible; target: root.target }
-    Shortcut { sequence: "Ctrl+Shift+D"; enabled: root.visible && !session.busy; onActivated: voice.recording ? voice.stop() : voice.start() }
+    Shortcut { sequence: "Ctrl+Shift+D"; enabled: root.visible && !session.busy && !handsFree.armed; onActivated: voice.recording ? voice.stop() : voice.start() }
     Miilo.NativeDictation {
         id: voice
         objectName: "native-dictation"
-        active: root.visible && !session.busy
+        active: root.visible && !session.busy && !handsFree.armed
         focusSafe: draft.activeFocus && Window.active
         onFocusRequested: draft.forceActiveFocus()
     }
     ColumnLayout {
-        anchors.fill: parent; anchors.margins: root.theme.gap * 2; spacing: root.theme.gap * 1.5
+        anchors.fill: parent; anchors.margins: root.theme.gap * 2; spacing: root.theme.gap
         RowLayout {
-            Miilo.ToolbarButton { theme: root.theme; kind: "back"; label: "Back to overview"; onClicked: root.closed() }
-            Miilo.TypeText { typography: root.theme.typography; text: "Ask Miilo"; color: root.theme.foreground; Layout.fillWidth: true; font.weight: Font.DemiBold }
+            Miilo.ToolbarButton { id: back; objectName:"chat-back";theme: root.theme; kind: "back"; label: "Back to overview"; onClicked: root.closed() }
+            Miilo.TypeText {objectName:"chat-title";typography: root.theme.typography; text: "Ask Miilo"; color: root.theme.foreground; Layout.fillWidth: true;Layout.preferredHeight:back.implicitHeight;verticalAlignment:Text.AlignVCenter;lineHeight:1;font.weight: Font.DemiBold }
         }
         Miilo.TypeText {
             typography: root.theme.typography; role: "small"; color: root.theme.foreground
@@ -37,6 +54,8 @@ FocusScope {
         }
         ScrollView {
             id: conversation
+            objectName: "chat-conversation"
+            visible: session.value("history").length > 0 || session.busy || !!session.value("answer") || !!session.value("error") || !!session.value("context")
             Layout.fillWidth: true; Layout.fillHeight: true; clip: true
             contentWidth: availableWidth
             ColumnLayout {
@@ -65,15 +84,14 @@ FocusScope {
                 }
             }
         }
-        CheckBox {
+        Controls.Check {
             id: consent
             objectName: "chat-consent"
+            context: root.context
+            textRole: "small"
+            Layout.fillWidth: true
             enabled: !session.busy
             text: "Share observed context and messages with my configured model"
-            contentItem: Miilo.TypeText {
-                typography: root.theme.typography; role: "small"; color: root.theme.foreground
-                text: consent.text; leftPadding: consent.indicator.width + 6
-            }
         }
         TextArea {
             id: draft
@@ -83,29 +101,47 @@ FocusScope {
             wrapMode: TextEdit.Wrap; textFormat: TextEdit.PlainText
             selectByMouse: true; color: root.theme.foreground
             placeholderText: "Ask about your work"
-            placeholderTextColor: root.theme.foreground
+            placeholderTextColor: root.surface.widget.ink("muted")
+            padding: root.theme.gap
+            selectionColor: root.theme.selectionFill
+            selectedTextColor: root.theme.foreground
             font.family: root.theme.typography.family
             font.pixelSize: root.theme.typography.size("body")
             Accessible.name: "Message to Miilo"
-            background: Rectangle { color: root.theme.secondaryFill; border.width: 1; border.color: root.theme.border; radius: 4 }
+            background: Rectangle { color: root.theme.inset; border.width: 1; border.color: draft.activeFocus ? root.theme.accent : root.theme.line; radius: root.theme.radius }
         }
         RowLayout {
+            id: dictationRow
+            objectName: "chat-dictation-row"
             Layout.fillWidth: true
+            spacing: root.theme.gap
             Miilo.ToolbarButton {
-                theme: root.theme; kind: voice.recording ? "stop" : "voice"
+                id: dictationButton
+                objectName: "chat-dictation-button"
+                theme: root.theme; kind: handsFree.armed && handsFree.muted ? "muted" : voice.recording ? "stop" : "voice"
                 circular: true; selected: voice.owned
                 implicitWidth: 32; implicitHeight: 32; padding: 8
-                label: voice.recording ? "Stop dictation" : "Dictate with Superwhisper"
+                label: handsFree.armed ? (handsFree.muted ? "Unmute microphone" : "Mute microphone") : voice.recording ? "Stop dictation" : "Dictate with Superwhisper"
                 focusPolicy: Qt.NoFocus
-                enabled: voice.recording || (voice.ready && !voice.busy && !voice.owned && !session.busy)
-                onClicked: voice.recording ? voice.stop() : voice.start()
+                enabled: handsFree.armed || voice.recording || (voice.ready && !voice.busy && !voice.owned && !session.busy)
+                onClicked: handsFree.armed ? handsFree.toggleMute() : voice.recording ? voice.stop() : voice.start()
             }
-            Miilo.TypeText { typography: root.theme.typography; role: "small"; color: root.theme.foreground; text: voice.message; Layout.fillWidth: true }
+            Miilo.TypeText {
+                objectName: "chat-dictation-status"
+                typography: root.theme.typography; role: "small"; color: root.theme.foreground
+                text: handsFree.armed || handsFree.error ? handsFree.message : voice.message
+                Layout.fillWidth: true
+                Layout.minimumHeight: dictationButton.implicitHeight
+                verticalAlignment: Text.AlignVCenter
+                lineHeight: 1
+            }
             Controls.Action { context: root.context; visible: voice.owned; text: "Cancel"; focusPolicy: Qt.NoFocus; onClicked: voice.cancel() }
-            Miilo.ToolbarButton { theme: root.theme; kind: "menu"; label: "Superwhisper settings"; onClicked: voice.settings() }
+            Miilo.ToolbarButton { objectName: "chat-dictation-settings"; theme: root.theme; kind: "settings"; label: "Voice settings"; onClicked: voiceOptions.open() }
             Controls.Action { context: root.context; text: "Recheck"; visible: !voice.ready; enabled: !voice.busy && !voice.owned; onClicked: voice.probe() }
         }
         RowLayout {
+            id: commands
+            objectName: "chat-commands"
             Layout.alignment: root.surface.viewValue("leftHanded") === true ? Qt.AlignLeft : Qt.AlignRight
             Controls.Action { context: root.context; text: "New conversation"; enabled: !session.busy && !voice.owned; onClicked: { session.reset(); consent.checked = false; } }
             Controls.Action {
@@ -115,5 +151,6 @@ FocusScope {
                 onClicked: { if (session.busy) session.cancel(); else if (session.send(draft.text)) draft.text = ""; }
             }
         }
+        Item { Layout.fillHeight: true; visible: !conversation.visible }
     }
 }

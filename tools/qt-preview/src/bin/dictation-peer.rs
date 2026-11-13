@@ -1,9 +1,29 @@
 use serde_json::{Value, json};
-use std::io::{self, Read, Write};
+use std::io::{self, BufRead, Read, Write};
 use std::{env, fs, process, thread, time::Duration};
 
 fn main() {
     let action = env::args().nth(1).unwrap_or_default();
+    if action == "run" {
+        println!("{}", json!({"type":"ready"}));
+        io::stdout().flush().unwrap();
+        let mut muted = false;
+        for line in io::stdin().lock().lines() {
+            let value: Value = serde_json::from_str(&line.unwrap()).unwrap();
+            match value["type"].as_str() {
+                Some("stop") => break,
+                Some("mute") => muted = true,
+                Some("unmute") => muted = false,
+                _ => {}
+            }
+            println!(
+                "{}",
+                json!({"type":"state","phase":if muted {"muted"} else {"waiting"}})
+            );
+            io::stdout().flush().unwrap();
+        }
+        return;
+    }
     if action == "snapshot" || action == "refresh" {
         if action == "refresh" {
             thread::sleep(Duration::from_secs(9));

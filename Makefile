@@ -20,7 +20,7 @@ check-typography: check-plain-text
 	bash tools/test-typography.sh
 	bash tools/test-configuration.sh
 
-check-native: check check-dictation check-live
+check-native: check check-dictation check-live check-voice check-host-theme
 	bash tools/check-native.sh
 
 .PHONY: render-design
@@ -64,3 +64,13 @@ check-live:
 	cargo fmt --manifest-path tools/live-monitor/Cargo.toml --check
 	cargo test --locked --manifest-path tools/live-monitor/Cargo.toml
 	cargo clippy --locked --manifest-path tools/live-monitor/Cargo.toml --all-targets -- -D warnings
+
+.PHONY: check-voice
+check-voice:
+	cargo fmt --manifest-path tools/voice-session/Cargo.toml --check
+	cargo test --locked --manifest-path tools/voice-session/Cargo.toml
+	cargo clippy --locked --manifest-path tools/voice-session/Cargo.toml --all-targets -- -D warnings
+
+.PHONY: check-host-theme
+check-host-theme:
+	bash tools/test-host-theme.sh

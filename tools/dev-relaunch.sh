@@ -39,8 +39,10 @@ if "$rebuild"; then
 fi
 run cargo build --locked --manifest-path "$root/tools/live-monitor/Cargo.toml" --bin miilo-live-monitor
 monitor_dir="${CARGO_TARGET_DIR:-$root/tools/live-monitor/target}"
+run cargo build --locked --manifest-path "$root/tools/voice-session/Cargo.toml" --bin miilo-voice-session
 run make -C "$root" check-native check-typography
-install_args=(--monitor "$monitor_dir/debug/miilo-live-monitor" --helper "$helper" --local "$local_binary")
+voice_dir="${CARGO_TARGET_DIR:-$root/tools/voice-session/target}"
+install_args=(--voice "$voice_dir/debug/miilo-voice-session" --monitor "$monitor_dir/debug/miilo-live-monitor" --helper "$helper" --local "$local_binary")
 if "$rebuild"; then install_args+=(--install-binaries --cli "$cli_binary"); fi
 run "$node_bin" "$root/tools/install-dev-plugin.cjs" "${install_args[@]}"
 if "$migrate_config"; then run "$HOME/.local/bin/miilo" config migrate; fi

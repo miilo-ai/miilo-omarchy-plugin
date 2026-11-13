@@ -17,17 +17,32 @@ Ui.BarWidget {
     function close() { dashboard.close() }
     function toggle() { dashboard.toggle() }
     function closeForPopoutSwitch() { close() }
-    implicitWidth: button.implicitWidth
+    property bool sessionUnlocked: false
+    readonly property var voice: dashboard.voiceSession
+    implicitWidth: button.implicitWidth + (microphone.visible ? microphone.implicitWidth : 0)
+    Commons.ShellIpc {
+        target: "miiloVoice"
+        function mute(): string { root.voice.mute(); return "muted"; }
+        function toggleMute(): string { root.voice.toggleMute(); return root.voice.muted ? "muted" : "listening"; }
+    }
+    Timer {
+        interval: 250; repeat: true; running: true; triggeredOnStart: true
+        onTriggered: {
+            const result=Commons.IpcRegistry.call("lock","isLocked",[]);
+            root.sessionUnlocked=result.ran && result.output === "false";
+        }
+    }
     implicitHeight: button.implicitHeight
     Miilo.ObservationFeed {id:feed;active:root.visible;expanded:dashboard.opened}
     Miilo.LiveController {
         id:live;appName:"Miilo One";statePath:Quickshell.env("HOME")+"/.local/state/miilo-one/live";focused:dashboard.opened&&dashboard.focused
         onOpenRequested:(source,target)=>{dashboard.open();if(target)dashboard.inspect(target);}
     }
-    Dashboard { id: dashboard;liveController:live;observationFeed:feed }
+    Dashboard { id: dashboard; sessionUnlocked: root.sessionUnlocked;liveController:live;observationFeed:feed }
     Ui.BarIconButton {
         id: button
-        anchors.fill: parent
+        anchors.left: parent.left
+        anchors.verticalCenter: parent.verticalCenter
         bar: root.bar
         tooltipText: root.unavailable ? "Miilo One: check connection" : root.attentionCount ? "Miilo One: " + root.attentionCount + " need attention" : "Open Miilo One"
         Accessible.role: Accessible.Button
@@ -49,4 +64,18 @@ Ui.BarWidget {
         }
         onPressed: (code) => { if (code === Qt.LeftButton) root.toggle() }
     }
+    Ui.BarIconButton {
+        id: microphone
+        anchors.left: button.right
+        anchors.verticalCenter: parent.verticalCenter
+        bar: root.bar
+        visible: !!root.voice && root.voice.armed
+        tooltipText: root.voice && root.voice.muted ? "Unmute Miilo microphone" : "Mute Miilo microphone"
+        Accessible.role: Accessible.Button
+        Accessible.name: tooltipText
+        Accessible.onPressAction: root.voice.toggleMute()
+        iconComponent: Component { Miilo.VoiceGlyph { ink: microphone.foreground; muted: !root.voice || root.voice.muted } }
+        onPressed: code => { if (code === Qt.LeftButton) root.voice.toggleMute(); }
+    }
+
 }

@@ -27,6 +27,16 @@ Dictation does not submit a message, approve an action or start an agent.
 Use `make check-dictation` for inert native lifecycle tests; these do not record
 audio or substitute for an actual microphone-to-draft test before release.
 
+Optional **Hands-free** mode uses a local wake phrase and voice activity detection
+to submit spoken questions during an explicitly enabled Ask Miilo session. It
+stops when the session closes or locks; the bar mic and optional global shortcut
+can mute it. Superwhisper's selected transcription route may process audio in the
+cloud. Replies are text. See [voice setup and privacy](docs/voice.md) for the
+separate helper/runtime installation and remaining microphone acceptance checks.
+
+Appearance follows the shell's live surface roles. Application-window opacity is
+a separate, explicit [native appearance opt-in](docs/native-appearance.md).
+
 ## Preview
 
 <p align="center">

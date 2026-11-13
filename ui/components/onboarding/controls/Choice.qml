@@ -65,7 +65,7 @@ ComboBox {
     popup: Popup {
         y: control.height
         width: control.width
-        implicitHeight: Math.min(contentItem.implicitHeight + 8, context.height * 0.45)
+        implicitHeight: Math.min(contentItem.implicitHeight + 8, control.Window.window ? control.Window.window.height * 0.45 : 320)
         padding: 4
         contentItem: ListView {
             clip: true
@@ -75,7 +75,7 @@ ComboBox {
             ScrollBar.vertical: ThemeScrollBar { context: control.context }
         }
         background: Rectangle {
-            color: context.widget.ink("background")
+            color: context.theme.menuSurface
             radius: context.theme.radius
             border.color: context.theme.line
             border.width: 1

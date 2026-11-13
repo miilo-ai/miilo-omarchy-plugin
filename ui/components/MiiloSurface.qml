@@ -33,6 +33,10 @@ Item {
     property string configurationError: ""
     property string hostThemeRevision: ""
     onHostThemeRevisionChanged: themeReload.restart()
+    ThemeUpdates {
+        directory: Quickshell.env("MIILO_THEME_FILE") ? "" : Quickshell.env("HOME") + "/.local/state/omarchy/current/theme"
+        onCommitted: themeReload.restart()
+    }
     Timer {id:themeReload;interval:50;onTriggered:themeFile.reload()}
     property string widgetPath: Quickshell.env("MIILO_WIDGET_PATH") || decodeURIComponent(String(Qt.resolvedUrl("../../assets/70-miilo-fleet.owl")).replace(/^file:\/\//, ""))
     readonly property alias widget: widget

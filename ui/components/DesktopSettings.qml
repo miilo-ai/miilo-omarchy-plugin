@@ -22,7 +22,6 @@ FocusScope {
     onSectionChanged: configuring = false
     onVisibleChanged: if (!visible) configuring = false
     Keys.onEscapePressed: closed()
-    Rectangle { anchors.fill: parent; color: root.widget.ink("background") }
     ColumnLayout {
         anchors.fill: parent; anchors.margins: root.theme.gap * 2; spacing: root.theme.gap * 1.5
         RowLayout {

@@ -19,6 +19,8 @@ FloatingWindow {
     property int importedCount: 0
     property bool showingSettings: false
     property bool showingChat: false
+    property bool sessionUnlocked: false
+    readonly property var voiceSession: chatPanel.handsFree
     property var liveController: null
     property var observationFeed: null
     readonly property bool applicationFocused: body.Window.active
@@ -97,7 +99,7 @@ FloatingWindow {
             onClosed: root.showingSettings = false
         }
         Chat.ChatPanel {
-            id: chatPanel; anchors.fill: surface; theme: root.interactionTheme; surface: root.surface
+            id: chatPanel; sessionUnlocked: root.sessionUnlocked; anchors.fill: surface; theme: root.interactionTheme; surface: root.surface
             visible: root.visible && root.showingChat
             onClosed: root.showingChat = false
         }

@@ -13,8 +13,12 @@ QtObject {
     property real radius: 4
     property real controlHeight: 28
     property color surface: widget.ink("background")
-    readonly property color inset: Qt.tint(surface, wash(foreground, 0.025))
-    readonly property color line: wash(foreground, 0.11)
+    property color menuSurface: surface
+    property color tooltipSurface: surface
+    property color tooltipText: foreground
+    property color tooltipBorder: border
+    property color inset: Qt.tint(surface, wash(foreground, 0.025))
+    property color line: wash(foreground, 0.11)
     function duration(ms) {return reduceMotion?0:ms;}
     function tint(name, opacity) {
         return wash(widget.ink(name), opacity);
