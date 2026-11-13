@@ -1,2 +1,4 @@
-# Unified patches require whitespace-only context lines.
-patches/*.patch -whitespace
+/.specify export-ignore
+/.runtime export-ignore
+/.github export-ignore
+/AGENTS.md export-ignore

@@ -15,14 +15,16 @@ TextField {
     selectedTextColor: context.widget.ink("foreground")
     font.family: context.theme.typography.family
     font.pixelSize: context.theme.typography.size("body")
-    implicitHeight: context.theme.typography.controlHeight(contentHeight, topPadding + bottomPadding)
+    implicitHeight: Math.max(context.theme.controlHeight, context.theme.typography.controlHeight(contentHeight, topPadding + bottomPadding))
+    leftPadding: context.theme.gap
+    rightPadding: context.theme.gap
     topPadding: 2
     bottomPadding: 2
     selectByMouse: true
     background: Rectangle {
-        color: field.activeFocus ? context.theme.focusFill : context.widget.ink("lighter_background")
-        border.color: context.theme.border
+        color: context.theme.inset
+        radius: context.theme.radius
+        border.color: field.activeFocus ? context.theme.accent : context.theme.line
         border.width: 1
-        Rectangle { anchors.bottom: parent.bottom; anchors.horizontalCenter: parent.horizontalCenter; width: parent.width - 12; height: 2; visible: field.activeFocus; color: context.theme.accent }
     }
 }

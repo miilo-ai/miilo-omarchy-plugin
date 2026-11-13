@@ -531,15 +531,18 @@ Item {
       implicitWidth: label.implicitWidth + 20 * root.dp
       implicitHeight: root.typography.controlHeight(label.implicitHeight / root.dp, 6) * root.dp
       Rectangle {
+        objectName: "owlButtonBorder"
         anchors.fill: parent
         // The launcher's corners follow its style, and Omarchy's is square.
         radius: L.num(root.p.radius, 0) * root.dp
         color: "transparent"
-        border.width: Math.max(1, root.dp)
+        border.width: Math.max(1, root.dp) / Math.max(0.1, Math.abs(root.scale))
+        antialiasing: root.scale !== 1
         border.color: label.color
       }
       Text {
         id: label
+        objectName: "owlButtonLabel"
         anchors.centerIn: parent
         text: root.p.text === undefined || root.p.text === null ? "…" : String(root.p.text)
         textFormat: Text.PlainText

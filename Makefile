@@ -1,5 +1,7 @@
 .PHONY: check check-native check-typography
 check: check-preview-toolchain
+	node tools/check-repository-hygiene.cjs
+	node --test tools/repository-hygiene.test.cjs
 	node tools/test-render-invalidation.cjs
 	node tools/check-no-python.cjs
 	node --test tools/no-python.test.cjs
@@ -18,7 +20,7 @@ check-typography: check-plain-text
 	bash tools/test-typography.sh
 	bash tools/test-configuration.sh
 
-check-native: check
+check-native: check check-dictation check-live check-voice check-host-theme
 	bash tools/check-native.sh
 
 .PHONY: render-design
@@ -30,6 +32,10 @@ check-canvas-clock:
 	node tools/test-canvas-clock.cjs
 
 check-typography: check-canvas-clock
+
+.PHONY: check-dictation
+check-dictation:
+	bash tools/test-native-dictation.sh
 .PHONY: check-plain-text
 check-plain-text:
 	node tools/test-plain-text.cjs
@@ -52,3 +58,19 @@ check-preview: check-preview-toolchain
 .PHONY: check-brand
 check-brand:
 	QT_QPA_PLATFORM=offscreen QT_QUICK_BACKEND=software qmltestrunner -input tests/brand -o -,txt
+
+.PHONY: check-live
+check-live:
+	cargo fmt --manifest-path tools/live-monitor/Cargo.toml --check
+	cargo test --locked --manifest-path tools/live-monitor/Cargo.toml
+	cargo clippy --locked --manifest-path tools/live-monitor/Cargo.toml --all-targets -- -D warnings
+
+.PHONY: check-voice
+check-voice:
+	cargo fmt --manifest-path tools/voice-session/Cargo.toml --check
+	cargo test --locked --manifest-path tools/voice-session/Cargo.toml
+	cargo clippy --locked --manifest-path tools/voice-session/Cargo.toml --all-targets -- -D warnings
+
+.PHONY: check-host-theme
+check-host-theme:
+	bash tools/test-host-theme.sh

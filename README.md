@@ -1,4 +1,4 @@
-<h1 align="center">Miilo for Omarchy</h1>
+<h1 align="center">Miilo One for Omarchy</h1>
 
 <p align="center">
   <img alt="QML" src="https://img.shields.io/badge/QML-267b36?style=flat-square&amp;logo=qt&amp;logoColor=white" />
@@ -14,6 +14,28 @@ robot fleet, searchable work, explanations and supported provider actions.
 The plugin consumes a versioned shared renderer and delegates observation to the
 native helper. Provider credentials and execution remain outside the UI.
 See the release-status guide for validation scope and remaining platform checks.
+
+## Native dictation
+
+Open **Ask Miilo** from the face button. With Superwhisper selected under Omarchy's
+Setup → Defaults → Dictation, use the microphone button or **Ctrl+Shift+D** to
+start and stop dictation into the draft. Review the text before sending. Closing
+the panel or moving focus away cancels a recording started by this panel.
+The settings control opens Superwhisper's own configuration; local/cloud audio
+processing, history and usage limits follow its settings, independently of Miilo.
+Dictation does not submit a message, approve an action or start an agent.
+Use `make check-dictation` for inert native lifecycle tests; these do not record
+audio or substitute for an actual microphone-to-draft test before release.
+
+Optional **Hands-free** mode uses a local wake phrase and voice activity detection
+to submit spoken questions during an explicitly enabled Ask Miilo session. It
+stops when the session closes or locks; the bar mic and optional global shortcut
+can mute it. Superwhisper's selected transcription route may process audio in the
+cloud. Replies are text. See [voice setup and privacy](docs/voice.md) for the
+separate helper/runtime installation and remaining microphone acceptance checks.
+
+Appearance follows the shell's live surface roles. Application-window opacity is
+a separate, explicit [native appearance opt-in](docs/native-appearance.md).
 
 ## Preview
 
@@ -33,7 +55,7 @@ See the release-status guide for validation scope and remaining platform checks.
 ## Install
 
 Requires Omarchy Quattro with its plugin commands, Quickshell/Qt, Nerd Font icons,
-`miilo-owl` 1.7.0 from miilo-owl-widgets, and `miilo-local` 0.4.0 from miilo-cli
+`miilo-owl` 1.7.1 from miilo-owl-widgets, and `miilo-local` 0.4.0 from miilo-cli
 for local session onboarding. Put both binaries on the shell's PATH first.
 Download the matching helper and CLI binaries from their GitHub Releases.
 
@@ -87,8 +109,8 @@ path left behind despite absent inventory is reported as incomplete removal.
 Verification waits up to ten seconds for asynchronous shell inventory updates;
 unavailable inventory, invalid responses or a remaining install path fail visibly.
 This source change does not add a private-data purge or remove shared helpers.
-If the checkout was already removed, use the standard manager commands above;
-see [the native validation handoff](.specify/handoffs/uninstall-validation.md).
+If the checkout was already removed, use the standard manager commands above and
+verify its absence from the plugin inventory. Keep recovery records outside the source checkout.
 
 Removing the plugin retains connections and observations. Stop the separately
 owned collector explicitly if desired:
@@ -149,7 +171,7 @@ session has the required access; it cannot bypass a managed sandbox.
 
 `make check` runs portable source and installation checks with Node.js 22 or newer (development only). No npm packages are required. Preview capture uses native Qt 6 tools; shipped QML does not require Node.
 On Omarchy, run `make check-native` against the installed shell. See
-[the agent handoff](.specify/handoffs/omarchy-agent.md) and
+[the Omarchy integration guide](docs/omarchy-integration-guide.md) and
 [marketplace registration](docs/marketplace.md).
 
 ## Boundaries
@@ -208,3 +230,9 @@ at 16–128 px, theme changes and transparent visor rendering. The existing nati
 settings tests cover About navigation and manifest-version loading. Complete
 `make check-native check-typography` on Omarchy before release; local vector
 checks do not qualify shell integration.
+
+### Selected background observations
+
+Notifications are optional. Build the original Rust helper with `cargo build --locked --release --manifest-path tools/live-monitor/Cargo.toml --bin miilo-live-monitor`, then install that binary as `~/.local/bin/miilo-live-monitor`. The development relaunch script does this automatically. Open Notifications, choose the existing observation selection, then enable background monitoring. This starts only an unprivileged user service; it never starts or resumes an agent.
+
+Quiet mode and the focused dashboard suppress desktop messages while preserving local activity. Messages omit work titles, paths and transcripts. Disable background monitoring before uninstalling if you also want the independent monitor stopped. Shared helpers and private observation data are retained by plugin removal.

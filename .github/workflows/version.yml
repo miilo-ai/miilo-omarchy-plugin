@@ -48,11 +48,15 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: 22
-      - run: make check
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+        with:
+          toolchain: 1.96.1
+          components: rustfmt, clippy
+      - run: make check check-live check-voice
       - name: Require published runtime dependencies
         run: |
-          gh release view v0.3.0 --repo miilo-ai/miilo-cli
-          gh release view v1.5.0 --repo miilo-ai/miilo-owl-widgets
+          gh release view v0.4.0 --repo miilo-ai/miilo-cli
+          gh release view v1.7.1 --repo miilo-ai/miilo-owl-widgets
       - name: Create immutable tag and dispatch source release
         run: |
           set -euo pipefail

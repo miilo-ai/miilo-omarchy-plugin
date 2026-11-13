@@ -11,6 +11,18 @@ Item {
     property bool active: visible
     property bool expanded: false
     property var interactionTheme: null
+    property var observationFeed: null
+    property bool nativeControls: false
+    property bool paintBackground: true
+    onNativeControlsChanged: if(widget.instance)setViewState("nativeControls",nativeControls)
+    function connectFeed() {
+        if(!observationFeed||!widget.program||!widget.instance)return;
+        const slot=widget.program.globals.findIndex(g=>g.name==="feed");
+        if(slot<0)return;
+        widget.sourceSpecs=widget.sourceSpecs.filter(s=>s.slot!==slot);
+        if(active&&observationFeed.raw)widget.sourceStatus(slot,0,observationFeed.raw,"",false,true);
+    }
+    Connections {target:root.observationFeed;ignoreUnknownSignals:true;function onRawChanged(){root.connectFeed();}}
     readonly property string miiloHome: Quickshell.env("MIILO_HOME") || Quickshell.env("HOME") + "/.miilo"
     readonly property bool loading: {
         var revision = widget.generation;
@@ -19,6 +31,13 @@ Item {
     property bool configurationReady: false
     property bool sharedConfiguration: false
     property string configurationError: ""
+    property string hostThemeRevision: ""
+    onHostThemeRevisionChanged: themeReload.restart()
+    ThemeUpdates {
+        directory: Quickshell.env("MIILO_THEME_FILE") ? "" : Quickshell.env("HOME") + "/.local/state/omarchy/current/theme"
+        onCommitted: themeReload.restart()
+    }
+    Timer {id:themeReload;interval:50;onTriggered:themeFile.reload()}
     property string widgetPath: Quickshell.env("MIILO_WIDGET_PATH") || decodeURIComponent(String(Qt.resolvedUrl("../../assets/70-miilo-fleet.owl")).replace(/^file:\/\//, ""))
     readonly property alias widget: widget
     readonly property bool quietFleet: {
@@ -52,6 +71,7 @@ Item {
     }
     property var owlPalette: readablePalette("")
     onActiveChanged: if (active && widget.instance && widget.program) {
+        connectFeed();
         var slot = widget.program.globals.findIndex(g => g.name === "systemsOpen");
         if (slot >= 0) widget.instance.setState(slot, false);
     }
@@ -88,6 +108,7 @@ Item {
         }
     }
     FileView {
+        id: themeFile
         path: Quickshell.env("MIILO_THEME_FILE") || (Quickshell.env("HOME") + "/.local/state/omarchy/current/theme/colors.toml")
         watchChanges: true
         printErrors: false
@@ -106,7 +127,7 @@ Item {
         stateDir: root.sharedConfiguration ? root.miiloHome + "/preferences"
             : (Quickshell.env("XDG_STATE_HOME") || home + "/.local/state") + "/miilo/widgets"
     }
-    Rectangle { anchors.fill: parent; color: widget.ink("background") }
+    Rectangle { anchors.fill: parent; visible:root.paintBackground; color:root.interactionTheme?root.interactionTheme.surface:widget.ink("background") }
     Owl.OwlWidget {
         id: widget
         anchors.fill: parent
@@ -117,6 +138,7 @@ Item {
         typography.family: root.hostFontFamily
         palette: root.owlPalette
         active: root.active
+        reduceMotion:root.interactionTheme?root.interactionTheme.reduceMotion:false
         configureLocal: null
         interactionTheme: root.interactionTheme
         cols: 3
@@ -126,7 +148,7 @@ Item {
         screenHeight: Math.max(1, height)
         onScreenRequested: root.expanded = true
         onScreenClosed: root.expanded = false
-        onProgramChanged: if (program && root.expanded) Qt.callLater(openScreen)
+        onProgramChanged: {if (program && root.expanded) Qt.callLater(openScreen);Qt.callLater(root.connectFeed);Qt.callLater(()=>root.setViewState("nativeControls",root.nativeControls));}
     }
     TapHandler {
         enabled: !root.expanded && !!(widget.tree && widget.tree.onTap)

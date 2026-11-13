@@ -100,5 +100,17 @@ Item {
             compare(subject.tree,initialTree,"Canvas-only motion must not replace layout");
             compare(subject.problems.length,0);
         }
+        function test_host_reduced_motion_stops_clock_without_destroying_layout() {
+            tryVerify(()=>subject.instance!==null&&subject.tree!==null);
+            subject.reduceMotion=true;
+            wait(100);
+            const frame=subject.frame;
+            const tree=subject.tree;
+            wait(180);
+            compare(subject.frame,frame,"Reduced motion must stop the animation clock");
+            compare(subject.tree,tree,"Motion preference must preserve layout");
+            subject.reduceMotion=false;
+            tryVerify(()=>subject.frame>frame);
+        }
     }
 }

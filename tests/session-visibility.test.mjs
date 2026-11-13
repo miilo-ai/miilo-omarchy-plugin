@@ -144,7 +144,8 @@ for (const leftHanded of [false,true]) {
   assert(row);
   assert.equal(row.c[leftHanded?row.c.length-1:0].kind,'Spacer');
   const button = row.c.find(c=>c.kind==='Button');
-  assert(button.p.scale < 1);
+  assert.equal(button.p.scale,0.85);
+  assert.equal(button.p.height,24);
   assert.equal(actions.instance.persisted().leftHanded,leftHanded);
 }
 for (const count of [0,9,100]) {
@@ -174,3 +175,10 @@ const narrowOrbit = scene(factory, {}, {screenWidth:360}).render().find(n=>n.kin
 const wideOrbit = scene(factory, {}, {screenWidth:1200}).render().find(n=>n.kind==='Canvas'&&n.p.height>=82&&n.p.height<=140);
 assert.equal(narrowOrbit.p.height,82,'Narrow windows retain compact portraits');
 assert(wideOrbit.p.height>narrowOrbit.p.height,'Larger windows grow the portrait and its orbit together');
+
+const nativeScene=scene(fixture(),{nativeControls:true});
+nativeScene.set("nativeControls",true);
+const nativeNodes=nativeScene.render();
+assert(!nativeNodes.some(n=>n.p?.text==='All work'),'Native controls must replace the legacy filter row');
+assert(!nativeNodes.some(n=>n.p?.placeholder==='Search systems, agents or work'),'Native controls must replace the legacy search field');
+assert(nativeScene.get('actors').length>0,'Native chrome must preserve the observation scene');

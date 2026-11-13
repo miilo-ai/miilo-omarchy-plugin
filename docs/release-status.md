@@ -1,7 +1,7 @@
 # Release scope and validation
 
-Current published package: 0.3.0 (reviewed October 18, 2026).
-For available assets and subsequent versions, use GitHub Releases and the package manifests.
+The package version is declared in `manifest.json`. GitHub Releases records
+published assets; a local manifest is not evidence that its version was released.
 Documentation-only changes do not require a package version bump.
 
 ## Supported scope
@@ -13,21 +13,30 @@ Local observation is read-only; provider actions require a separately connected 
 
 ## Outstanding work
 
-- Voice capture/playback is deferred. The helper voice command deliberately returns
-  `not_implemented`; endpoint configuration is not microphone or streaming-audio support.
-- Full conversational chat-panel acceptance is distinct from the working model-backed
-  Explain path. Do not mark all chat milestones complete based on explanation demos.
+- The 0.5.0 candidate includes an Ask Miilo panel and native Superwhisper
+  dictation. It requires Superwhisper selected in Omarchy; installation, audio
+  processing, history and usage limits belong to Superwhisper. Start/stop/cancel
+  and status use its Linux CLI. Dictated text remains an editable draft and Send
+  requires explicit context-sharing consent. Optional hands-free mode uses a local
+  wake phrase and bounded speech turns to submit questions in an enabled session;
+  see [voice setup and privacy](voice.md). No provider action is executed by chat.
+- Native synthetic dictation and chat consent tests are separate from live
+  microphone delivery, model inference and installed-shell acceptance. Those
+  physical-user workflows remain release gates, including wake accuracy and false
+  activation under real background noise. The optional Rust voice-session helper
+  is separate from the legacy helper `voice` placeholder. Replies are text; speech
+  playback and interruption of playback are not implemented.
 - Keep platform-specific acceptance explicit: physical Android, Windows local observation,
   fractional scaling, large fleets and hidden/reduced-motion performance need their own evidence.
-- Marketplace approval and AUR availability require external confirmation; a public
-  repository or GitHub release does not establish a store listing.
+- Marketplace approval for an earlier version does not approve this candidate.
+  The 0.5.0 source, new dependencies and installation disclosures need review;
+  a public repository or GitHub release does not establish an updated store listing.
 - The protected Homebrew tap needs a PR-compatible publishing flow. Formula CI and
   an existing published formula do not establish automatic future tap updates.
 
 ## Documentation authority
 
-README and docs describe supported installation and operation. `.specify/specs`
-retains design requirements; `.specify/evidence` records dated test results.
-Old candidate plans and unchecked prelaunch checklists are historical, not current
-release blockers or proof of missing implementation. Do not erase recorded test
-limitations or treat screenshots as exhaustive platform certification.
+README and docs describe supported installation and operation. Personal plans and
+machine-specific validation history are maintained outside the source package.
+Portable checks and synthetic fixtures do not replace installed-shell acceptance,
+physical microphone testing or marketplace review.

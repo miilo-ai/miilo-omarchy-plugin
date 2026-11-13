@@ -12,14 +12,34 @@ RowLayout {
     signal refreshRequested()
     signal settingsRequested(string section)
     signal systemsRequested()
+    signal chatRequested()
     spacing: 4
     MiiloWordmark {
         objectName: "titleWordmark"
         ink: root.theme.foreground
-        Layout.preferredWidth: 86
-        Layout.preferredHeight: 34
+        Layout.preferredWidth: Layout.preferredHeight * 184 / 72
+        Layout.preferredHeight: root.theme.typography.size("body") * 2
+    }
+    TypeText {
+        objectName: "productNameLabel"
+        typography: root.theme.typography
+        role: "body"
+        lineHeight: 1
+        verticalAlignment: Text.AlignVCenter
+        Layout.preferredHeight: 36
+        Layout.leftMargin: 4
+        text: "One"
+        wrapMode: Text.NoWrap
+        Layout.minimumWidth: implicitWidth
+        color: root.theme.foreground
+        Layout.alignment: Qt.AlignVCenter
     }
     Item { Layout.fillWidth: true }
+    ToolbarButton {
+        theme: root.theme; kind: "voice"; label: "Ask Miilo"
+        contentItem: MiiloSymbol { ink: root.theme.foreground }
+        onClicked: root.chatRequested()
+    }
     ToolbarButton {
         id: addButton
         objectName: "addSystemButton"
@@ -42,7 +62,7 @@ RowLayout {
     ToolbarButton {
         id: menuButton
         objectName: "systemMenuButton"
-        theme: root.theme; kind: "menu"; label: "Miilo menu"
+        theme: root.theme; kind: "menu"; label: "Miilo One menu"
         enabled: !root.busy
         onClicked: settingsMenu.open()
         Menu {
@@ -54,6 +74,7 @@ RowLayout {
             MenuItem { text: "Pair computer"; checkable: true; autoExclusive: true; checked: root.activeSection === "pair"; onTriggered: root.settingsRequested("pair") }
             MenuItem { text: "Chat model"; checkable: true; autoExclusive: true; checked: root.activeSection === "chat"; onTriggered: root.settingsRequested("chat") }
             MenuItem { text: "About"; checkable: true; autoExclusive: true; checked: root.activeSection === "about"; onTriggered: root.settingsRequested("about") }
+            MenuItem { text: "Notifications"; checkable: true; autoExclusive: true; checked: root.activeSection === "notifications"; onTriggered: root.settingsRequested("notifications") }
         }
     }
     function focusAdd() { addButton.forceActiveFocus() }

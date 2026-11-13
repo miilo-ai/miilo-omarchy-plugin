@@ -1,0 +1,11 @@
+--- a/assets/70-miilo-fleet.owl
++++ b/assets/70-miilo-fleet.owl
+@@ -873,7 +873,7 @@
+             align: center
+             gap: 2
+             onTap: { inspectionView = "quiet"; expandedSystem = p.id; workflowActor = ""; selectedActor = ""; pageSize = 5; agentsOpen = false }
+-            QuietPortrait { provider: p; items: live.filter(w => w.providerId == p.id); s: clamp(min((screenWidth - 24 - (columns - 1) * 6) / columns * clamp(2 / max(1, len(systems)), 0.5, 1), screenHeight * 0.24), 24, len(systems) <= 2 ? 200 : 104) }
++            QuietPortrait { provider: p; items: live.filter(w => w.providerId == p.id); s: clamp(min((screenWidth - 24 - (columns - 1) * 6) / columns, max(0, screenHeight - 24) / rows - 36), 24, 200) }
+             Text { text: replace(p.name, "-", " "); width: max(48, (screenWidth - 24 - (columns - 1) * 8) / columns); height: 28; align: center; fontSize: 10; maxLines: 2 }
+           }
+         }

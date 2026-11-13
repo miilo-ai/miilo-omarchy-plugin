@@ -48,7 +48,7 @@ resource-loading surface; this guide does not certify arbitrary image URLs.
 - Keep the HTTP canary bound to loopback. Do not use external tracking services,
   real credentials or production endpoints as security fixtures.
 - Run the existing typography, configuration and source checks. Record the tested
-  revision, native environment, results and limits in `.specify/evidence/`.
+  revision, native environment, results and limits outside the distributable source tree.
 
 ## Preserve the native shell boundary
 
