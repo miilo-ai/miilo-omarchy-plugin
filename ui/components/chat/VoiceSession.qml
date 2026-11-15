@@ -17,7 +17,8 @@ Item {
     property string phase: "off"
     property string error: ""
     readonly property string message: !armed ? error : muted ? "Microphone muted" : phase === "waiting" ? "Say “" + wakePhrase + "”" : phase === "listening" ? "Listening…" : phase === "transcribing" ? "Transcribing…" : phase === "paused" ? "Waiting for the reply…" : "Preparing hands-free…"
-    signal transcript(string text)
+    property string telemetryConfig: ""
+    signal transcript(string text, string traceParent)
     function control(value) { if (engine.running) engine.write(JSON.stringify(value)+"\n"); }
     function arm() {
         if (!permitted || !unlocked) { error = "Enable sharing in an unlocked session first."; return false; }
@@ -42,7 +43,7 @@ Item {
             else if (value.type === "error") { error = value.message || "Voice session failed."; disarm(); }
             else if (value.type === "transcript" && armed && !muted && permitted && unlocked && !paused && typeof value.text === "string" && value.text.trim() && value.text.length <= 4000) {
                 phase = "paused";
-                transcript(value.text);
+                transcript(value.text, typeof value.traceparent === "string" ? value.traceparent : "");
             }
         } catch (_) { error = "Invalid voice-session response."; disarm(); }
     }
@@ -54,11 +55,11 @@ Item {
     onPermittedChanged: if (!permitted) disarm()
     onUnlockedChanged: if (!unlocked) disarm()
     onPausedChanged: control({type:"heartbeat",paused:paused})
-    Component.onCompleted: if (loadSavedSettings) settings.running = true
+    Component.onCompleted: if (loadSavedSettings) { settings.running = true; diagnostics.running = true; }
     Component.onDestruction: disarm()
     Process {
         id: engine
-        command: root.prefix.concat([root.program,"run","--phrase",root.wakePhrase,"--silence-ms",String(root.silenceMs)])
+        command: root.prefix.concat([root.program,"run","--phrase",root.wakePhrase,"--silence-ms",String(root.silenceMs)]).concat(root.telemetryConfig ? ["--telemetry-config",root.telemetryConfig] : [])
         stdinEnabled: true
         onStarted: { if (root.armed && root.permitted && root.unlocked) root.control({type:"heartbeat",paused:root.paused}); else engine.running = false; }
         stdout: SplitParser { onRead: line => root.receive(line) }
@@ -79,4 +80,16 @@ Item {
             } catch (_) { root.error = "Voice settings could not be loaded or saved."; }
         }
     }
+    Process {
+        id: diagnostics
+        command: root.prefix.concat(["miilo-owl","telemetry","status"])
+        stdout: StdioCollector { id: diagnosticStatus }
+        onExited: code => {
+            try {
+                const value = JSON.parse(diagnosticStatus.text);
+                if (code === 0 && value.enabled === true && typeof value.configPath === "string") root.telemetryConfig = value.configPath;
+            } catch (_) { root.telemetryConfig = ""; }
+        }
+    }
+
 }

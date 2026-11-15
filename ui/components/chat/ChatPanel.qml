@@ -19,7 +19,7 @@ FocusScope {
         unlocked: root.sessionUnlocked
         paused: session.busy || voice.owned
         loadSavedSettings: root.loadVoiceSettings
-        onTranscript: text => { if (consent.checked && !session.busy) session.send(text); }
+        onTranscript: (text, traceParent) => { if (consent.checked && !session.busy) session.send(text, traceParent); }
     }
     VoiceOptions {
         id: voiceOptions; objectName: "chat-voice-options"; parent: root

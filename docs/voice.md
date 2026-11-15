@@ -53,3 +53,18 @@ Vosk 0.3.45 native speech library and `vosk-model-small-en-us-0.15` English mode
 are from Alpha Cephei, licensed under Apache-2.0. They are downloaded separately,
 not embedded in the plugin. Superwhisper supplies the configured transcription
 service and its own terms. No Python runtime is introduced by Miilo's voice code.
+
+## Optional diagnostics
+
+Telemetry is off by default and separate from microphone/model-sharing consent.
+Configure it explicitly with `miilo-owl telemetry configure --consent --endpoint
+https://collector.example/v1/traces`, then restart the hands-free session. Use
+`miilo-owl telemetry disable` to suppress future and pending operation records.
+Only operation metadata and a validated transcription-to-chat trace parent are
+shared with the collector; audio, transcript, observed context, model names, work
+identifiers and endpoint URLs are excluded. Unknown providers are not inferred.
+The exporter uses bounded background delivery. Muting/closing capture does not
+wait on collector I/O; final process shutdown is bounded and best effort.
+Already queued/exported records cannot be recalled, and abrupt process termination
+may lose pending records. See the helper's telemetry guide for private collector
+credential files and supported endpoint policy.

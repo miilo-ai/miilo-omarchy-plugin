@@ -12,12 +12,22 @@ pub struct Request {
     child: Option<Child>,
     session: Option<u64>,
     preflight: bool,
+    telemetry: Option<std::sync::Arc<miilo_session_telemetry::Host>>,
+    operation: Option<miilo_session_telemetry::Pending>,
+    pub trace_parent: Option<String>,
     started: Instant,
     next_poll: Instant,
     pub generation: u64,
 }
 impl Request {
     pub fn start(samples: &[i16], generation: u64) -> Result<Self, String> {
+        Self::start_traced(samples, generation, None)
+    }
+    pub fn start_traced(
+        samples: &[i16],
+        generation: u64,
+        telemetry: Option<std::sync::Arc<miilo_session_telemetry::Host>>,
+    ) -> Result<Self, String> {
         let audio = tempfile::Builder::new()
             .suffix(".wav")
             .tempfile()
@@ -41,12 +51,32 @@ impl Request {
             child: Some(child),
             session: None,
             preflight: true,
+            telemetry,
+            operation: None,
+            trace_parent: None,
             started: Instant::now(),
             next_poll: Instant::now(),
             generation,
         })
     }
     pub fn poll(&mut self) -> Result<Option<String>, String> {
+        let result = self.poll_inner();
+        let outcome = match &result {
+            Ok(Some(_)) => Some(miilo_session_telemetry::Outcome::Success),
+            Err(_) => Some(miilo_session_telemetry::Outcome::Error(
+                miilo_session_telemetry::ErrorKind::Other,
+            )),
+            _ => None,
+        };
+        if let Some(outcome) = outcome {
+            self.trace_parent = self
+                .operation
+                .take()
+                .and_then(|operation| operation.finish(outcome));
+        }
+        result
+    }
+    fn poll_inner(&mut self) -> Result<Option<String>, String> {
         if self.started.elapsed() > Duration::from_secs(45) {
             return Err("Transcription timed out. Try again.".into());
         }
@@ -84,6 +114,7 @@ impl Request {
                     return Err("Superwhisper is already busy. Your turn was not submitted.".into());
                 }
                 self.preflight = false;
+                self.operation = self.telemetry.as_ref().map(|host| host.transcribe());
                 self.output
                     .as_file_mut()
                     .set_len(0)

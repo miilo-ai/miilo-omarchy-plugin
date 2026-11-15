@@ -31,8 +31,9 @@ Local observation is read-only; provider actions require a separately connected 
 - Marketplace approval for an earlier version does not approve this candidate.
   The 0.5.0 source, new dependencies and installation disclosures need review;
   a public repository or GitHub release does not establish an updated store listing.
-- The protected Homebrew tap needs a PR-compatible publishing flow. Formula CI and
-  an existing published formula do not establish automatic future tap updates.
+- Runtime pins require the reviewed helper and CLI releases. CLI 0.5.0 includes
+  release-equivalent artifact and Homebrew installation rehearsal; helper 1.7.2
+  remains a candidate until its release is published.
 
 ## Documentation authority
 

@@ -89,6 +89,15 @@ fn run() -> Result<(), String> {
     if args.first().is_none_or(|s| s != "run") {
         return Err("Use check, run or replay.".into());
     }
+    let telemetry = option("--telemetry-config").and_then(|path| {
+        match miilo_session_telemetry::Host::load(std::path::Path::new(&path)) {
+            Ok(host) => host,
+            Err(_) => {
+                eprintln!("Optional telemetry is unavailable; continuing without export.");
+                None
+            }
+        }
+    });
     let (tx, rx) = mpsc::sync_channel(16);
     std::thread::spawn(move || {
         let stdin = io::stdin();
@@ -146,7 +155,9 @@ fn run() -> Result<(), String> {
                 && let Some(text) = job.poll()?
             {
                 if session.gate.accepts(job.generation) {
-                    emit(serde_json::json!({"type":"transcript","text":text}));
+                    emit(
+                        serde_json::json!({"type":"transcript","text":text,"traceparent":job.trace_parent}),
+                    );
                 }
                 request = None;
                 session.completed();
@@ -158,7 +169,11 @@ fn run() -> Result<(), String> {
             if let Some(input) = &mut capture {
                 for frame in input.read()? {
                     if let Some(audio) = session.feed(&frame)? {
-                        request = Some(Request::start(&audio, session.gate.generation)?);
+                        request = Some(Request::start_traced(
+                            &audio,
+                            session.gate.generation,
+                            telemetry.clone(),
+                        )?);
                         break;
                     }
                 }

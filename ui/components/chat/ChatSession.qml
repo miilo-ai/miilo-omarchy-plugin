@@ -11,6 +11,7 @@ QtObject {
     property int serial: 0
     property string payload: ""
     property string program: "miilo-owl"
+    property string traceParent: ""
     property bool terminating: false
     readonly property bool busy: request.running || terminating || value("phase") === "streaming"
     function value(key) { var revision = generation; return state[key]; }
@@ -23,10 +24,11 @@ QtObject {
         generation++;
     }
     function cancel() { Stream.cancel(state); generation++; terminating = terminating || request.running; request.running = false; }
-    function send(text) {
+    function send(text, parent) {
         if (!active || busy) return false;
         try {
             const id = "native-" + Date.now() + "-" + (++serial);
+            traceParent = typeof parent === "string" && /^00-[0-9a-f]{32}-[0-9a-f]{16}-01$/.test(parent) ? parent : "";
             payload = JSON.stringify(Stream.begin(state, id, text));
             generation++;
             request.turnId = id;
@@ -43,7 +45,7 @@ QtObject {
     onActiveChanged: if (!active) reset()
     property Process request: Process {
         property string turnId: ""
-        command: [root.program, "chat"]
+        command: [root.program, "chat"].concat(root.traceParent ? ["--trace-parent",root.traceParent] : [])
         stdinEnabled: true
         onStarted: { write(root.payload); stdinEnabled = false; }
         stdout: SplitParser {
