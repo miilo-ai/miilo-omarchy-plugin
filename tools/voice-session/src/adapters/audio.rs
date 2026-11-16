@@ -9,6 +9,31 @@ use std::{
 };
 use webrtc_vad::{SampleRate, Vad, VadMode};
 
+pub struct Meter(std::time::Instant);
+impl Default for Meter {
+    fn default() -> Self {
+        Self(std::time::Instant::now())
+    }
+}
+impl Meter {
+    pub fn feed(&mut self, frame: &[i16]) {
+        if self.0.elapsed() < std::time::Duration::from_millis(100) {
+            return;
+        }
+        self.0 = std::time::Instant::now();
+        let energy = frame
+            .iter()
+            .map(|&sample| (sample as f64 / 32768.0).powi(2))
+            .sum::<f64>()
+            / frame.len().max(1) as f64;
+        println!(
+            "{}",
+            serde_json::json!({"type":"level","level":energy.sqrt().min(1.0)})
+        );
+        let _ = std::io::Write::flush(&mut std::io::stdout());
+    }
+}
+
 pub struct Capture {
     child: Child,
     stdout: ChildStdout,

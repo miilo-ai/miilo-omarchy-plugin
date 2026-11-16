@@ -35,6 +35,9 @@ fn main() {
 }
 fn run() -> Result<(), String> {
     let args: Vec<_> = std::env::args().skip(1).collect();
+    if miilo_voice_session::adapters::speech::command(&args)? {
+        return Ok(());
+    }
     if args.first().is_some_and(|s| s == "--version") {
         println!("miilo-voice-session 0.1.0");
         return Ok(());
@@ -45,6 +48,10 @@ fn run() -> Result<(), String> {
             .map(|pair| pair[1].clone())
     };
     let config = Config {
+        hands_free: option("--hands-free")
+            .unwrap_or("false".into())
+            .parse()
+            .map_err(|_| "Use true or false for hands-free.")?,
         wake_phrase: option("--phrase").unwrap_or("hey miilo".into()),
         silence_ms: option("--silence-ms")
             .unwrap_or("1000".into())
@@ -52,10 +59,9 @@ fn run() -> Result<(), String> {
             .map_err(|_| "Invalid silence delay.")?,
     };
     config.validate()?;
-    if args.first().is_some_and(|s| s == "settings") {
-        let saved = miilo_voice_session::settings::settings(config, option("--phrase").is_some())?;
+    if let Some(saved) = miilo_voice_session::settings::command(&args, config.clone())? {
         emit(
-            serde_json::json!({"type":"settings","wake_phrase":saved.phrase(),"silence_ms":saved.silence_ms}),
+            serde_json::json!({"type":"settings","wake_phrase":saved.phrase(),"silence_ms":saved.silence_ms,"hands_free":saved.hands_free}),
         );
         return Ok(());
     }
@@ -122,6 +128,7 @@ fn run() -> Result<(), String> {
     let mut heartbeat = Instant::now();
     let mut active = false;
     let mut last_phase = None;
+    let mut meter = miilo_voice_session::adapters::audio::Meter::default();
     emit(serde_json::json!({"type":"ready"}));
     loop {
         while let Ok(command) = rx.try_recv() {
@@ -168,6 +175,7 @@ fn run() -> Result<(), String> {
             }
             if let Some(input) = &mut capture {
                 for frame in input.read()? {
+                    meter.feed(&frame);
                     if let Some(audio) = session.feed(&frame)? {
                         request = Some(Request::start_traced(
                             &audio,

@@ -2,11 +2,33 @@ use serde::{Deserialize, Serialize};
 
 pub const RATE: usize = 16_000;
 pub const FRAME: usize = 480;
+pub fn spoken_reply(text: &str) -> String {
+    let mut output = String::new();
+    let mut word = String::new();
+    for character in text.chars().chain(std::iter::once('\0')) {
+        if character.is_alphabetic() {
+            word.push(character);
+            continue;
+        }
+        output.push_str(if word.eq_ignore_ascii_case("miilo") {
+            "Milo"
+        } else {
+            &word
+        });
+        word.clear();
+        if character != '\0' {
+            output.push(character);
+        }
+    }
+    output
+}
 #[derive(Clone, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Config {
     pub wake_phrase: String,
     pub silence_ms: u32,
+    #[serde(default)]
+    pub hands_free: bool,
 }
 impl Config {
     pub fn validate(&self) -> Result<(), String> {

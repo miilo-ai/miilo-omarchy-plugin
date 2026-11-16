@@ -15,7 +15,7 @@ pub fn settings(config: Config, save: bool) -> Result<Config, String> {
         write!(
             file,
             "{}",
-            serde_json::json!({"wake_phrase":config.phrase(),"silence_ms":config.silence_ms})
+            serde_json::json!({"wake_phrase":config.phrase(),"silence_ms":config.silence_ms,"hands_free":config.hands_free})
         )
         .map_err(|e| e.to_string())?;
         file.persist(path).map_err(|e| e.to_string())?;
@@ -32,4 +32,24 @@ pub fn settings(config: Config, save: bool) -> Result<Config, String> {
             _ => Err("Cannot read voice settings.".into()),
         }
     }
+}
+pub fn command(args: &[String], config: Config) -> Result<Option<Config>, String> {
+    if args.first().is_none_or(|value| value != "settings") {
+        return Ok(None);
+    }
+    let mut saved = settings(config.clone(), false)?;
+    let has = |name: &str| args.iter().any(|value| value == name);
+    if has("--phrase") {
+        saved.wake_phrase = config.wake_phrase;
+    }
+    if has("--silence-ms") {
+        saved.silence_ms = config.silence_ms;
+    }
+    if has("--hands-free") {
+        saved.hands_free = config.hands_free;
+    }
+    if has("--phrase") || has("--silence-ms") || has("--hands-free") {
+        saved = settings(saved, true)?;
+    }
+    Ok(Some(saved))
 }

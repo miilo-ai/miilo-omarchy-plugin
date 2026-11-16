@@ -23,6 +23,7 @@ fn session() -> Session<OneWake, Speech> {
         OneWake(0),
         Speech,
         Config {
+            hands_free: false,
             wake_phrase: "hey miilo".into(),
             silence_ms: 1000,
         },

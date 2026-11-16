@@ -12,28 +12,53 @@ FocusScope {
     property bool sessionUnlocked: false
     property bool loadVoiceSettings: true
     property alias handsFree: handsFree
+    readonly property string playbackPhase: playback.busy ? playback.phase : ""
+    readonly property bool playbackReady: playback.ready
+    readonly property bool ready: session.configured && (!handsFree.preferred || playback.ready)
+    property int spokenSerial: -1
+    function openVoice() { voiceOptions.open(); }
+    function openConversation() {
+        session.probe();
+        if (handsFree.preferred && !handsFree.armed) {consent.checked=true;Qt.callLater(()=>handsFree.arm());}
+    }
+    VoicePlayback {
+        id: playback; objectName:"chat-playback"
+        loadSettings: root.loadVoiceSettings
+        previewAllowed: root.visible && root.sessionUnlocked
+        active: root.visible && consent.checked && handsFree.armed && !handsFree.muted && root.sessionUnlocked
+    }
+    Connections {
+        target: session
+        function onBusyChanged() {
+            if (!session.busy && session.value("phase")==="done" && session.serial!==root.spokenSerial) {
+                root.spokenSerial=session.serial;
+                playback.speak(session.value("answer"));
+            }
+        }
+    }
     VoiceSession {
         id: handsFree
         objectName: "chat-hands-free"
         permitted: root.visible && consent.checked
         unlocked: root.sessionUnlocked
-        paused: session.busy || voice.owned
+        paused: session.busy || voice.owned || playback.busy
         loadSavedSettings: root.loadVoiceSettings
         onTranscript: (text, traceParent) => { if (consent.checked && !session.busy) session.send(text, traceParent); }
     }
     VoiceOptions {
         id: voiceOptions; objectName: "chat-voice-options"; parent: root
-        context: root.context; voice: handsFree; consent: consent.checked
+        context: root.context; voice: handsFree; consent: consent.checked; playback: playback
         onProviderSettingsRequested: voice.settings()
         onEnableRequested: { consent.checked = true; Qt.callLater(() => handsFree.arm()); }
         onDictationRequested: voice.start()
+        onPreviewRequested: playback.preview()
     }
     readonly property var context: ({theme: theme, widget: surface.widget})
     signal closed()
     Keys.onEscapePressed: { voice.cancel(); root.closed(); }
     onVisibleChanged: if (!visible) { handsFree.disarm(); consent.checked = false; voice.cancel(); }
     onTargetChanged: { handsFree.disarm(); consent.checked = false; voice.cancel(); }
-    ChatSession { id: session; objectName: "chat-session"; active: root.visible; target: root.target }
+    ChatSession { id: session; objectName: "chat-session"; active: root.visible; target: root.target; loadConfigStatus:root.loadVoiceSettings }
     Shortcut { sequence: "Ctrl+Shift+D"; enabled: root.visible && !session.busy && !handsFree.armed; onActivated: voice.recording ? voice.stop() : voice.start() }
     Miilo.NativeDictation {
         id: voice
@@ -134,7 +159,7 @@ FocusScope {
             Miilo.TypeText {
                 objectName: "chat-dictation-status"
                 typography: root.theme.typography; role: "small"; color: root.theme.foreground
-                text: handsFree.armed || handsFree.error ? handsFree.message : voice.owned ? voice.message : "Start a hands-free conversation"
+                text: playback.busy ? (playback.phase==="speaking" ? "Speaking…" : "Preparing spoken reply…") : playback.error ? playback.error : handsFree.armed || handsFree.error ? handsFree.message : voice.owned ? voice.message : "Start a hands-free conversation"
                 Layout.fillWidth: true
                 Layout.minimumHeight: dictationButton.implicitHeight
                 verticalAlignment: Text.AlignVCenter

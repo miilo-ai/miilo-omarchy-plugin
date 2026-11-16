@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import Quickshell.Io
 import "StreamState.js" as Stream
 
@@ -13,6 +14,10 @@ QtObject {
     property string program: "miilo-owl"
     property string traceParent: ""
     property bool terminating: false
+    property bool loadConfigStatus: true
+    property bool configured: false
+    function probe() { if(loadConfigStatus && !setupStatus.running)setupStatus.running=true; }
+    Component.onCompleted: probe()
     readonly property bool busy: request.running || terminating || value("phase") === "streaming"
     function value(key) { var revision = generation; return state[key]; }
     function reset() {
@@ -59,5 +64,10 @@ QtObject {
             Stream.exited(root.state, turnId);
             root.generation++;
         }
+    }
+    property Process setupStatus: Process {
+        command: ["env","PATH="+Quickshell.env("HOME")+"/.local/bin:"+Quickshell.env("PATH"),root.program,"chat-status"]
+        stdout: StdioCollector { id: configuration }
+        onExited: code => {try{root.configured=code===0 && JSON.parse(configuration.text).ready===true;}catch(_){root.configured=false;}}
     }
 }

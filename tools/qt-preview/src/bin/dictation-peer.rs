@@ -4,6 +4,32 @@ use std::{env, fs, process, thread, time::Duration};
 
 fn main() {
     let action = env::args().nth(1).unwrap_or_default();
+    if action == "settings" && env::args().any(|value| value == "--hands-free") {
+        println!(
+            "{}",
+            json!({"type":"settings","wake_phrase":"hey miilo","silence_ms":1000,"hands_free":env::args().next_back().as_deref()==Some("true")})
+        );
+        return;
+    }
+    if action == "playback-status" {
+        println!("{{\"ready\":true}}");
+        return;
+    }
+    if action == "speak" {
+        let mut input = String::new();
+        io::stdin().read_to_string(&mut input).unwrap();
+        let request: Value = serde_json::from_str(&input).unwrap();
+        assert!(
+            request["text"]
+                .as_str()
+                .is_some_and(|text| !text.is_empty())
+        );
+        println!("{{\"type\":\"state\",\"phase\":\"speaking\"}}");
+        io::stdout().flush().unwrap();
+        thread::sleep(Duration::from_millis(800));
+        println!("{{\"type\":\"state\",\"phase\":\"done\"}}");
+        return;
+    }
     if action == "run" {
         println!("{}", json!({"type":"ready"}));
         io::stdout().flush().unwrap();

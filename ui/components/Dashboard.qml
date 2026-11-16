@@ -50,15 +50,22 @@ FloatingWindow {
                 theme: root.interactionTheme
                 activeSection: root.showingSettings ? settingsPanel.section : ""
                 busy: importer.busy
+                voiceSession: chatPanel.handsFree
+                voiceOutputPhase: chatPanel.playbackPhase
+                voiceReady: chatPanel.ready
                 onLocalRequested: root.showSessions()
                 onRemoteRequested: root.showSettings("systems")
                 onRefreshRequested: root.observationFeed?root.observationFeed.refresh():surface.widget.refresh()
                 onSettingsRequested: section => root.showSettings(section)
                 onSystemsRequested: root.showSettings("filters")
                 onChatRequested: {
-                    const work = surface.viewValue("focused");
-                    chatPanel.target = work ? {workKey: work._key, revisionKey: work._revisionKey} : null;
-                    root.showingSettings = false; root.showingChat = true;
+                    if (!root.showingChat) {
+                        const work = surface.viewValue("focused");
+                        chatPanel.target = work ? {workKey: work._key, revisionKey: work._revisionKey} : null;
+                        root.showingSettings = false; root.showingChat = true;
+                    }
+                    Qt.callLater(()=>chatPanel.openConversation());
+                    chatPanel.forceActiveFocus();
                 }
             }
             TypeText {anchors.right:parent.right;anchors.bottom:parent.bottom;anchors.rightMargin:10;typography:root.interactionTheme.typography;role:"small";color:root.interactionTheme.foreground;visible:!!root.observationFeed&&root.observationFeed.stale;text:"Observation unavailable · previous snapshot"}

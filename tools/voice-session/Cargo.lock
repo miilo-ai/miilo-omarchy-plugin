@@ -651,9 +651,11 @@ dependencies = [
  "libc",
  "libloading",
  "miilo-session-telemetry",
+ "reqwest",
  "serde",
  "serde_json",
  "tempfile",
+ "url",
  "webrtc-vad",
 ]
 

@@ -28,6 +28,7 @@ Item {
             findChild(panel,"chat-session").program = peer;
             var handsFree=findChild(panel,"chat-hands-free");
             handsFree.program=peer;handsFree.prefix=[];
+            handsFree.preferred=false;
             var voice = findChild(panel,"native-dictation");
             voice.program = peer; voice.selector = peer; voice.prefix = [];
         }

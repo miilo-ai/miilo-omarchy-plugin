@@ -13,9 +13,11 @@ Item {
     property string wakePhrase: "hey miilo"
     property int silenceMs: 1000
     property bool armed: false
+    property bool preferred: false
     property bool muted: true
     property string phase: "off"
     property string error: ""
+    property real level: 0
     readonly property string message: !armed ? error : muted ? "Microphone muted" : phase === "waiting" ? "Say “" + wakePhrase + "”" : phase === "listening" ? "Listening…" : phase === "transcribing" ? "Transcribing…" : phase === "paused" ? "Waiting for the reply…" : "Preparing hands-free…"
     property string telemetryConfig: ""
     signal transcript(string text, string traceParent)
@@ -26,10 +28,10 @@ Item {
         return true;
     }
     function disarm() {
-        muted = true; armed = false; phase = "off";
+        muted = true; armed = false; phase = "off"; level = 0;
         control({type:"stop"}); engine.running = false;
     }
-    function mute() { muted = true; control({type:"mute"}); }
+    function mute() { muted = true; level = 0; control({type:"mute"}); }
     function toggleMute() {
         if (!armed) return;
         if (!muted) mute();
@@ -39,7 +41,8 @@ Item {
         if (line.length > 65536) { error = "Voice response exceeded its limit."; disarm(); return; }
         try {
             const value = JSON.parse(line);
-            if (value.type === "state") phase = value.phase;
+            if (value.type === "level" && armed && !muted && !paused && typeof value.level === "number" && isFinite(value.level)) level = Math.max(0,Math.min(1,value.level));
+            else if (value.type === "state") { phase = value.phase; if (phase!=="waiting" && phase!=="listening") level=0; }
             else if (value.type === "error") { error = value.message || "Voice session failed."; disarm(); }
             else if (value.type === "transcript" && armed && !muted && permitted && unlocked && !paused && typeof value.text === "string" && value.text.trim() && value.text.length <= 4000) {
                 phase = "paused";
@@ -51,6 +54,12 @@ Item {
         disarm();
         settings.command = prefix.concat([program,"settings","--phrase",phrase,"--silence-ms",String(delay)]);
         if (!settings.running) settings.running = true;
+    }
+    function setPreferred(value) {
+        preferred=value;
+        if (!value) disarm();
+        preferences.command=prefix.concat([program,"settings","--hands-free",value?"true":"false"]);
+        if (!preferences.running) preferences.running=true;
     }
     onPermittedChanged: if (!permitted) disarm()
     onUnlockedChanged: if (!unlocked) disarm()
@@ -76,9 +85,13 @@ Item {
             try {
                 const value = JSON.parse(saved.text);
                 if (code !== 0 || value.type !== "settings") throw Error();
-                root.wakePhrase = value.wake_phrase; root.silenceMs = value.silence_ms;
+                root.wakePhrase = value.wake_phrase; root.silenceMs = value.silence_ms; root.preferred = value.hands_free === true;
             } catch (_) { root.error = "Voice settings could not be loaded or saved."; }
         }
+    }
+    Process {
+        id: preferences
+        onExited: code => { if(code!==0) root.error="Hands-free preference could not be saved."; }
     }
     Process {
         id: diagnostics

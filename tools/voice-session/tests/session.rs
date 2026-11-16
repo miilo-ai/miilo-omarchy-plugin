@@ -24,6 +24,7 @@ impl ActivityDetector for Voice {
 }
 fn config() -> Config {
     Config {
+        hands_free: false,
         wake_phrase: "hey computer".into(),
         silence_ms: 1000,
     }

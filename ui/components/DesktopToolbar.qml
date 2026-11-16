@@ -7,12 +7,16 @@ RowLayout {
     required property var theme
     property bool busy: false
     property string activeSection: ""
+    property var voiceSession: null
+    property string voiceOutputPhase: ""
+    property bool voiceReady: false
     signal localRequested()
     signal remoteRequested()
     signal refreshRequested()
     signal settingsRequested(string section)
     signal systemsRequested()
     signal chatRequested()
+    signal voiceRequested()
     spacing: 4
     MiiloWordmark {
         objectName: "titleWordmark"
@@ -35,11 +39,7 @@ RowLayout {
         Layout.alignment: Qt.AlignVCenter
     }
     Item { Layout.fillWidth: true }
-    ToolbarButton {
-        theme: root.theme; kind: "voice"; label: "Ask Miilo"
-        contentItem: MiiloSymbol { ink: root.theme.foreground }
-        onClicked: root.chatRequested()
-    }
+    VoiceStatus { theme: root.theme; compact:root.width<600; configured:root.voiceReady; voice: root.voiceSession; outputPhase: root.voiceOutputPhase; onStartRequested: root.chatRequested() }
     ToolbarButton {
         id: addButton
         objectName: "addSystemButton"

@@ -1,15 +1,29 @@
 # Hands-free voice
 
-In Ask Miilo, press the microphone or open the voice cog and enable **Hands-free**. The disclosure
-beside the toggle explains that enabling it permits sharing spoken turns and
-observed context with the configured model for this live session.
+Click the Miilo face to open Ask Miilo. In the voice cog, enable **Hands-free**. The disclosure
+beside the toggle explains that enabling it remembers voice mode and permits
+sharing spoken turns and observed context during a session. Future clicks on
+the same Miilo face start that voice workflow directly, without another icon or
+toggle. App launch or shell restart never automatically arms capture.
 Say the wake phrase, ask a question, then pause. Miilo detects the silence,
 transcribes the question with Superwhisper, and sends it to the selected Miilo
-chat model. Replies currently appear as text. After each reply, listening resumes
+chat model. Configured spoken replies play automatically. After each reply, listening resumes
 automatically; follow-up questions need no repeated wake phrase, Stop or Send.
 Quiet gaps do not end the conversation. Nearby speech can become a follow-up while
 the session is active. Mute stops capture and requires the wake phrase again after
-explicitly unmuting. Spoken reply playback is not implemented.
+explicitly unmuting. Listening pauses during synthesis and playback so the answer
+does not become another question. Mute, lock, closing chat or revoking sharing
+also cancels playback. Text replies remain available if speech fails.
+
+The single Miilo face uses the theme's muted/foreground ink to distinguish
+unconfigured/configured playback, without another toolbar icon. Active session
+status shows Wake listening, Listening, Transcribing, Replying and Speaking.
+Input bars reflect measured microphone level; they are not an
+indication that speech has been understood or sent. Capture starts only after
+explicit session consent. Use the chat microphone or the bar control to mute.
+Configuration readiness is not proof of a live endpoint or active microphone.
+No setup sound is played automatically; **Test playback** is explicit. Spoken
+product names use the pronunciation MY-LO; displayed text keeps the Miilo spelling.
 
 Wake detection runs locally. The default phrase is “hey miilo”; the English
 recognizer uses “milo” as its phonetic spelling. Custom phrases contain two to
@@ -49,6 +63,21 @@ shortcut. Wake assets live in `$XDG_DATA_HOME/miilo/voice` (default
 `~/.local/share/miilo/voice`); phrase and silence preferences live in
 `$XDG_CONFIG_HOME/miilo/voice.json` (default `~/.config/miilo/voice.json`). Neither
 arming nor unmuting is persisted across shell restarts.
+
+## Spoken replies
+
+Pipe a JSON object into `miilo-voice-session configure-playback` with `base_url`
+(OpenAI-compatible HTTPS URL ending in `/v1`, or loopback HTTP), `model`, `voice`
+and `api_key_file` (absolute private credential filename, or null). Configuration
+is saved privately at `$XDG_CONFIG_HOME/miilo/playback.json`. Recheck playback in
+the voice cog after changing it. Never put a credential in arguments or source.
+
+The speech service receives only the completed answer, not observation snapshots
+or the conversation history. Requests do not follow redirects or ambient proxies.
+WAV responses are size/duration bounded and validated before PipeWire playback;
+audio uses an anonymous temporary file, leaving no named recording on cancellation.
+Speech is optional and requires its own configured provider. Superwhisper remains
+the transcription provider; it does not supply this application's spoken replies.
 
 ## Dependencies
 
