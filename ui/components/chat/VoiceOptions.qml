@@ -11,6 +11,7 @@ Popup {
     property bool consent: false
     signal providerSettingsRequested()
     signal enableRequested()
+    signal dictationRequested()
     width: Math.min(420,parent.width-32)
     x: Math.round((parent.width-width)/2)
     y: Math.max(8,Math.round((parent.height-height)/2))
@@ -37,7 +38,7 @@ Popup {
         }
         Miilo.TypeText {
             typography:root.context.theme.typography;role:"small";color:root.context.theme.foreground;Layout.fillWidth:true
-            text:!root.voice.unlocked ? "Unlock your desktop to enable hands-free." : "Turning this on allows sharing spoken questions and observed context with your configured model for this session. Wake listening stays local. Transcription uses Superwhisper’s selected local or cloud model; silence sends the turn."
+            text:!root.voice.unlocked ? "Unlock your desktop to enable hands-free." : "Start with your wake phrase, then speak naturally. Pauses send each turn; listening resumes after the text reply. Follow-ups need no wake phrase. While active, nearby speech can also be sent. Spoken turns and observed context go to your configured model; transcription uses Superwhisper’s selected local or cloud model. Mute stops capture."
         }
         Miilo.TypeText {typography:root.context.theme.typography;role:"small";color:root.context.theme.foreground;text:"Wake phrase";Layout.topMargin:root.context.theme.gap}
         Controls.Field {
@@ -58,6 +59,7 @@ Popup {
         }
         Miilo.TypeText {typography:root.context.theme.typography;role:"small";color:root.context.theme.foreground;Layout.fillWidth:true;visible:!!root.voice.error;text:root.voice.error}
         Miilo.TypeText {typography:root.context.theme.typography;role:"small";color:root.context.theme.foreground;Layout.fillWidth:true;text:"Mute anywhere: Super+Ctrl+M (when configured)."}
+        Controls.Action {context:root.context;text:"Dictate into draft";onClicked:{root.voice.disarm();root.dictationRequested();root.close();}}
         Controls.Action {context:root.context;text:"Superwhisper settings";onClicked:{root.voice.disarm();root.providerSettingsRequested();root.close();}}
         }
 }

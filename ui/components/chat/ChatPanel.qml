@@ -26,6 +26,7 @@ FocusScope {
         context: root.context; voice: handsFree; consent: consent.checked
         onProviderSettingsRequested: voice.settings()
         onEnableRequested: { consent.checked = true; Qt.callLater(() => handsFree.arm()); }
+        onDictationRequested: voice.start()
     }
     readonly property var context: ({theme: theme, widget: surface.widget})
     signal closed()
@@ -119,17 +120,21 @@ FocusScope {
                 id: dictationButton
                 objectName: "chat-dictation-button"
                 theme: root.theme; kind: handsFree.armed && handsFree.muted ? "muted" : voice.recording ? "stop" : "voice"
-                circular: true; selected: voice.owned
+                circular: true; selected: handsFree.armed || voice.owned
                 implicitWidth: 32; implicitHeight: 32; padding: 8
-                label: handsFree.armed ? (handsFree.muted ? "Unmute microphone" : "Mute microphone") : voice.recording ? "Stop dictation" : "Dictate with Superwhisper"
+                label: handsFree.armed ? (handsFree.muted ? "Unmute microphone" : "Mute microphone") : voice.recording ? "Stop dictation" : "Start hands-free conversation"
                 focusPolicy: Qt.NoFocus
-                enabled: handsFree.armed || voice.recording || (voice.ready && !voice.busy && !voice.owned && !session.busy)
-                onClicked: handsFree.armed ? handsFree.toggleMute() : voice.recording ? voice.stop() : voice.start()
+                enabled: handsFree.armed || voice.recording || (root.sessionUnlocked && !voice.owned && !session.busy)
+                onClicked: {
+                    if (handsFree.armed) handsFree.toggleMute();
+                    else if (voice.recording) voice.stop();
+                    else voiceOptions.open();
+                }
             }
             Miilo.TypeText {
                 objectName: "chat-dictation-status"
                 typography: root.theme.typography; role: "small"; color: root.theme.foreground
-                text: handsFree.armed || handsFree.error ? handsFree.message : voice.message
+                text: handsFree.armed || handsFree.error ? handsFree.message : voice.owned ? voice.message : "Start a hands-free conversation"
                 Layout.fillWidth: true
                 Layout.minimumHeight: dictationButton.implicitHeight
                 verticalAlignment: Text.AlignVCenter

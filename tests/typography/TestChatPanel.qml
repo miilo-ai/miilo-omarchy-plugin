@@ -122,6 +122,26 @@ Item {
             panel.visible = false;
             compare(consent.checked,false); compare(session.busy,false);
         }
+        function test_microphone_exposes_session_consent_and_followups_auto_send() {
+            panel.sessionUnlocked=true;panel.visible=true;
+            var session=findChild(panel,"chat-session"), handsFree=findChild(panel,"chat-hands-free");
+            var consent=findChild(panel,"chat-consent"), options=findChild(panel,"chat-voice-options");
+            session.reset();consent.checked=false;
+            var microphone=findChild(panel,"chat-dictation-button");
+            compare(microphone.label,"Start hands-free conversation");
+            mouseClick(microphone);tryCompare(options,"opened",true);
+            compare(handsFree.armed,false);compare(consent.checked,false);
+            options.close();consent.checked=true;handsFree.armed=true;handsFree.muted=false;
+            handsFree.receive(JSON.stringify({type:"transcript",text:"First synthetic question"}));
+            tryVerify(()=>session.value("phase")==="done"&&!session.busy);
+            compare(session.value("history").length,2);
+            compare(handsFree.paused,false);
+            handsFree.receive(JSON.stringify({type:"transcript",text:"Follow up without buttons"}));
+            tryVerify(()=>session.value("history").length===4&&!session.busy);
+            handsFree.mute();
+            handsFree.receive(JSON.stringify({type:"transcript",text:"Discard after mute"}));
+            compare(session.value("history").length,4);
+        }
         function test_changing_work_clears_the_conversation() {
             var session = findChild(panel,"chat-session");
             session.state.history = [{role:"user",text:"Synthetic prior turn"}];

@@ -1,11 +1,15 @@
 # Hands-free voice
 
-In Ask Miilo, open the voice cog and enable **Hands-free**. The disclosure
+In Ask Miilo, press the microphone or open the voice cog and enable **Hands-free**. The disclosure
 beside the toggle explains that enabling it permits sharing spoken turns and
 observed context with the configured model for this live session.
 Say the wake phrase, ask a question, then pause. Miilo detects the silence,
 transcribes the question with Superwhisper, and sends it to the selected Miilo
-chat model. Replies currently appear as text.
+chat model. Replies currently appear as text. After each reply, listening resumes
+automatically; follow-up questions need no repeated wake phrase, Stop or Send.
+Quiet gaps do not end the conversation. Nearby speech can become a follow-up while
+the session is active. Mute stops capture and requires the wake phrase again after
+explicitly unmuting. Spoken reply playback is not implemented.
 
 Wake detection runs locally. The default phrase is “hey miilo”; the English
 recognizer uses “milo” as its phonetic spelling. Custom phrases contain two to
@@ -28,7 +32,8 @@ late transcripts. Audio already submitted to a speech provider cannot be recalle
 
 Speech shorter than the minimum duration, a wake with no question, and turns over
 30 seconds are discarded. Silence delay is configurable from 0.7 to 2.5 seconds.
-Manual dictation remains available when hands-free is off.
+Manual draft dictation remains available from **Voice → Dictate into draft** or
+Ctrl+Shift+D when hands-free is off. It intentionally keeps editing/Send controls.
 
 ## Install
 
