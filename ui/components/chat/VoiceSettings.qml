@@ -45,11 +45,11 @@ ColumnLayout {
     RowLayout {
         spacing: root.context.theme.gap
         Controls.Action { context: root.context; text: "Recheck"; onClicked: root.controller.playback.probe() }
-        Controls.Action { context: root.context; text: "Test playback"; enabled: root.controller.playback.ready && !root.controller.playback.busy; onClicked: root.controller.playback.preview() }
+        Controls.Action { objectName: "voice-preview"; context: root.context; text: "Test playback"; enabled: root.controller.playback.ready && !root.controller.playback.busy; onClicked: root.controller.playback.preview() }
     }
     Miilo.TypeText { typography: root.context.theme.typography; role: "small"; color: root.context.theme.foreground; text: "Mute anywhere: Super+Ctrl+M (when configured)."; Layout.fillWidth: true }
     Controls.Action { context: root.context; text: "Superwhisper settings"; onClicked: { root.controller.stop(); provider.settings(); } }
     Miilo.NativeDictation { id: provider; active: root.visible }
-    onVisibleChanged: if (!visible && root.controller.playback.previewing) root.controller.playback.cancel()
-    Component.onDestruction: if (root.controller.playback.previewing) root.controller.playback.cancel()
+    onVisibleChanged: if (!visible && root.controller && root.controller.playback.previewing) root.controller.playback.cancel()
+    Component.onDestruction: if (root.controller && root.controller.playback.previewing) root.controller.playback.cancel()
 }

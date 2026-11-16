@@ -12,6 +12,8 @@ Item {
     QtObject {id:surface;property var widget:palette;function viewValue(name){return false}}
     Miilo.InteractionTheme {id:theme;widget:palette}
     Chat.ChatPanel {id:panel;loadVoiceSettings:false;width:600;height:500;theme:theme;surface:surface;visible:false}
+    QtObject {id:settingsContext;property var theme:panel.theme;property var widget:palette}
+    Chat.VoiceSettings {id:settings;context:settingsContext;controller:panel;width:600;visible:false}
     QtObject {id:fakeVoice;property bool armed:false;property bool muted:true;property string phase:"off";property real level:0;property string error:"";function toggleMute(){muted=!muted}}
     Miilo.VoiceStatus {id:status;theme:theme;voice:fakeVoice}
     SignalSpy {id:faceSpy;target:status;signalName:"startRequested"}
@@ -27,7 +29,20 @@ Item {
             findChild(panel,"chat-session").reset();panel.sharing=true;
             handsFree.armed=true;handsFree.muted=false;
         }
-        function cleanup(){panel.visible=false;tryCompare(findChild(panel,"chat-playback"),"busy",false);tryCompare(findChild(panel,"chat-session"),"busy",false)}
+        function cleanup(){settings.visible=false;panel.visible=false;tryCompare(findChild(panel,"chat-playback"),"busy",false);tryCompare(findChild(panel,"chat-session"),"busy",false)}
+        function test_settings_save_voice_preference_without_starting_capture(){
+            const voice=panel.handsFree;voice.disarm();voice.preferred=false;
+            settings.visible=true;wait(40);
+            mouseClick(findChild(settings,"hands-free-toggle"));
+            tryCompare(voice,"preferred",true);compare(voice.armed,false);compare(panel.playback.busy,false);
+        }
+        function test_settings_preview_is_explicit_and_stops_when_leaving(){
+            panel.handsFree.disarm();settings.visible=true;wait(40);
+            compare(panel.playback.busy,false);
+            mouseClick(findChild(settings,"voice-preview"));
+            tryVerify(()=>panel.playback.phase==="speaking");
+            settings.visible=false;tryCompare(panel.playback,"busy",false);
+        }
         function test_reply_plays_before_listening_resumes_and_mute_cancels(){
             var voice=findChild(panel,"chat-hands-free"),playback=findChild(panel,"chat-playback"),session=findChild(panel,"chat-session");
             voice.receive(JSON.stringify({type:"transcript",text:"Synthetic question"}));
