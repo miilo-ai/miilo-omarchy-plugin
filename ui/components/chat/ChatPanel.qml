@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import ".." as Miilo
 import "../onboarding/controls" as Controls
 
+// An in-place conversation dock. The workspace remains visible and interactive.
 FocusScope {
     id: root
     required property var theme
@@ -11,176 +12,97 @@ FocusScope {
     property var target: null
     property bool sessionUnlocked: false
     property bool loadVoiceSettings: true
+    property bool sharing: false
+    property bool composing: false
+    property bool captions: false
+    property bool overlayVisible: true
     property alias handsFree: handsFree
+    property alias playback: playback
     readonly property string playbackPhase: playback.busy ? playback.phase : ""
-    readonly property bool playbackReady: playback.ready
-    readonly property bool ready: session.configured && (!handsFree.preferred || playback.ready)
-    property int spokenSerial: -1
-    function openVoice() { voiceOptions.open(); }
+    readonly property bool ready: session.configured && playback.ready
+    readonly property var context: ({theme: theme, widget: surface.widget})
+    readonly property bool expanded: overlayVisible && (composing || captions || !!session.value("error") || !!playback.error || !!handsFree.error)
+    implicitHeight: expanded ? form.implicitHeight + theme.gap * 2 : 0
+    signal settingsRequested()
+    signal closed()
     function openConversation() {
         session.probe();
-        if (handsFree.preferred && !handsFree.armed) {consent.checked=true;Qt.callLater(()=>handsFree.arm());}
+        if (handsFree.armed) { handsFree.disarm(); playback.cancel(); session.cancel(); return; }
+        if (!handsFree.preferred) { composing = !composing; return; }
+        sharing = true;
+        Qt.callLater(() => { if (root.visible && root.sharing) handsFree.arm(); });
+    }
+    function stop() { handsFree.disarm(); playback.cancel(); session.cancel(); }
+    onVisibleChanged: if (!visible) { stop(); sharing = false; composing = false; }
+    onTargetChanged: { stop(); sharing = false; }
+    VoiceSession {
+        id: handsFree; objectName: "chat-hands-free"
+        permitted: root.visible && root.sharing
+        unlocked: root.sessionUnlocked
+        paused: session.busy || playback.busy
+        loadSavedSettings: root.loadVoiceSettings
+        onTranscript: (text, traceParent) => { if (root.sharing && !session.busy) session.send(text, traceParent); }
+        onMutedChanged: if (muted) { playback.cancel(); session.cancel(); }
     }
     VoicePlayback {
-        id: playback; objectName:"chat-playback"
+        id: playback; objectName: "chat-playback"
         loadSettings: root.loadVoiceSettings
         previewAllowed: root.visible && root.sessionUnlocked
-        active: root.visible && consent.checked && handsFree.armed && !handsFree.muted && root.sessionUnlocked
+        active: root.visible && root.sharing && handsFree.armed && !handsFree.muted && root.sessionUnlocked
     }
-    Connections {
-        target: session
-        function onBusyChanged() {
-            if (!session.busy && session.value("phase")==="done" && session.serial!==root.spokenSerial) {
-                root.spokenSerial=session.serial;
-                playback.speak(session.value("answer"));
-            }
-        }
+    ChatSession {
+        id: session; objectName: "chat-session"
+        active: root.visible && root.sharing && root.sessionUnlocked
+        target: root.target; loadConfigStatus: root.loadVoiceSettings
+        onTurnStarted: playback.beginTurn()
+        onAnswerDelta: text => playback.append(text, false)
+        onTurnFinished: complete => { if (complete) playback.append("", true); else playback.cancel(); }
     }
-    VoiceSession {
-        id: handsFree
-        objectName: "chat-hands-free"
-        permitted: root.visible && consent.checked
-        unlocked: root.sessionUnlocked
-        paused: session.busy || voice.owned || playback.busy
-        loadSavedSettings: root.loadVoiceSettings
-        onTranscript: (text, traceParent) => { if (consent.checked && !session.busy) session.send(text, traceParent); }
-    }
-    VoiceOptions {
-        id: voiceOptions; objectName: "chat-voice-options"; parent: root
-        context: root.context; voice: handsFree; consent: consent.checked; playback: playback
-        onProviderSettingsRequested: voice.settings()
-        onEnableRequested: { consent.checked = true; Qt.callLater(() => handsFree.arm()); }
-        onDictationRequested: voice.start()
-        onPreviewRequested: playback.preview()
-    }
-    readonly property var context: ({theme: theme, widget: surface.widget})
-    signal closed()
-    Keys.onEscapePressed: { voice.cancel(); root.closed(); }
-    onVisibleChanged: if (!visible) { handsFree.disarm(); consent.checked = false; voice.cancel(); }
-    onTargetChanged: { handsFree.disarm(); consent.checked = false; voice.cancel(); }
-    ChatSession { id: session; objectName: "chat-session"; active: root.visible; target: root.target; loadConfigStatus:root.loadVoiceSettings }
-    Shortcut { sequence: "Ctrl+Shift+D"; enabled: root.visible && !session.busy && !handsFree.armed; onActivated: voice.recording ? voice.stop() : voice.start() }
-    Miilo.NativeDictation {
-        id: voice
-        objectName: "native-dictation"
-        active: root.visible && !session.busy && !handsFree.armed
-        focusSafe: draft.activeFocus && Window.active
-        onFocusRequested: draft.forceActiveFocus()
+    Rectangle {
+        anchors.fill: parent; visible: root.expanded
+        color: root.theme.surface; radius: root.theme.radius
+        border.color: root.theme.line; border.width: 1
     }
     ColumnLayout {
-        anchors.fill: parent; anchors.margins: root.theme.gap * 2; spacing: root.theme.gap
+        id: form; anchors { left: parent.left; right: parent.right; top: parent.top; margins: root.theme.gap }
+        visible: root.expanded; spacing: root.theme.gap
         RowLayout {
-            Miilo.ToolbarButton { id: back; objectName:"chat-back";theme: root.theme; kind: "back"; label: "Back to overview"; onClicked: root.closed() }
-            Miilo.TypeText {objectName:"chat-title";typography: root.theme.typography; text: "Ask Miilo"; color: root.theme.foreground; Layout.fillWidth: true;Layout.preferredHeight:back.implicitHeight;verticalAlignment:Text.AlignVCenter;lineHeight:1;font.weight: Font.DemiBold }
+            Layout.fillWidth: true
+            Miilo.TypeText { typography: root.theme.typography; color: root.theme.foreground; text: "Miilo"; Layout.fillWidth: true }
+            Miilo.ToolbarButton { theme: root.theme; kind: "settings"; label: "Voice settings"; onClicked: root.settingsRequested() }
+            Controls.Action { context: root.context; text: "Hide"; onClicked: { root.composing = false; root.captions = false; session.dismissError(); playback.error = ""; handsFree.error = ""; } }
         }
         Miilo.TypeText {
-            typography: root.theme.typography; role: "small"; color: root.theme.foreground
-            Layout.fillWidth: true
-            text: root.target ? "Discuss the selected work with your configured model. Replies are advice; they cannot control an agent." : "Discuss your observed work with your configured model. Replies are advice; they cannot control an agent."
+            objectName: "chat-caption"; visible: root.captions; Layout.fillWidth: true
+            typography: root.theme.typography; color: root.theme.foreground
+            text: session.value("answer"); maximumLineCount: 3; elide: Text.ElideRight
         }
-        ScrollView {
-            id: conversation
-            objectName: "chat-conversation"
-            visible: session.value("history").length > 0 || session.busy || !!session.value("answer") || !!session.value("error") || !!session.value("context")
-            Layout.fillWidth: true; Layout.fillHeight: true; clip: true
-            contentWidth: availableWidth
-            ColumnLayout {
-                width: conversation.availableWidth; spacing: 10
-                Repeater {
-                    model: session.value("history")
-                    Miilo.TypeText {
-                        required property var modelData
-                        typography: root.theme.typography; color: root.theme.foreground
-                        Layout.fillWidth: true
-                        text: (modelData.role === "user" ? "You: " : "Miilo: ") + modelData.text
-                    }
-                }
-                Miilo.TypeText {
-                    typography: root.theme.typography; color: root.theme.foreground; Layout.fillWidth: true
-                    visible: session.value("phase") !== "done"
-                    text: session.value("answer") || (session.busy ? "Waiting for your model…" : "")
-                }
-                Miilo.TypeText {
-                    typography: root.theme.typography; role: "small"; color: root.theme.foreground; Layout.fillWidth: true
-                    text: session.value("context") ? "Context: " + session.value("context").status + " · " + session.value("context").references.length + " references · " + session.value("context").omitted + " omitted" : ""
-                }
-                Miilo.TypeText {
-                    typography: root.theme.typography; role: "small"; color: root.theme.foreground
-                    Layout.fillWidth: true; text: session.value("error")
-                }
-            }
+        Miilo.TypeText {
+            Layout.fillWidth: true; visible: !!text
+            typography: root.theme.typography; role: "small"; color: root.theme.foreground
+            text: session.value("error") || playback.error || handsFree.error
         }
         Controls.Check {
-            id: consent
-            objectName: "chat-consent"
-            context: root.context
-            textRole: "small"
-            Layout.fillWidth: true
-            enabled: !session.busy
+            objectName: "chat-consent"; context: root.context; visible: root.composing
             text: "Share observed context and messages with my configured model"
-        }
-        TextArea {
-            id: draft
-            objectName: "chat-draft"
-            Layout.fillWidth: true; Layout.preferredHeight: 80
-            enabled: !session.busy
-            wrapMode: TextEdit.Wrap; textFormat: TextEdit.PlainText
-            selectByMouse: true; color: root.theme.foreground
-            placeholderText: "Ask about your work"
-            placeholderTextColor: root.surface.widget.ink("muted")
-            padding: root.theme.gap
-            selectionColor: root.theme.selectionFill
-            selectedTextColor: root.theme.foreground
-            font.family: root.theme.typography.family
-            font.pixelSize: root.theme.typography.size("body")
-            Accessible.name: "Message to Miilo"
-            background: Rectangle { color: root.theme.inset; border.width: 1; border.color: draft.activeFocus ? root.theme.accent : root.theme.line; radius: root.theme.radius }
+            checked: root.sharing; onToggled: root.sharing = checked
         }
         RowLayout {
-            id: dictationRow
-            objectName: "chat-dictation-row"
-            Layout.fillWidth: true
-            spacing: root.theme.gap
-            Miilo.ToolbarButton {
-                id: dictationButton
-                objectName: "chat-dictation-button"
-                theme: root.theme; kind: handsFree.armed && handsFree.muted ? "muted" : voice.recording ? "stop" : "voice"
-                circular: true; selected: handsFree.armed || voice.owned
-                implicitWidth: 32; implicitHeight: 32; padding: 8
-                label: handsFree.armed ? (handsFree.muted ? "Unmute microphone" : "Mute microphone") : voice.recording ? "Stop dictation" : "Start hands-free conversation"
-                focusPolicy: Qt.NoFocus
-                enabled: handsFree.armed || voice.recording || (root.sessionUnlocked && !voice.owned && !session.busy)
-                onClicked: {
-                    if (handsFree.armed) handsFree.toggleMute();
-                    else if (voice.recording) voice.stop();
-                    else voiceOptions.open();
-                }
+            visible: root.composing; Layout.fillWidth: true; spacing: root.theme.gap
+            TextField {
+                id: draft; objectName: "chat-draft"; Layout.fillWidth: true
+                placeholderText: "Ask about your work"; color: root.theme.foreground
+                placeholderTextColor: root.surface.widget.ink("muted")
+                font.family: root.theme.typography.family; font.pixelSize: root.theme.typography.size("body")
+                padding: root.theme.gap; enabled: !session.busy
+                background: Rectangle { color: root.theme.inset; radius: root.theme.radius; border.color: root.theme.line; border.width: 1 }
+                onAccepted: if (root.sharing && session.send(text)) text = ""
             }
-            Miilo.TypeText {
-                objectName: "chat-dictation-status"
-                typography: root.theme.typography; role: "small"; color: root.theme.foreground
-                text: playback.busy ? (playback.phase==="speaking" ? "Speaking…" : "Preparing spoken reply…") : playback.error ? playback.error : handsFree.armed || handsFree.error ? handsFree.message : voice.owned ? voice.message : "Start a hands-free conversation"
-                Layout.fillWidth: true
-                Layout.minimumHeight: dictationButton.implicitHeight
-                verticalAlignment: Text.AlignVCenter
-                lineHeight: 1
-            }
-            Controls.Action { context: root.context; visible: voice.owned; text: "Cancel"; focusPolicy: Qt.NoFocus; onClicked: voice.cancel() }
-            Miilo.ToolbarButton { objectName: "chat-dictation-settings"; theme: root.theme; kind: "settings"; label: "Voice settings"; onClicked: voiceOptions.open() }
-            Controls.Action { context: root.context; text: "Recheck"; visible: !voice.ready; enabled: !voice.busy && !voice.owned; onClicked: voice.probe() }
-        }
-        RowLayout {
-            id: commands
-            objectName: "chat-commands"
-            Layout.alignment: root.surface.viewValue("leftHanded") === true ? Qt.AlignLeft : Qt.AlignRight
-            Controls.Action { context: root.context; text: "New conversation"; enabled: !session.busy && !voice.owned; onClicked: { session.reset(); consent.checked = false; } }
             Controls.Action {
-                objectName: "chat-send"
-                context: root.context; text: session.busy ? "Stop waiting" : "Send"; primary: true
-                enabled: session.busy || (consent.checked && draft.text.trim().length > 0 && !voice.owned && !voice.pendingStart)
+                objectName: "chat-send"; context: root.context; text: session.busy ? "Stop" : "Send"
+                enabled: session.busy || (root.sessionUnlocked && root.sharing && draft.text.trim().length > 0)
                 onClicked: { if (session.busy) session.cancel(); else if (session.send(draft.text)) draft.text = ""; }
             }
         }
-        Item { Layout.fillHeight: true; visible: !conversation.visible }
     }
 }

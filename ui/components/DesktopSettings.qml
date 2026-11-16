@@ -4,6 +4,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import "../../vendor/owl" as Owl
 import "onboarding/controls" as Controls
+import "chat" as Chat
 
 FocusScope {
     id: root
@@ -12,9 +13,10 @@ FocusScope {
     readonly property var widget: surface.widget
     property string section: "appearance"
     property bool configuring: false
+    property var voiceController: null
     property var liveController: null
-    readonly property var sections: ["appearance", "filters", "systems", "chat", "pair", "about", "notifications"]
-    readonly property var labels: ["Appearance", "Systems", "Connections", "Chat model", "Pair computer", "About", "Notifications"]
+    readonly property var sections: ["appearance", "filters", "systems", "chat", "voice", "pair", "about", "notifications"]
+    readonly property var labels: ["Appearance", "Systems", "Connections", "Chat model", "Voice", "Pair computer", "About", "Notifications"]
     readonly property bool wide: width >= 440
     signal closed()
     function read(name) { var revision = widget.generation; return surface.viewValue(name) }
@@ -60,6 +62,13 @@ FocusScope {
                 ColumnLayout {
                     width: scroll.availableWidth; spacing: root.theme.gap * 1.5
                     TypeText { typography: root.theme.typography; role: "body"; text: root.labels[root.sections.indexOf(root.section)]; color: root.theme.foreground; font.weight: Font.DemiBold; Layout.fillWidth: true }
+                    Loader {
+                        active: root.section === "voice" && root.voiceController !== null
+                        Layout.fillWidth: true
+                        sourceComponent: Component {
+                            Chat.VoiceSettings { context: root; controller: root.voiceController }
+                        }
+                    }
                     AboutSettings { context: root; visible: root.section === "about"; Layout.fillWidth: true }
                     Loader {active:root.section==="notifications"&&root.liveController!==null;Layout.fillWidth:true;sourceComponent:Component {LiveSettings {context:root;live:root.liveController}}}
                     AppearanceSettings { context: root; visible: root.section === "appearance"; Layout.fillWidth: true }

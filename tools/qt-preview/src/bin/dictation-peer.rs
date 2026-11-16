@@ -15,19 +15,17 @@ fn main() {
         println!("{{\"ready\":true}}");
         return;
     }
-    if action == "speak" {
-        let mut input = String::new();
-        io::stdin().read_to_string(&mut input).unwrap();
-        let request: Value = serde_json::from_str(&input).unwrap();
-        assert!(
-            request["text"]
-                .as_str()
-                .is_some_and(|text| !text.is_empty())
-        );
-        println!("{{\"type\":\"state\",\"phase\":\"speaking\"}}");
-        io::stdout().flush().unwrap();
-        thread::sleep(Duration::from_millis(800));
-        println!("{{\"type\":\"state\",\"phase\":\"done\"}}");
+    if action == "speak-stream" {
+        for line in io::stdin().lock().lines() {
+            let request: Value = serde_json::from_str(&line.unwrap()).unwrap();
+            if request["type"] == "done" {
+                break;
+            }
+            assert!(request["text"].as_str().is_some_and(|s| !s.is_empty()));
+            println!("{}", json!({"type":"state","phase":"speaking"}));
+            io::stdout().flush().unwrap();
+            thread::sleep(Duration::from_millis(800));
+        }
         return;
     }
     if action == "run" {
@@ -66,7 +64,7 @@ fn main() {
         let request: Value = serde_json::from_str(&input).unwrap();
         for (sequence, event) in [
             json!({"type":"context","status":"complete","omitted":0,"references":[]}),
-            json!({"type":"text_delta","text":"Synthetic answer"}),
+            json!({"type":"text_delta","text":if request["text"]=="Slow fixture" {"First sentence. More text"} else {"Synthetic answer"}}),
             json!({"type":"done"}),
         ]
         .into_iter()

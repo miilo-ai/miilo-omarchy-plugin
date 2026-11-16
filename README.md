@@ -15,24 +15,21 @@ The plugin consumes a versioned shared renderer and delegates observation to the
 native helper. Provider credentials and execution remain outside the UI.
 See the release-status guide for validation scope and remaining platform checks.
 
-## Native dictation
+## Voice
 
-Open **Ask Miilo** from the face button. With Superwhisper selected under Omarchy's
-Setup → Defaults → Dictation, use the microphone button or **Ctrl+Shift+D** to
-start and stop dictation into the draft. Review the text before sending. Closing
-the panel or moving focus away cancels a recording started by this panel.
-The settings control opens Superwhisper's own configuration; local/cloud audio
-processing, history and usage limits follow its settings, independently of Miilo.
-Dictation does not submit a message, approve an action or start an agent.
-Use `make check-dictation` for inert native lifecycle tests; these do not record
-audio or substitute for an actual microphone-to-draft test before release.
+Configure **Hands-free** under Settings → Voice. Clicking the Miilo face starts
+or stops the session on your current screen. Say the wake phrase once, then ask
+questions naturally; pauses send each turn and listening resumes after spoken
+replies. The workspace stays visible. Optional captions appear at its bottom.
+Launch and shell restart never automatically activate the microphone.
 
-Optional **Hands-free** mode uses a local wake phrase and voice activity detection
-to submit spoken questions during an explicitly enabled Ask Miilo session. It
-stops when the session closes or locks; the bar mic and optional global shortcut
-can mute it. Superwhisper's selected transcription route may process audio in the
-cloud. Replies are text. See [voice setup and privacy](docs/voice.md) for the
-separate helper/runtime installation and remaining microphone acceptance checks.
+Superwhisper must be selected under Omarchy's Setup → Defaults → Dictation.
+Its configured local/cloud processing, history and usage limits still apply.
+Spoken replies require a separate configured speech endpoint. Complete phrases
+are synthesized as model text arrives, with bounded preparation ahead of playback.
+The bar control and optional global shortcut can mute the session.
+See [voice setup and privacy](docs/voice.md) for configuration, provider boundaries,
+manual text entry, and remaining physical microphone acceptance checks.
 
 Appearance follows the shell's live surface roles. Application-window opacity is
 a separate, explicit [native appearance opt-in](docs/native-appearance.md).

@@ -97,7 +97,7 @@ Item {
             verify(!findChild(panel,"setupTerminalLoader").active);
             panel.width = 320;
             var navigation = findChild(panel,"settingsNavigation");
-            navigation.currentIndex = 4; navigation.activated(4);
+            navigation.currentIndex = panel.sections.indexOf("pair"); navigation.activated(navigation.currentIndex);
             compare(panel.section,"pair");
         }
         function test_about_navigation_and_version() {

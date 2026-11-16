@@ -5,7 +5,7 @@ use std::{
     time::Duration,
 };
 
-fn state(phase: &str) {
+pub(super) fn state(phase: &str) {
     println!("{}", serde_json::json!({"type":"state","phase":phase}));
     let _ = std::io::stdout().flush();
 }
@@ -24,6 +24,7 @@ pub fn command(args: &[String]) -> Result<bool, String> {
             )?;
             println!("{{\"ready\":true}}");
         }
+        Some("speak-stream") => super::speech_stream::run()?,
         Some("speak") => {
             #[derive(serde::Deserialize)]
             #[serde(deny_unknown_fields)]
@@ -51,11 +52,14 @@ fn read_input(limit: u64) -> Result<Vec<u8>, String> {
     Ok(bytes)
 }
 pub fn speak(text: &str) -> Result<(), String> {
+    state("preparing_playback");
+    play(synthesize(text)?)
+}
+pub fn synthesize(text: &str) -> Result<std::fs::File, String> {
     if text.trim().is_empty() || text.chars().count() > 16000 {
         return Err("Spoken reply is empty or too long; read the text reply.".into());
     }
     let settings = speech_config::load()?;
-    state("preparing_playback");
     let client = reqwest::blocking::Client::builder()
         .no_proxy()
         .redirect(reqwest::redirect::Policy::none())
@@ -88,6 +92,9 @@ pub fn speak(text: &str) -> Result<(), String> {
         .map_err(|_| "Cannot prepare speech playback.")?;
     file.rewind()
         .map_err(|_| "Cannot prepare speech playback.")?;
+    Ok(file)
+}
+pub fn play(file: std::fs::File) -> Result<(), String> {
     let mut command = Command::new("pw-play");
     command
         .arg("-")

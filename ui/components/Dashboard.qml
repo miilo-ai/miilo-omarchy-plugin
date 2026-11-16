@@ -10,7 +10,7 @@ FloatingWindow {
     color: "transparent"
     property real textScale: 1
     property string textFamily: Qt.application.font.family
-    readonly property bool compactFleet: surface.quietFleet && !importer.visible && !showingSettings && !showingChat
+    readonly property bool compactFleet: surface.quietFleet && !importer.visible && !showingSettings
     // Desired size follows navigation; the compositor owns the actual viewport.
     implicitWidth: compactFleet ? Math.min(420, screen ? screen.width - 32 : 420) : screen ? Math.min(960, Math.round(screen.width * 0.65)) : 640
     implicitHeight: compactFleet ? Math.min(320, screen ? screen.height - 32 : 320) : screen ? Math.min(720, Math.round(screen.height * 0.8)) : 520
@@ -18,15 +18,14 @@ FloatingWindow {
     property alias importer: importer
     property int importedCount: 0
     property bool showingSettings: false
-    property bool showingChat: false
     property bool sessionUnlocked: false
     readonly property var voiceSession: chatPanel.handsFree
     property var liveController: null
     property var observationFeed: null
     readonly property bool applicationFocused: body.Window.active
-    function showSettings(section) { showingChat = false; surface.closeSettings(); settingsPanel.section = section; showingSettings = true; settingsPanel.forceActiveFocus() }
-    function showSessions() { showingChat = false; surface.closeSettings(); showingSettings = false; importer.review() }
-    function back() { if (showingChat) showingChat = false; else if (showingSettings) showingSettings = false; else root.visible = false }
+    function showSettings(section) { surface.closeSettings(); settingsPanel.section = section; showingSettings = true; settingsPanel.forceActiveFocus() }
+    function showSessions() { surface.closeSettings(); showingSettings = false; importer.review() }
+    function back() { if (showingSettings) showingSettings = false; else root.visible = false }
     property QtObject interactionTheme: InteractionTheme { widget: surface.widget }
     Shortcut { sequence: "Ctrl+L"; enabled: root.visible && !importer.busy; onActivated: root.showSessions() }
     Shortcut { sequence: "Escape"; enabled: root.visible && !importer.visible; onActivated: root.back() }
@@ -59,13 +58,11 @@ FloatingWindow {
                 onSettingsRequested: section => root.showSettings(section)
                 onSystemsRequested: root.showSettings("filters")
                 onChatRequested: {
-                    if (!root.showingChat) {
+                    if (!chatPanel.handsFree.armed) {
                         const work = surface.viewValue("focused");
                         chatPanel.target = work ? {workKey: work._key, revisionKey: work._revisionKey} : null;
-                        root.showingSettings = false; root.showingChat = true;
                     }
-                    Qt.callLater(()=>chatPanel.openConversation());
-                    chatPanel.forceActiveFocus();
+                    chatPanel.openConversation();
                 }
             }
             TypeText {anchors.right:parent.right;anchors.bottom:parent.bottom;anchors.rightMargin:10;typography:root.interactionTheme.typography;role:"small";color:root.interactionTheme.foreground;visible:!!root.observationFeed&&root.observationFeed.stale;text:"Observation unavailable · previous snapshot"}
@@ -73,7 +70,7 @@ FloatingWindow {
         OverviewControls {
             id:overviewControls;theme:root.interactionTheme;surface:surface
             anchors {left:parent.left;right:parent.right;top:header.bottom;leftMargin:root.interactionTheme.gap*2;rightMargin:root.interactionTheme.gap*2}
-            visible:atOverview&&!root.showingSettings&&!root.showingChat&&!importer.visible
+            visible:atOverview&&!root.showingSettings&&!importer.visible
             height:visible?implicitHeight+root.interactionTheme.gap:0
         }
         MiiloSurface {
@@ -88,9 +85,9 @@ FloatingWindow {
             }
             hostTextScale: root.textScale
             hostFontFamily: root.textFamily
-            active: root.visible && !importer.visible && !root.showingSettings && !root.showingChat
+            active: root.visible && !importer.visible && !root.showingSettings
             observationFeed:root.observationFeed
-            visible: !importer.visible && !root.showingSettings && !root.showingChat
+            visible: !importer.visible && !root.showingSettings
             expanded: true
             interactionTheme: root.interactionTheme
             focus: true
@@ -101,14 +98,18 @@ FloatingWindow {
             anchors.fill: surface
             surface: root.surface
             theme: root.interactionTheme
+            voiceController: chatPanel
             liveController:root.liveController
             visible: root.showingSettings
             onClosed: root.showingSettings = false
         }
         Chat.ChatPanel {
-            id: chatPanel; sessionUnlocked: root.sessionUnlocked; anchors.fill: surface; theme: root.interactionTheme; surface: root.surface
-            visible: root.visible && root.showingChat
-            onClosed: root.showingChat = false
+            id: chatPanel; sessionUnlocked: root.sessionUnlocked; theme: root.interactionTheme; surface: root.surface
+            overlayVisible: !root.showingSettings
+            anchors { left: surface.left; right: surface.right; bottom: surface.bottom; margins: root.interactionTheme.gap * 2 }
+            height: implicitHeight; z: 10
+            visible: root.visible && !importer.visible
+            onSettingsRequested: root.showSettings("voice")
         }
         LocalImport {
             id: importer
@@ -117,7 +118,7 @@ FloatingWindow {
             widget: surface.widget
             theme: root.interactionTheme
             active: root.visible
-            suspended: root.showingSettings || root.showingChat
+            suspended: root.showingSettings
             onVisibleChanged: if (!visible && root.visible) headerContent.focusAdd()
             onConnected: count => {
                 root.importedCount = count;

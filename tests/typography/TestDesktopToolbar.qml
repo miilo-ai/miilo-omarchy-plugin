@@ -123,7 +123,7 @@ Item {
             settingsSpy.clear();
             var menu = findChild(toolbar, "systemMenuButton");
             menu.forceActiveFocus(); keyClick(Qt.Key_Space); wait(30);
-            for (var i = 0; i < 6; i++) keyClick(Qt.Key_Down);
+            for (var i = 0; i < 7; i++) keyClick(Qt.Key_Down);
             keyClick(Qt.Key_Return);
             tryCompare(settingsSpy, "count", 1); compare(settingsSpy.signalArguments[0][0], "about");
         }

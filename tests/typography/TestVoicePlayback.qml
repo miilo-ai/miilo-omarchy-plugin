@@ -24,7 +24,7 @@ Item {
             var playback=findChild(panel,"chat-playback");playback.program=peer;playback.prefix=[];playback.ready=true;playback.error="";
             var handsFree=findChild(panel,"chat-hands-free");handsFree.program=peer;handsFree.prefix=[];
             panel.sessionUnlocked=true;panel.visible=true;
-            findChild(panel,"chat-session").reset();findChild(panel,"chat-consent").checked=true;
+            findChild(panel,"chat-session").reset();panel.sharing=true;
             handsFree.armed=true;handsFree.muted=false;
         }
         function cleanup(){panel.visible=false;tryCompare(findChild(panel,"chat-playback"),"busy",false);tryCompare(findChild(panel,"chat-session"),"busy",false)}
@@ -36,6 +36,14 @@ Item {
             voice.receive(JSON.stringify({type:"transcript",text:"Follow up"}));
             tryVerify(()=>playback.busy&&playback.phase==="speaking");
             voice.mute();tryCompare(playback,"busy",false);compare(voice.muted,true);
+        }
+        function test_first_audio_starts_before_the_answer_finishes(){
+            const voice=panel.handsFree,playback=panel.playback,session=findChild(panel,"chat-session");
+            voice.receive(JSON.stringify({type:"transcript",text:"Slow fixture"}));
+            tryVerify(()=>playback.phase==="speaking");
+            compare(session.busy,true);compare(session.value("phase"),"streaming");
+            voice.mute();tryCompare(playback,"busy",false);tryCompare(session,"busy",false);
+            compare(session.value("history").length,0);
         }
         function test_status_distinguishes_wake_input_and_output(){
             compare(status.label,"Voice off");fakeVoice.armed=true;fakeVoice.muted=false;fakeVoice.phase="waiting";compare(status.label,"Wake listening");
@@ -50,9 +58,9 @@ Item {
         }
         function test_saved_hands_free_starts_from_the_shared_face_entry(){
             var voice=findChild(panel,"chat-hands-free");voice.disarm();
-            findChild(panel,"chat-consent").checked=false;voice.preferred=true;
+            panel.sharing=false;voice.preferred=true;
             panel.openConversation();tryCompare(voice,"armed",true);tryCompare(voice,"phase","waiting");
-            compare(findChild(panel,"chat-consent").checked,true);voice.preferred=false;
+            compare(panel.sharing,true);voice.preferred=false;
         }
         function test_preview_requires_an_explicit_config_action(){
             var voice=findChild(panel,"chat-hands-free"),playback=findChild(panel,"chat-playback");

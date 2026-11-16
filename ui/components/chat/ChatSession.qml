@@ -16,10 +16,14 @@ QtObject {
     property bool terminating: false
     property bool loadConfigStatus: true
     property bool configured: false
+    signal turnStarted()
+    signal answerDelta(string text)
+    signal turnFinished(bool complete)
     function probe() { if(loadConfigStatus && !setupStatus.running)setupStatus.running=true; }
     Component.onCompleted: probe()
     readonly property bool busy: request.running || terminating || value("phase") === "streaming"
     function value(key) { var revision = generation; return state[key]; }
+    function dismissError() { state.error = ""; generation++; }
     function reset() {
         Stream.cancel(state);
         terminating = terminating || request.running;
@@ -28,7 +32,7 @@ QtObject {
         Stream.select(state, target);
         generation++;
     }
-    function cancel() { Stream.cancel(state); generation++; terminating = terminating || request.running; request.running = false; }
+    function cancel() { Stream.cancel(state); generation++; terminating = terminating || request.running; request.running = false; turnFinished(false); }
     function send(text, parent) {
         if (!active || busy) return false;
         try {
@@ -38,6 +42,7 @@ QtObject {
             generation++;
             request.turnId = id;
             request.stdinEnabled = true;
+            turnStarted();
             request.running = true;
             return true;
         } catch (_) {
@@ -55,14 +60,20 @@ QtObject {
         onStarted: { write(root.payload); stdinEnabled = false; }
         stdout: SplitParser {
             onRead: line => {
-                Stream.receive(root.state, request.turnId, line);
+                const before = root.state.answer.length;
+                const accepted = Stream.receive(root.state, request.turnId, line);
                 root.generation++;
+                if (accepted && root.state.answer.length > before)
+                    root.answerDelta(root.state.answer.slice(before));
+                if (accepted && root.state.phase === "done") root.turnFinished(true);
+                else if (root.state.phase === "incomplete") root.turnFinished(false);
             }
         }
         onExited: code => {
             root.terminating = false;
             Stream.exited(root.state, turnId);
             root.generation++;
+            if (root.state.phase === "incomplete") root.turnFinished(false);
         }
     }
     property Process setupStatus: Process {

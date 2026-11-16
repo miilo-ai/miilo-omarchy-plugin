@@ -13,6 +13,8 @@ Item {
     property string wakePhrase: "hey miilo"
     property int silenceMs: 1000
     property bool armed: false
+    property bool terminating: false
+    property bool pendingArm: false
     property bool preferred: false
     property bool muted: true
     property string phase: "off"
@@ -24,10 +26,13 @@ Item {
     function control(value) { if (engine.running) engine.write(JSON.stringify(value)+"\n"); }
     function arm() {
         if (!permitted || !unlocked) { error = "Enable sharing in an unlocked session first."; return false; }
+        if (terminating) { pendingArm = true; return true; }
+        if (armed) return true;
         error = ""; muted = false; phase = "starting"; armed = true; engine.running = true;
         return true;
     }
     function disarm() {
+        pendingArm = false; terminating = terminating || engine.running;
         muted = true; armed = false; phase = "off"; level = 0;
         control({type:"stop"}); engine.running = false;
     }
@@ -73,6 +78,8 @@ Item {
         onStarted: { if (root.armed && root.permitted && root.unlocked) root.control({type:"heartbeat",paused:root.paused}); else engine.running = false; }
         stdout: SplitParser { onRead: line => root.receive(line) }
         onExited: code => {
+            root.terminating = false;
+            if (root.pendingArm) { root.pendingArm = false; Qt.callLater(() => { if (root.permitted && root.unlocked) root.arm(); }); return; }
             if (root.armed) { root.error = "Voice session stopped. Enable it again when ready."; root.armed = false; root.muted = true; root.phase = "off"; }
         }
     }

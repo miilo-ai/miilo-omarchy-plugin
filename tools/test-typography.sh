@@ -8,7 +8,7 @@ trap 'rm -rf -- "$scratch"' EXIT
 mkdir "$scratch/runtime"
 chmod 700 "$scratch/runtime"
 # Each suite owns its offscreen window so popups cannot steal another suite's input.
-for fixture in TestTypography TestDesktopToolbar TestDesktopSettings TestAgentGroups TestRobotKeyboard TestChatPanel TestVoicePlayback TestObservationFeed; do
+for fixture in ${MIILO_TYPOGRAPHY_FIXTURES:-TestTypography TestDesktopToolbar TestDesktopSettings TestAgentGroups TestRobotKeyboard TestChatPanel TestVoicePlayback TestObservationFeed}; do
   case "$fixture" in
     TestTypography) marker=MIILO_TYPOGRAPHY_OK ;;
     TestDesktopToolbar) marker=MIILO_TOOLBAR_OK ;;

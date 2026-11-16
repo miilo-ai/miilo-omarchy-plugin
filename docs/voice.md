@@ -1,10 +1,11 @@
 # Hands-free voice
 
-Click the Miilo face to open Ask Miilo. In the voice cog, enable **Hands-free**. The disclosure
-beside the toggle explains that enabling it remembers voice mode and permits
-sharing spoken turns and observed context during a session. Future clicks on
-the same Miilo face start that voice workflow directly, without another icon or
-toggle. App launch or shell restart never automatically arms capture.
+Configure **Hands-free** under Settings → Voice. The disclosure beside the toggle
+explains sharing spoken turns and observed context. Saving the preference does
+not start capture. Click the Miilo face to start or stop on your current screen,
+without another icon, toggle or chat page. App launch and shell restart never
+automatically arm capture. Captions are optional in Voice settings and appear in
+a compact bottom overlay; they are hidden by default.
 Say the wake phrase, ask a question, then pause. Miilo detects the silence,
 transcribes the question with Superwhisper, and sends it to the selected Miilo
 chat model. Configured spoken replies play automatically. After each reply, listening resumes
@@ -12,7 +13,7 @@ automatically; follow-up questions need no repeated wake phrase, Stop or Send.
 Quiet gaps do not end the conversation. Nearby speech can become a follow-up while
 the session is active. Mute stops capture and requires the wake phrase again after
 explicitly unmuting. Listening pauses during synthesis and playback so the answer
-does not become another question. Mute, lock, closing chat or revoking sharing
+does not become another question. Mute, lock, closing the window or revoking sharing
 also cancels playback. Text replies remain available if speech fails.
 
 The single Miilo face uses the theme's muted/foreground ink to distinguish
@@ -20,7 +21,7 @@ unconfigured/configured playback, without another toolbar icon. Active session
 status shows Wake listening, Listening, Transcribing, Replying and Speaking.
 Input bars reflect measured microphone level; they are not an
 indication that speech has been understood or sent. Capture starts only after
-explicit session consent. Use the chat microphone or the bar control to mute.
+explicit session consent. Use the bar control or the global shortcut to mute.
 Configuration readiness is not proof of a live endpoint or active microphone.
 No setup sound is played automatically; **Test playback** is explicit. Spoken
 product names use the pronunciation MY-LO; displayed text keeps the Miilo spelling.
@@ -32,9 +33,9 @@ not speaker authentication. Nearby people or playback may also activate it.
 Test your phrase, distance, and noise environment before relying on it.
 
 The mic control in the Omarchy bar stays available while the session is armed.
-It can mute and explicitly unmute the session without opening Ask Miilo. The
+It can mute and explicitly unmute the session without opening a separate screen. The
 optional global **Super+Ctrl+M** shortcut always mutes; it never starts recording.
-Closing Ask Miilo, changing the selected work, revoking sharing, locking, or a
+Closing the window, changing the conversation target, revoking sharing, locking, or a
 missed safety heartbeat stops the session. It must be explicitly enabled again.
 Listening pauses while a turn is transcribing or the model is replying.
 
@@ -46,8 +47,9 @@ late transcripts. Audio already submitted to a speech provider cannot be recalle
 
 Speech shorter than the minimum duration, a wake with no question, and turns over
 30 seconds are discarded. Silence delay is configurable from 0.7 to 2.5 seconds.
-Manual draft dictation remains available from **Voice → Dictate into draft** or
-Ctrl+Shift+D when hands-free is off. It intentionally keeps editing/Send controls.
+With Hands-free off, the face opens a compact text composer on the current screen.
+You can use Omarchy’s normal Superwhisper shortcut to dictate into its focused
+input. Review and Send remain explicit for text entry.
 
 ## Install
 
@@ -70,10 +72,16 @@ Pipe a JSON object into `miilo-voice-session configure-playback` with `base_url`
 (OpenAI-compatible HTTPS URL ending in `/v1`, or loopback HTTP), `model`, `voice`
 and `api_key_file` (absolute private credential filename, or null). Configuration
 is saved privately at `$XDG_CONFIG_HOME/miilo/playback.json`. Recheck playback in
-the voice cog after changing it. Never put a credential in arguments or source.
+Settings → Voice after changing it. Never put a credential in arguments or source.
 
-The speech service receives only the completed answer, not observation snapshots
+The speech service receives completed phrases from the streamed answer, not observation snapshots
 or the conversation history. Requests do not follow redirects or ambient proxies.
+Speech begins at the first completed phrase, without waiting for the whole model
+answer. Next-phrase synthesis overlaps playback, with at most two prepared files
+ahead of the current audio and bounded text queues. A service that buffers each
+WAV still adds its own synthesis delay; this is sentence pipelining, not a claim
+of token-level audio streaming. On model failure, queued speech is discarded;
+already-heard phrases cannot be recalled.
 WAV responses are size/duration bounded and validated before PipeWire playback;
 audio uses an anonymous temporary file, leaving no named recording on cancellation.
 Speech is optional and requires its own configured provider. Superwhisper remains

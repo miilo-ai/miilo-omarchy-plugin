@@ -13,19 +13,19 @@ Local observation is read-only; provider actions require a separately connected 
 
 ## Outstanding work
 
-- The 0.5.0 candidate includes an Ask Miilo panel and native Superwhisper
-  dictation. It requires Superwhisper selected in Omarchy; installation, audio
-  processing, history and usage limits belong to Superwhisper. Start/stop/cancel
-  and status use its Linux CLI. Dictated text remains an editable draft and Send
-  requires explicit context-sharing consent. Optional hands-free mode uses a local
-  wake phrase and bounded speech turns to submit questions in an enabled session;
-  see [voice setup and privacy](voice.md). No provider action is executed by chat.
-- Native synthetic dictation and chat consent tests are separate from live
-  microphone delivery, model inference and installed-shell acceptance. Those
-  physical-user workflows remain release gates, including wake accuracy and false
-  activation under real background noise. The optional Rust voice-session helper
-  is separate from the legacy helper `voice` placeholder. Replies are text; speech
-  playback and interruption of playback are not implemented.
+- The 0.5.0 candidate includes in-place chat and hands-free voice. Configure it in
+  Settings → Voice; the Miilo face activates the saved mode without leaving the
+  current workspace. Optional captions appear at the bottom. Superwhisper handles
+  transcription with its selected local/cloud processing and history settings.
+  Separate configured speech receives completed answer phrases. Synthesis overlaps
+  playback, but the service may buffer each audio response. No provider action is
+  executed by chat. See [voice setup and privacy](voice.md).
+- Native synthetic consent, turn ordering, concurrent synthesis/playback and
+  cancellation tests are separate from physical microphone delivery and perceived
+  conversational latency. Physical wake accuracy, false activation under real
+  background noise and back-to-back spoken interaction remain release gates.
+  The optional Rust voice-session helper is separate from the legacy helper
+  `voice` placeholder.
 - Keep platform-specific acceptance explicit: physical Android, Windows local observation,
   fractional scaling, large fleets and hidden/reduced-motion performance need their own evidence.
 - Marketplace approval for an earlier version does not approve this candidate.
