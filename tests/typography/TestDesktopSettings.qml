@@ -60,8 +60,8 @@ Item {
             workers.workers=[{id:"synthetic-node",name:"Fixture computer",enabled:true,availability:{mode:"paused",revision:7},runtime:{state:"online",busy_runners:0}}];
             wait(50);compare(workers.busy,false);
             workers.change(workers.workers[0],1);
-            compare(workers.arguments[0],"available");compare(workers.arguments[1],"synthetic-node");compare(workers.arguments[2],"7");
-            verify(workers.arguments[3].startsWith("native-"));compare(workers.busy,false);
+            compare(workers.commandArguments[0],"available");compare(workers.commandArguments[1],"synthetic-node");compare(workers.commandArguments[2],"7");
+            verify(workers.commandArguments[3].startsWith("native-"));compare(workers.busy,false);
             workers.workers=[];panel.section="appearance";
         }
         function test_loading_respects_reduced_motion_and_visibility() {

@@ -10,20 +10,20 @@ ColumnLayout {
     property var workers: []
     property string status: ""
     property string error: ""
-    property var arguments: ["list"]
+    property var commandArguments: ["list"]
     property bool changing: false
     property bool requestsEnabled: true
     property int serial: 0
     readonly property bool busy: request.running
     readonly property var modes: ["paused", "available", "idle_only", "draining"]
     spacing: root.context.theme.gap * 1.5
-    function refresh() { if (requestsEnabled && !busy) { changing = false; arguments = ["list"]; request.running = true; } }
+    function refresh() { if (requestsEnabled && !busy) { changing = false; root.commandArguments = ["list"]; request.running = true; } }
     function change(worker, index) {
         if (busy || index < 0 || index >= modes.length || modes[index] === worker.availability.mode) return;
         const command = {paused:"pause", available:"available", idle_only:"idle-only", draining:"drain"}[modes[index]];
         changing = true;
         error = "";
-        arguments = [command, worker.id, String(worker.availability.revision), "native-" + Date.now() + "-" + (++serial)];
+        root.commandArguments = [command, worker.id, String(worker.availability.revision), "native-" + Date.now() + "-" + (++serial)];
         if (requestsEnabled) request.running = true;
     }
     onVisibleChanged: if (visible) refresh()
@@ -31,7 +31,7 @@ ColumnLayout {
     Timer { interval: 15000; repeat: true; running: root.visible && root.requestsEnabled; onTriggered: root.refresh() }
     Process {
         id: request
-        command: [Quickshell.env("HOME") + "/.local/bin/miilo-owl", "workers"].concat(root.arguments)
+        command: [Quickshell.env("HOME") + "/.local/bin/miilo-owl", "workers"].concat(root.commandArguments)
         stdout: StdioCollector { id: output }
         onExited: code => {
             try {
