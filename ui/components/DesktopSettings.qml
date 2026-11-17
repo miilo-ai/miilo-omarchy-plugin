@@ -15,8 +15,8 @@ FocusScope {
     property bool configuring: false
     property var voiceController: null
     property var liveController: null
-    readonly property var sections: ["appearance", "filters", "systems", "chat", "voice", "pair", "about", "notifications"]
-    readonly property var labels: ["Appearance", "Systems", "Connections", "Chat model", "Voice", "Pair computer", "About", "Notifications"]
+    readonly property var sections: ["appearance", "filters", "systems", "chat", "voice", "pair", "workers", "about", "notifications"]
+    readonly property var labels: ["Appearance", "Systems", "Connections", "Chat model", "Voice", "Pair computer", "Workers", "About", "Notifications"]
     readonly property bool wide: width >= 440
     signal closed()
     function read(name) { var revision = widget.generation; return surface.viewValue(name) }
@@ -69,6 +69,7 @@ FocusScope {
                             Chat.VoiceSettings { context: root; controller: root.voiceController }
                         }
                     }
+                    WorkersSettings {objectName:"workersSettings";context:root;visible:root.section === "workers";Layout.fillWidth:true}
                     AboutSettings { context: root; visible: root.section === "about"; Layout.fillWidth: true }
                     Loader {active:root.section==="notifications"&&root.liveController!==null;Layout.fillWidth:true;sourceComponent:Component {LiveSettings {context:root;live:root.liveController}}}
                     AppearanceSettings { context: root; visible: root.section === "appearance"; Layout.fillWidth: true }

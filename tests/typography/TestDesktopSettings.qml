@@ -52,6 +52,18 @@ Item {
             compare(live.config.sources.length,0);
             panel.liveController=null;
         }
+        function test_workers_render_and_bind_mutations_to_revision() {
+            var workers=findChild(panel,"workersSettings");verify(workers);
+            workers.requestsEnabled=false;
+            panel.section="workers";wait(50);
+            tryCompare(findChild(panel,"workersNavigation"),"selected",true);
+            workers.workers=[{id:"synthetic-node",name:"Fixture computer",enabled:true,availability:{mode:"paused",revision:7},runtime:{state:"online",busy_runners:0}}];
+            wait(50);compare(workers.busy,false);
+            workers.change(workers.workers[0],1);
+            compare(workers.arguments[0],"available");compare(workers.arguments[1],"synthetic-node");compare(workers.arguments[2],"7");
+            verify(workers.arguments[3].startsWith("native-"));compare(workers.busy,false);
+            workers.workers=[];panel.section="appearance";
+        }
         function test_loading_respects_reduced_motion_and_visibility() {
             var robot = findChild(loading,"loadingRobot"); verify(robot);
             compare(robot.active,false); loading.visible = true;

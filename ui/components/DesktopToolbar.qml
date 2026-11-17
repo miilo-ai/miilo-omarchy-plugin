@@ -74,6 +74,7 @@ RowLayout {
             MenuItem { text: "Pair computer"; checkable: true; autoExclusive: true; checked: root.activeSection === "pair"; onTriggered: root.settingsRequested("pair") }
             MenuItem { text: "Chat model"; checkable: true; autoExclusive: true; checked: root.activeSection === "chat"; onTriggered: root.settingsRequested("chat") }
             MenuItem { text: "Voice"; onTriggered: root.settingsRequested("voice") }
+            MenuItem { text: "Workers"; onTriggered: root.settingsRequested("workers") }
             MenuItem { text: "About"; checkable: true; autoExclusive: true; checked: root.activeSection === "about"; onTriggered: root.settingsRequested("about") }
             MenuItem { text: "Notifications"; checkable: true; autoExclusive: true; checked: root.activeSection === "notifications"; onTriggered: root.settingsRequested("notifications") }
         }
