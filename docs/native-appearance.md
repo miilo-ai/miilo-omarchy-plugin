@@ -10,6 +10,11 @@ The shell pushes live theme updates. Miilo also watches Omarchy's completed
 replacement. Shell-role changes are observed even when the foundational colors
 stay the same.
 
+Settings shares the dashboard's single background surface. Its scrolling area
+stays transparent, and scrollbar tracks use the shell's control fill rather than
+an opaque palette background. Navigating between settings sections must not
+replace or compound the window's surface alpha.
+
 Application-window transparency is a separate compositor policy. To opt the
 Miilo One window into Omarchy's standard appearance behavior, explicitly run:
 

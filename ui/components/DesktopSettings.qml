@@ -57,6 +57,11 @@ FocusScope {
             }
             ScrollView {
                 id: scroll
+                objectName: "settingsScroll"
+                // The dashboard owns the single live shell surface, including alpha.
+                background: null
+                ScrollBar.vertical: Controls.ThemeScrollBar { context: root }
+                ScrollBar.horizontal: Controls.ThemeScrollBar { context: root }
                 Layout.fillWidth: true; Layout.fillHeight: true; clip: true
                 contentWidth: availableWidth
                 ColumnLayout {

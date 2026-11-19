@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Controls
 import QtTest
 import Quickshell
 import Quickshell.Io
@@ -18,10 +19,18 @@ Item {
     }
     FileView {id:writer;path:Quickshell.env("MIILO_THEME_FIXTURE")+".generation";atomicWrites:true;printErrors:false}
     Host.Theme { id: theme; widget: palette }
+    QtObject {
+        id: settingsState
+        property var widget: palette
+        function viewValue(name) { return null; }
+        function setViewState(name, value) {}
+    }
+    Miilo.DesktopSettings { id: settings; width: 600; height: 400; surface: settingsState; theme: theme; visible: false }
     Miilo.ToolbarButton {id: button;theme:theme;kind:"settings";label:"Voice settings"}
     TestCase {
         name:"MiiloLiveTheme"
         when:true
+        function cleanup() { console.log("HOST_THEME_CASE",qtest_results.functionName,qtest_results.failed?"FAILED":"passed"); }
         onCompletedChanged: if(completed) console.log(qtest_results.failCount===0?"MIILO_HOST_THEME_OK":"MIILO_HOST_THEME_FAILED",qtest_results.passCount,qtest_results.failCount)
         function test_completed_theme_flips_are_observed_after_atomic_replacement() {
             tryVerify(()=>commits>0);
@@ -41,6 +50,24 @@ Item {
             verify(Math.abs(theme.surface.a-0.9)<0.01);
             verify(Math.abs(tip.background.color.a-0.3)<0.01);
             Commons.Color.shellValues=initial;
+        }
+        function test_settings_keep_the_shared_surface_on_navigation_and_theme_flips() {
+            const initial=Commons.Color.shellValues;
+            try {
+                const scroll=findChild(settings,"settingsScroll");verify(scroll);
+                findChild(settings,"workersSettings").requestsEnabled=false;
+                settings.visible=true;
+                for (const alpha of [0.42, 1.0, 0.68]) {
+                    Commons.Color.shellValues=Object.assign({},initial,{"popups.background-alpha":String(alpha)});
+                    for (const section of settings.sections) {
+                        settings.section=section;wait(0);
+                        compare(scroll.background,null);
+                        verify(Math.abs(settings.theme.surface.a-alpha)<0.01);
+                        compare(scroll.ScrollBar.vertical.background.color,theme.inset);
+                        verify(scroll.ScrollBar.vertical.background.color.a<1);
+                    }
+                }
+            } finally { settings.visible=false;Commons.Color.shellValues=initial; }
         }
     }
 }
