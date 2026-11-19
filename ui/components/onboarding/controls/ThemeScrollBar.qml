@@ -6,6 +6,7 @@ import QtQuick.Layouts
 ScrollBar {
     required property var context
     id: scroll
+    visible: policy === ScrollBar.AlwaysOn || (policy === ScrollBar.AsNeeded && size < 1)
     contentItem: Rectangle {
         implicitWidth: 6
         implicitHeight: 6

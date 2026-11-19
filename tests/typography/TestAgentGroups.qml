@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Controls
 import QtTest
 import "../../ui/components" as Miilo
 import "../../vendor/owl" as Owl
@@ -43,6 +44,20 @@ Item {
                 theme.selectedFill=Qt.rgba(0.6,0.4,0.2,0.12);
                 compare(future.indicator.color,theme.selectedFill);
             } finally { future.checked=false;theme.inset=originalInset;theme.selectedFill=originalSelected; }
+        }
+        function test_scrollbar_is_hidden_without_overflow_and_tracks_the_right_edge() {
+            var bar=editor.ScrollBar.vertical;
+            try {
+                editor.height=1000;
+                tryCompare(bar,"size",1);
+                compare(bar.visible,false);
+                editor.height=100;
+                tryVerify(()=>bar.size<1);
+                compare(bar.visible,true);
+                compare(bar.parent,editor);
+                compare(bar.x+bar.width,editor.width);
+                compare(bar.height,editor.availableHeight);
+            } finally { editor.height=500; }
         }
     }
 }

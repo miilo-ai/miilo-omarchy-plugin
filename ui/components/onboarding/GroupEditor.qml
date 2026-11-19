@@ -20,7 +20,7 @@ ScrollView {
     Layout.fillHeight: true
     contentWidth: availableWidth
     background: null
-    ScrollBar.vertical: Controls.ThemeScrollBar { context: view;}
+    ScrollBar.vertical: Controls.ThemeScrollBar { context: view; parent: view; x: view.width-width; y: view.topPadding; height: view.availableHeight }
     ColumnLayout {
         width: parent.width
         spacing: 12

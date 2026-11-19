@@ -39,8 +39,8 @@ FocusScope {
         id: pageScroll
         objectName: "onboardingScroll"
         background: null
-        ScrollBar.vertical: Controls.ThemeScrollBar { context: root }
-        ScrollBar.horizontal: Controls.ThemeScrollBar { context: root }
+        ScrollBar.vertical: Controls.ThemeScrollBar { context: root; parent: pageScroll; x: pageScroll.width-width; y: pageScroll.topPadding; height: pageScroll.availableHeight }
+        ScrollBar.horizontal: Controls.ThemeScrollBar { context: root; parent: pageScroll; x: pageScroll.leftPadding; y: pageScroll.height-height; width: pageScroll.availableWidth }
         anchors.fill: parent
         clip: true
         contentWidth: availableWidth
