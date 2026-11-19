@@ -38,6 +38,9 @@ FocusScope {
     ScrollView {
         id: pageScroll
         objectName: "onboardingScroll"
+        background: null
+        ScrollBar.vertical: Controls.ThemeScrollBar { context: root }
+        ScrollBar.horizontal: Controls.ThemeScrollBar { context: root }
         anchors.fill: parent
         clip: true
         contentWidth: availableWidth

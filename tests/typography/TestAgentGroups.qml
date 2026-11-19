@@ -31,5 +31,18 @@ Item {
             controller.draft = ({kind:"unknown"});
             compare(editor.rule().kind, "all");
         }
+        function test_group_form_uses_translucent_theme_controls() {
+            var future=findChild(editor,"futureMatches");verify(future);
+            var originalInset=theme.inset, originalSelected=theme.selectedFill;
+            try {
+                theme.inset=Qt.rgba(0.2,0.3,0.4,0.08);
+                theme.selectedFill=Qt.rgba(0.3,0.5,0.6,0.18);
+                compare(editor.background,null);
+                future.checked=false;compare(future.indicator.color,theme.inset);
+                future.checked=true;compare(future.indicator.color,theme.selectedFill);
+                theme.selectedFill=Qt.rgba(0.6,0.4,0.2,0.12);
+                compare(future.indicator.color,theme.selectedFill);
+            } finally { future.checked=false;theme.inset=originalInset;theme.selectedFill=originalSelected; }
+        }
     }
 }

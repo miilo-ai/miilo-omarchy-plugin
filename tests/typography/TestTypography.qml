@@ -187,6 +187,9 @@ Item {
             tryVerify(() => list.currentItem && list.currentItem.modelData.header && list.currentItem.width > 0);
             var header = list.currentItem, robot = findChild(header,"groupRobot");
             var title = findChild(header,"sessionTitle"), check = findChild(header,"sessionCheckbox");
+            list.focus=false;
+            compare(header.background.color,theme.inset);
+            compare(findChild(importer,"onboardingScroll").background,null);
             tryVerify(() => Math.abs(robot.mapToItem(header,0,robot.height/2).y - title.mapToItem(header,0,title.height/2).y) < 1);
             tryCompare(check,"width",12); tryCompare(check,"height",12); tryCompare(robot,"width",24);
             typeSystem.profile = "phone"; tryCompare(check,"width",16); tryCompare(robot,"width",32); typeSystem.profile = "desktop"; tryCompare(robot,"width",24);
