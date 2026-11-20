@@ -25,6 +25,15 @@ Item {
         function setViewState(name, value) { var next = Object.assign({}, values); next[name] = value; values = next; palette.generation++ }
     }
     Miilo.InteractionTheme { id: theme; widget: palette; typography: typeSystem }
+    QtObject {
+        id:live
+        property bool busy:false
+        property bool monitorStale:false
+        property bool deliveryFailed:false
+        property string error:""
+        property var config:({enabled:false,completions:false,quiet:false,sources:[]})
+        property var state:({events:[]})
+    }
     Miilo.DesktopSettings { id: panel; visible: false; width: 600; height: 600; surface: state; theme: theme }
     Miilo.LoadingCrew { id: loading; visible: false; widget: palette; theme: theme }
     Owl.OwlTerminal { id: terminal; width: 500; height: 180; visible: false; widget: palette; sessionActive: visible; node: ({p:{command:"printf terminal-ready"}}) }
@@ -35,6 +44,26 @@ Item {
         onCompletedChanged: if (completed) console.log(qtest_results.failCount === 0 ? "MIILO_SETTINGS_OK" : "MIILO_SETTINGS_FAILED", qtest_results.passCount, qtest_results.failCount)
         function init() { panel.visible = true; panel.width = 600; panel.section = "appearance"; closeSpy.clear(); wait(50) }
         function cleanup() { console.log("SETTINGS_CASE",qtest_results.functionName,qtest_results.failed ? "FAILED" : "passed"); panel.visible = false }
+        function test_notifications_render_without_starting_monitoring() {
+            panel.liveController=live;
+            panel.section="notifications";
+            wait(100);
+            compare(live.config.enabled,false);
+            compare(live.config.sources.length,0);
+            panel.liveController=null;
+        }
+        function test_workers_render_and_bind_mutations_to_revision() {
+            var workers=findChild(panel,"workersSettings");verify(workers);
+            workers.requestsEnabled=false;
+            panel.section="workers";wait(50);
+            tryCompare(findChild(panel,"workersNavigation"),"selected",true);
+            workers.workers=[{id:"synthetic-node",name:"Fixture computer",enabled:true,availability:{mode:"paused",revision:7},runtime:{state:"online",busy_runners:0}}];
+            wait(50);compare(workers.busy,false);
+            workers.change(workers.workers[0],1);
+            compare(workers.commandArguments[0],"available");compare(workers.commandArguments[1],"synthetic-node");compare(workers.commandArguments[2],"7");
+            verify(workers.commandArguments[3].startsWith("native-"));compare(workers.busy,false);
+            workers.workers=[];panel.section="appearance";
+        }
         function test_loading_respects_reduced_motion_and_visibility() {
             var robot = findChild(loading,"loadingRobot"); verify(robot);
             compare(robot.active,false); loading.visible = true;
@@ -80,14 +109,14 @@ Item {
             verify(!findChild(panel,"setupTerminalLoader").active);
             panel.width = 320;
             var navigation = findChild(panel,"settingsNavigation");
-            navigation.currentIndex = 4; navigation.activated(4);
+            navigation.currentIndex = panel.sections.indexOf("pair"); navigation.activated(navigation.currentIndex);
             compare(panel.section,"pair");
         }
         function test_about_navigation_and_version() {
             panel.section = "about";
             tryCompare(findChild(panel,"aboutNavigation"),"selected",true);
             var version = findChild(panel,"pluginVersionLabel"); verify(version);
-            tryVerify(() => /^Omarchy plugin · \d+\.\d+\.\d+$/.test(version.text));
+            tryVerify(() => /^Miilo One · v\d+\.\d+\.\d+$/.test(version.text));
             verify(findChild(panel,"aboutWebsite").visible);
             verify(findChild(panel,"aboutSponsor").visible);
             for (var name of ["aboutWebsite", "aboutSponsor"]) {

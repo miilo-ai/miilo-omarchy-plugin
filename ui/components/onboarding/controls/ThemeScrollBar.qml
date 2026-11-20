@@ -6,11 +6,12 @@ import QtQuick.Layouts
 ScrollBar {
     required property var context
     id: scroll
+    visible: policy === ScrollBar.AlwaysOn || (policy === ScrollBar.AsNeeded && size < 1)
     contentItem: Rectangle {
         implicitWidth: 6
         implicitHeight: 6
-        color: context.widget.ink(scroll.pressed ? "accent" : "muted")
+        color: scroll.pressed ? context.theme.accent : context.theme.border
         opacity: scroll.active ? 1 : 0.5
     }
-    background: Rectangle { color: context.widget.ink("dark_background") }
+    background: Rectangle { color: context.theme.inset }
 }

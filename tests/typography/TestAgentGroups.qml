@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Controls
 import QtTest
 import "../../ui/components" as Miilo
 import "../../vendor/owl" as Owl
@@ -30,6 +31,33 @@ Item {
             }
             controller.draft = ({kind:"unknown"});
             compare(editor.rule().kind, "all");
+        }
+        function test_group_form_uses_translucent_theme_controls() {
+            var future=findChild(editor,"futureMatches");verify(future);
+            var originalInset=theme.inset, originalSelected=theme.selectedFill;
+            try {
+                theme.inset=Qt.rgba(0.2,0.3,0.4,0.08);
+                theme.selectedFill=Qt.rgba(0.3,0.5,0.6,0.18);
+                compare(editor.background,null);
+                future.checked=false;compare(future.indicator.color,theme.inset);
+                future.checked=true;compare(future.indicator.color,theme.selectedFill);
+                theme.selectedFill=Qt.rgba(0.6,0.4,0.2,0.12);
+                compare(future.indicator.color,theme.selectedFill);
+            } finally { future.checked=false;theme.inset=originalInset;theme.selectedFill=originalSelected; }
+        }
+        function test_scrollbar_is_hidden_without_overflow_and_tracks_the_right_edge() {
+            var bar=editor.ScrollBar.vertical;
+            try {
+                editor.height=1000;
+                tryCompare(bar,"size",1);
+                compare(bar.visible,false);
+                editor.height=100;
+                tryVerify(()=>bar.size<1);
+                compare(bar.visible,true);
+                compare(bar.parent,editor);
+                compare(bar.x+bar.width,editor.width);
+                compare(bar.height,editor.availableHeight);
+            } finally { editor.height=500; }
         }
     }
 }

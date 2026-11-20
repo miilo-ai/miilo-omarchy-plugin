@@ -11,12 +11,12 @@ GridLayout {
     required property var options
     required property var values
     columns: width < 300 ? 1 : 2
-    columnSpacing: 12; rowSpacing: 3
+    columnSpacing: root.context.theme.gap; rowSpacing: root.context.theme.gap / 2
     Layout.fillWidth: true
     TypeText {
         typography: root.context.theme.typography
-        text: root.label; color: root.context.theme.foreground; role: "small"
-        Layout.preferredWidth: 100
+        text: root.label; color: Qt.tint(root.context.theme.surface,root.context.theme.wash(root.context.theme.foreground,0.7)); role: "body"
+        Layout.preferredWidth: Math.max(120, root.context.theme.typography.size("body") * 11)
     }
     Controls.Choice {
         context: root.context

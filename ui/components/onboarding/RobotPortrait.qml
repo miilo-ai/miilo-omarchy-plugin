@@ -15,6 +15,7 @@ Canvas {
     property string expression: "ready"
     property string motion: "reduced"
     property bool active: true
+    readonly property bool reducedByHost: !!widget?.interactionTheme?.reduceMotion
     property real clock: 0.6
     readonly property var fallbackPalette: Owl.themeFromToml('foreground="' + ink + '"\naccent="' + accent + '"\nbackground="' + (widget ? widget.ink("background") : "#16151d") + '"')
     readonly property var colors: {
@@ -35,7 +36,7 @@ Canvas {
     implicitHeight: 56
     Accessible.ignored: true
     FrameAnimation {
-        running: root.active && root.visible && root.motion === "full"
+        running: root.active && root.visible && root.motion === "full" && !root.reducedByHost
         onTriggered: root.clock = elapsedTime + 0.6
     }
     onClockChanged: requestPaint()

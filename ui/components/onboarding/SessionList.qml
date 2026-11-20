@@ -61,7 +61,7 @@ ListView {
         topInset: 0; bottomInset: 0
         implicitHeight: view.theme.typography.controlHeight(contentItem.implicitHeight, topPadding + bottomPadding)
         background: Rectangle {
-            color: choice.down ? view.theme.pressedFill : choice.cursor ? view.theme.focusFill : choice.checked || choice.partial ? view.theme.selectedFill : choice.hovered ? view.theme.hoverFill : choice.modelData.header ? view.widget.ink("lighter_background") : "transparent"
+            color: choice.down ? view.theme.pressedFill : choice.cursor ? view.theme.focusFill : choice.checked || choice.partial ? view.theme.selectedFill : choice.hovered ? view.theme.hoverFill : choice.modelData.header ? view.theme.inset : "transparent"
             Rectangle { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; width: 3; height: Math.min(24, parent.height - 4); visible: choice.cursor; color: view.theme.accent }
         }
         Rectangle {

@@ -1,0 +1,28 @@
+--- a/70-miilo-fleet.owl
++++ b/70-miilo-fleet.owl
+@@ -6,6 +6,7 @@
+   minSize: 3x2
+   padding: 8
+   // Presentation preferences only: never alter observations or action authority.
++  state nativeControls = false
+   state robotMotion = "full" persist
+   state robotPace = "normal" persist
+   state robotPersonality = "expressive" persist
+@@ -1011,7 +1012,7 @@
+         if setupSection == "appearance" { RobotColors { } }
+       } else {
+       Setup { }
+-      if focused == null && actor == null { Search { placeholder: "Search systems, agents or work" } }
++      if !nativeControls && focused == null && actor == null { Search { placeholder: "Search systems, agents or work" } }
+       if focused != null {
+         WorkDetail { }
+       } else if actor != null {
+@@ -1030,7 +1031,7 @@
+       } else {
+         let actionable = works.filter(w => w.attention != "none" || any(attention, a => a._workKey == w._key))
+         let visible = (needle == "" ? live : searched).filter(w => !needsOnly || any(actionable, a => a._key == w._key)).sortBy(w => any(actionable, a => a._key == w._key) ? 0 : w.lifecycle == "active" ? 1 : 2)
+-        WorkViewToolbar { count: len(actionable) }
++        if !nativeControls { WorkViewToolbar { count: len(actionable) } }
+         if observatoryView == "orbit" && expandedSystem != "" && any(provs, p => p.id == expandedSystem) {
+           QuietSystemTasks { provider: find(provs, p => p.id == expandedSystem); list: visible }
+         } else if observatoryView == "orbit" {

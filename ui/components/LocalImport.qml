@@ -35,10 +35,12 @@ FocusScope {
     Shortcut { sequence: "Ctrl+G"; enabled: root.visible && flow.mode === "review"; onActivated: flow.editGroup(-1) }
     Shortcut { sequence: "Ctrl+R"; enabled: root.visible && flow.mode === "review"; onActivated: flow.review() }
     Shortcut { sequence: "Ctrl+Return"; enabled: root.visible && flow.mode === "review" && (flow.selected.length > 0 || flow.groupsDirty); onActivated: flow.importSelected() }
-    Rectangle { anchors.fill: parent; color: root.widget.ink("background") }
     ScrollView {
         id: pageScroll
         objectName: "onboardingScroll"
+        background: null
+        ScrollBar.vertical: Controls.ThemeScrollBar { context: root; parent: pageScroll; x: pageScroll.width-width; y: pageScroll.topPadding; height: pageScroll.availableHeight }
+        ScrollBar.horizontal: Controls.ThemeScrollBar { context: root; parent: pageScroll; x: pageScroll.leftPadding; y: pageScroll.height-height; width: pageScroll.availableWidth }
         anchors.fill: parent
         clip: true
         contentWidth: availableWidth

@@ -19,7 +19,8 @@ ScrollView {
     Layout.fillWidth: true
     Layout.fillHeight: true
     contentWidth: availableWidth
-    ScrollBar.vertical: Controls.ThemeScrollBar { context: view;}
+    background: null
+    ScrollBar.vertical: Controls.ThemeScrollBar { context: view; parent: view; x: view.width-width; y: view.topPadding; height: view.availableHeight }
     ColumnLayout {
         width: parent.width
         spacing: 12
@@ -37,9 +38,9 @@ ScrollView {
                 implicitWidth: 20
                 implicitHeight: 20
                 anchors.verticalCenter: parent.verticalCenter
-                color: view.widget.ink("background")
+                color: futureMatches.checked ? view.theme.selectedFill : view.theme.inset
                 border.width: futureMatches.activeFocus ? 2 : 1
-                border.color: view.widget.ink(futureMatches.activeFocus ? "accent" : "foreground")
+                border.color: futureMatches.activeFocus ? view.theme.accent : view.theme.line
                 Rectangle {
                     anchors.centerIn: parent
                     width: 10; height: 10

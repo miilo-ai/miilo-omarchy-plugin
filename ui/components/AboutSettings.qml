@@ -21,7 +21,7 @@ ColumnLayout {
     TypeText {
         objectName: "pluginVersionLabel"
         typography: root.context.theme.typography; role: "small"
-        text: "Omarchy plugin · " + root.pluginVersion
+        text: "Miilo One · " + (root.pluginVersion === "Unavailable" ? root.pluginVersion : "v" + root.pluginVersion)
         color: root.context.theme.foreground; Layout.fillWidth: true
     }
     TypeText {
@@ -46,6 +46,7 @@ ColumnLayout {
     }
     TypeText {
         objectName: "aboutSupportCopy"
+        Layout.topMargin: 10
         typography: root.context.theme.typography; role: "small"
         text: "Help fund Miilo’s development."
         color: root.context.theme.foreground; Layout.fillWidth: true
