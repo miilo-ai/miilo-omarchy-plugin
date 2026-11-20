@@ -82,6 +82,10 @@ ahead of the current audio and bounded text queues. A service that buffers each
 WAV still adds its own synthesis delay; this is sentence pipelining, not a claim
 of token-level audio streaming. On model failure, queued speech is discarded;
 already-heard phrases cannot be recalled.
+Voice turns request conversational spoken text, normally one or two short
+sentences, with a smaller output budget than text chat. Long unpunctuated openings
+are split earlier for the first speech phrase. These measures reduce avoidable
+waiting but do not remove the provider's synthesis or transcription latency.
 WAV responses are size/duration bounded and validated before PipeWire playback;
 audio uses an anonymous temporary file, leaving no named recording on cancellation.
 Speech is optional and requires its own configured provider. Superwhisper remains

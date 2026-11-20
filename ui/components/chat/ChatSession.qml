@@ -16,6 +16,8 @@ QtObject {
     property bool terminating: false
     property bool loadConfigStatus: true
     property bool configured: false
+    property bool spoken: false
+    property bool spokenTurn: false
     signal turnStarted()
     signal answerDelta(string text)
     signal turnFinished(bool complete)
@@ -39,6 +41,7 @@ QtObject {
             const id = "native-" + Date.now() + "-" + (++serial);
             traceParent = typeof parent === "string" && /^00-[0-9a-f]{32}-[0-9a-f]{16}-01$/.test(parent) ? parent : "";
             payload = JSON.stringify(Stream.begin(state, id, text));
+            spokenTurn = spoken;
             generation++;
             request.turnId = id;
             request.stdinEnabled = true;
@@ -55,7 +58,7 @@ QtObject {
     onActiveChanged: if (!active) reset()
     property Process request: Process {
         property string turnId: ""
-        command: [root.program, "chat"].concat(root.traceParent ? ["--trace-parent",root.traceParent] : [])
+        command: [root.program, "chat"].concat(root.spokenTurn ? ["--spoken"] : []).concat(root.traceParent ? ["--trace-parent",root.traceParent] : [])
         stdinEnabled: true
         onStarted: { write(root.payload); stdinEnabled = false; }
         stdout: SplitParser {

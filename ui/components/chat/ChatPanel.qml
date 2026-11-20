@@ -54,6 +54,7 @@ FocusScope {
         id: session; objectName: "chat-session"
         active: root.visible && root.sharing && root.sessionUnlocked
         target: root.target; loadConfigStatus: root.loadVoiceSettings
+        spoken: handsFree.armed
         onTurnStarted: playback.beginTurn()
         onAnswerDelta: text => playback.append(text, false)
         onTurnFinished: complete => { if (complete) playback.append("", true); else playback.cancel(); }
