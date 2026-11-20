@@ -1,0 +1,5 @@
+--- a/70-miilo-fleet.owl
++++ b/70-miilo-fleet.owl
+@@ -749,1 +749,1 @@
+-    let representative = len(team) > 0 ? team[0] : {_key: provider.id, providerId: provider.id, name: provider.name, status: "ready", health: "unknown"}
++    let representative = len(team) > 0 ? team[0] : {_key: provider.id, providerId: provider.id, name: provider.name, status: provider.status ?? "ready", health: provider.health ?? "unknown"}
