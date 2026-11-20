@@ -24,8 +24,9 @@ Local observation is read-only; provider actions require a separately connected 
   cancellation tests are separate from physical microphone delivery and perceived
   conversational latency. Physical wake accuracy, false activation under real
   background noise and back-to-back spoken interaction remain release gates.
-  The optional Rust voice-session helper is separate from the legacy helper
-  `voice` placeholder.
+  The Rust `miilo-voice-session` helper owns microphone capture and playback;
+  the shared `miilo-owl` helper supplies chat text and observations. The unused
+  legacy `miilo-owl voice` placeholder has been removed from the helper candidate.
 - Keep platform-specific acceptance explicit: physical Android, Windows local observation,
   fractional scaling, large fleets and hidden/reduced-motion performance need their own evidence.
 - Marketplace approval for an earlier version does not approve this candidate.

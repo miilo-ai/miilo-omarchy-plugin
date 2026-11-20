@@ -210,7 +210,7 @@ widget "miilo" {
       if setupSection == "chat" {
         Text { text: "Choose your chat endpoint, model and credential file. Consent applies to the questions and task context you share."; style: small; color: muted; maxLines: 4 }
         Terminal { command: "miilo-owl chat-setup"; fill: width; height: max(1, screenHeight * 0.6) }
-        Text { text: "Voice integration is not implemented in this launcher yet. Transcription and speech output will use separate endpoint settings."; style: small; color: muted; maxLines: 4 }
+        Text { text: "Hands-free voice is configured in the native Miilo One Settings → Voice panel. Click the Miilo face to start a conversation."; style: small; color: muted; maxLines: 4 }
       } else if setupSection == "filters" {
       Setup { }
       if len(selectableProviders) <= 1 { Text { text: "All connected systems are shown."; style: small; color: muted } }

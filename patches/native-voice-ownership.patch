@@ -1,0 +1,5 @@
+--- a/70-miilo-fleet.owl
++++ b/70-miilo-fleet.owl
+@@ -213,1 +213,1 @@
+-        Text { text: "Voice integration is not implemented in this launcher yet. Transcription and speech output will use separate endpoint settings."; style: small; color: muted; maxLines: 4 }
++        Text { text: "Hands-free voice is configured in the native Miilo One Settings → Voice panel. Click the Miilo face to start a conversation."; style: small; color: muted; maxLines: 4 }
