@@ -5,7 +5,7 @@
     {
       "source": "70-miilo-fleet.owl",
       "path": "assets/70-miilo-fleet.owl",
-      "sha256": "91785ab38d6882ca042c75b769920082339d6fb7470a1bb87bc7c60fa8e8961b",
+      "sha256": "0014e30899dabc7d6b4736f63fb261b7676e914e47a3556afa39d05173b2616c",
       "patches": [
         "patches/presentation-consistency.patch",
         "patches/desktop-density.patch",
@@ -23,7 +23,8 @@
         "patches/adaptive-fleet-scale.patch",
         "patches/native-overview-controls.patch",
         "patches/viewport-fleet-capacity.patch",
-        "patches/native-voice-ownership.patch"
+        "patches/native-voice-ownership.patch",
+        "patches/provider-detail-health.patch"
       ]
     },
     {
