@@ -1,11 +1,17 @@
 // Pure presentation helpers; backend authorization remains authoritative.
 function details(item) {
     var value = item && item.extensions && item.extensions["io.miilo.intake"];
-    return value && value.version === 1 ? value : null;
+    function identity(v) { return typeof v === "string" && v.trim().length > 0 && v.length <= 512; }
+    if (!value || value.version !== 1 || !value.source ||
+        !identity(value.source.connectionId) || !identity(value.source.externalId) || !identity(value.source.revision) || !identity(value.workflowId) ||
+        !["pending","accepted","deferred","dismissed"].includes(value.decision) ||
+        !["not_started","queued","running","checking","ready_for_review","completed","blocked","cancelled"].includes(value.execution) ||
+        !["not_required","pending","synchronized","failed"].includes(value.synchronization)) return null;
+    return value;
 }
 function available(item, action) {
-    if (!details(item)) return false;
-    return (item.actions || []).some(function(a) { if (a.id !== "intake." + action || a.available !== true || a.confirmation === "strong") return false;
+    if (!details(item) || item.health !== "healthy" || typeof item.revision !== "string" || !item.revision) return false;
+    return (item.actions || []).some(function(a) { if (a.id !== "intake." + action || a.available !== true || !["read","bounded"].includes(a.risk) || !["none","explicit"].includes(a.confirmation)) return false;
         var required = a.inputSchema && a.inputSchema.required || [];
         return Array.isArray(required) && required.every(function(key) { return action === "defer" && key === "until"; }); });
 }
@@ -18,7 +24,9 @@ function command(item, action, requestId, confirmedAt, until) {
 }
 function label(item) {
     var value = details(item);
-    if (!value) return "Unsupported intake version";
+    if (!value) return "Unsupported intake details";
+    if (value.synchronization === "failed") return "Source update failed";
+    if (value.synchronization === "pending") return "Updating source";
     if (value.decision === "accepted") return String(value.execution).replace(/_/g, " ");
     return value.decision === "pending" ? "Needs you" : value.decision;
 }

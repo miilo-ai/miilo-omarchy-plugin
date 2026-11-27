@@ -19,7 +19,7 @@ Item {
         property var retryArguments: []
         property string endpoint: ""
         property string tokenFile: ""
-        property var items: [{providerId:"custom",id:"task",title:"<img src='http://127.0.0.1:9/no'>",summary:"Synthetic task",revision:"r1",extensions:{"io.miilo.intake":{version:1,decision:"pending",execution:"not_started"}},actions:[{id:"intake.accept",available:true},{id:"intake.defer",available:true},{id:"intake.dismiss",available:true}]}]
+        property var items: [{providerId:"custom",id:"task",title:"<img src='http://127.0.0.1:9/no'>",summary:"Synthetic task",revision:"r1",health:"healthy",extensions:{"io.miilo.intake":{version:1,source:{connectionId:"source",externalId:"task",revision:"source-r1"},workflowId:"project",synchronization:"not_required",decision:"pending",execution:"not_started"}},actions:[{id:"intake.accept",available:true,risk:"bounded",confirmation:"explicit"},{id:"intake.defer",available:true,risk:"bounded",confirmation:"explicit"},{id:"intake.dismiss",available:true,risk:"bounded",confirmation:"explicit"}]}]
         property string chosen: ""
         function refresh() {}
         function retry() {}
