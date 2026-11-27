@@ -10,6 +10,7 @@ RowLayout {
     property var voiceSession: null
     property string voiceOutputPhase: ""
     property bool voiceReady: false
+    signal inboxRequested()
     signal localRequested()
     signal remoteRequested()
     signal refreshRequested()
@@ -68,6 +69,7 @@ RowLayout {
         Menu {
             id: settingsMenu
             y: menuButton.height
+            MenuItem { text: "Inbox"; onTriggered: root.inboxRequested() }
             MenuItem { text: "Systems"; checkable: true; autoExclusive: true; checked: root.activeSection === "filters"; onTriggered: root.systemsRequested() }
             MenuItem { text: "Appearance"; checkable: true; autoExclusive: true; checked: root.activeSection === "appearance"; onTriggered: root.settingsRequested("appearance") }
             MenuItem { text: "Connections"; checkable: true; autoExclusive: true; checked: root.activeSection === "systems"; onTriggered: root.settingsRequested("systems") }

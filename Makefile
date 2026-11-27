@@ -74,3 +74,11 @@ check-voice:
 .PHONY: check-host-theme
 check-host-theme:
 	bash tools/test-host-theme.sh
+
+.PHONY: check-intake
+check-intake:
+	bash tools/test-intake.sh
+
+.PHONY: check-intake-runtime
+check-intake-runtime:
+	bash tools/test-intake-runtime.sh "$(MIILO_INTAKE_TEST_CLI)"

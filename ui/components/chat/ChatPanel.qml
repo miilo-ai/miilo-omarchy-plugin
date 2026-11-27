@@ -9,6 +9,8 @@ FocusScope {
     id: root
     required property var theme
     required property var surface
+    property var inputHandler: null
+    property bool externalBusy: false
     property var target: null
     property bool sessionUnlocked: false
     property bool loadVoiceSettings: true
@@ -32,6 +34,16 @@ FocusScope {
         sharing = true;
         Qt.callLater(() => { if (root.visible && root.sharing) handsFree.arm(); });
     }
+    function submitText(text, parent, method) {
+        if (!root.sessionUnlocked || root.externalBusy) return false;
+        if (inputHandler && inputHandler(text, method || "manual")) return true;
+        return root.sharing && session.send(text, parent);
+    }
+    function speakStatus(text) {
+        if (handsFree.armed && !handsFree.muted && root.sessionUnlocked && !session.busy && !playback.busy) {
+            playback.beginTurn(); playback.append(text, true);
+        }
+    }
     function stop() { handsFree.disarm(); playback.cancel(); session.cancel(); }
     onVisibleChanged: if (!visible) { stop(); sharing = false; composing = false; }
     onTargetChanged: { stop(); sharing = false; }
@@ -39,9 +51,9 @@ FocusScope {
         id: handsFree; objectName: "chat-hands-free"
         permitted: root.visible && root.sharing
         unlocked: root.sessionUnlocked
-        paused: session.busy || playback.busy
+        paused: session.busy || playback.busy || root.externalBusy
         loadSavedSettings: root.loadVoiceSettings
-        onTranscript: (text, traceParent) => { if (root.sharing && !session.busy) session.send(text, traceParent); }
+        onTranscript: (text, traceParent) => { if (root.sharing && !session.busy) root.submitText(text, traceParent, "voice"); }
         onMutedChanged: if (muted) { playback.cancel(); session.cancel(); }
     }
     VoicePlayback {
@@ -97,12 +109,12 @@ FocusScope {
                 font.family: root.theme.typography.family; font.pixelSize: root.theme.typography.size("body")
                 padding: root.theme.gap; enabled: !session.busy
                 background: Rectangle { color: root.theme.inset; radius: root.theme.radius; border.color: root.theme.line; border.width: 1 }
-                onAccepted: if (root.sharing && session.send(text)) text = ""
+                onAccepted: if (root.submitText(text, "", "manual")) text = ""
             }
             Controls.Action {
                 objectName: "chat-send"; context: root.context; text: session.busy ? "Stop" : "Send"
-                enabled: session.busy || (root.sessionUnlocked && root.sharing && draft.text.trim().length > 0)
-                onClicked: { if (session.busy) session.cancel(); else if (session.send(draft.text)) draft.text = ""; }
+                enabled: session.busy || (root.sessionUnlocked && (root.sharing || root.inputHandler) && draft.text.trim().length > 0)
+                onClicked: { if (session.busy) session.cancel(); else if (root.submitText(draft.text, "", "manual")) draft.text = ""; }
             }
         }
     }
