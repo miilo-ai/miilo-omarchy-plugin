@@ -38,6 +38,7 @@ Item {
     Crew.SessionList { id: sessionList; y: 120; width: 400; height: 100; controller: sessions; widget: palette; theme: toolbar.theme }
     SignalSpy { id: localSpy; target: toolbar; signalName: "localRequested" }
     SignalSpy { id: remoteSpy; target: toolbar; signalName: "remoteRequested" }
+    SignalSpy { id: inboxSpy; target: toolbar; signalName: "inboxRequested" }
     SignalSpy { id: settingsSpy; target: toolbar; signalName: "settingsRequested" }
     SignalSpy { id: refreshSpy; target: toolbar; signalName: "refreshRequested" }
     TestCase {
@@ -45,7 +46,7 @@ Item {
         when: true
         onCompletedChanged: if (completed) console.log(qtest_results.failCount === 0 ? "MIILO_TOOLBAR_OK" : "MIILO_TOOLBAR_FAILED", qtest_results.passCount, qtest_results.failCount)
         function init() { wait(50); toolbar.busy = false; localSpy.clear(); remoteSpy.clear(); refreshSpy.clear() }
-        function cleanup(){overview.visible=false;}
+        function cleanup(){console.log("TOOLBAR_CASE",qtest_results.functionName,qtest_results.failed?"FAILED":"passed");overview.visible=false;}
         function test_window_background_covers_native_controls_in_both_modes() {
             const background=findChild(themedWindow,"dashboardBackground");verify(background);
             compare(background.anchors.fill,background.parent);
@@ -105,25 +106,32 @@ Item {
             toolbar.busy = true; mouseClick(refresh); compare(refreshSpy.count, 1);
             verify(!add.enabled); verify(!menu.enabled);
         }
+        function test_inbox_menu_keyboard_navigation() {
+            inboxSpy.clear();
+            var menu = findChild(toolbar, "systemMenuButton");
+            menu.forceActiveFocus(); keyClick(Qt.Key_Space);
+            wait(30); keyClick(Qt.Key_Down); keyClick(Qt.Key_Return);
+            tryCompare(inboxSpy, "count", 1);
+        }
         function test_settings_menu_keyboard_navigation() {
             settingsSpy.clear();
             var menu = findChild(toolbar, "systemMenuButton");
             menu.forceActiveFocus(); keyClick(Qt.Key_Space);
-            wait(30); keyClick(Qt.Key_Down); keyClick(Qt.Key_Down); keyClick(Qt.Key_Return);
+            wait(30); for (var i = 0; i < 3; i++) keyClick(Qt.Key_Down); keyClick(Qt.Key_Return);
             tryCompare(settingsSpy, "count", 1); compare(settingsSpy.signalArguments[0][0], "appearance");
         }
         function test_connections_menu_keyboard_navigation() {
             settingsSpy.clear();
             var menu = findChild(toolbar, "systemMenuButton");
             menu.forceActiveFocus(); keyClick(Qt.Key_Space);
-            wait(30); keyClick(Qt.Key_Down); keyClick(Qt.Key_Down); keyClick(Qt.Key_Down); keyClick(Qt.Key_Return);
+            wait(30); for (var i = 0; i < 4; i++) keyClick(Qt.Key_Down); keyClick(Qt.Key_Return);
             tryCompare(settingsSpy, "count", 1); compare(settingsSpy.signalArguments[0][0], "systems");
         }
         function test_about_menu_keyboard_navigation() {
             settingsSpy.clear();
             var menu = findChild(toolbar, "systemMenuButton");
             menu.forceActiveFocus(); keyClick(Qt.Key_Space); wait(30);
-            for (var i = 0; i < 8; i++) keyClick(Qt.Key_Down);
+            for (var i = 0; i < 9; i++) keyClick(Qt.Key_Down);
             keyClick(Qt.Key_Return);
             tryCompare(settingsSpy, "count", 1); compare(settingsSpy.signalArguments[0][0], "about");
         }
@@ -131,7 +139,7 @@ Item {
             settingsSpy.clear();
             var menu=findChild(toolbar,"systemMenuButton");
             menu.forceActiveFocus();keyClick(Qt.Key_Space);wait(30);
-            for(var i=0;i<7;i++)keyClick(Qt.Key_Down);
+            for(var i=0;i<8;i++)keyClick(Qt.Key_Down);
             keyClick(Qt.Key_Return);
             tryCompare(settingsSpy,"count",1);compare(settingsSpy.signalArguments[0][0],"workers");
         }
