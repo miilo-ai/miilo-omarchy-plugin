@@ -5,6 +5,7 @@ import QtQuick.Layouts
 import "../../vendor/owl" as Owl
 import "onboarding/controls" as Controls
 import "chat" as Chat
+import "intake" as Intake
 
 FocusScope {
     id: root
@@ -14,9 +15,10 @@ FocusScope {
     property string section: "appearance"
     property bool configuring: false
     property var voiceController: null
+    property var intakeController: null
     property var liveController: null
-    readonly property var sections: ["appearance", "filters", "systems", "chat", "voice", "pair", "workers", "about", "notifications"]
-    readonly property var labels: ["Appearance", "Systems", "Connections", "Chat model", "Voice", "Pair computer", "Workers", "About", "Notifications"]
+    readonly property var sections: ["appearance", "filters", "systems", "chat", "voice", "pair", "workers", "intake", "about", "notifications"]
+    readonly property var labels: ["Appearance", "Systems", "Connections", "Chat model", "Voice", "Pair computer", "Workers", "Intake", "About", "Notifications"]
     readonly property bool wide: width >= 440
     signal closed()
     function read(name) { var revision = widget.generation; return surface.viewValue(name) }
@@ -75,6 +77,7 @@ FocusScope {
                         }
                     }
                     WorkersSettings {objectName:"workersSettings";context:root;visible:root.section === "workers";Layout.fillWidth:true}
+                    Loader { active: root.section === "intake" && root.intakeController !== null; Layout.fillWidth: true; sourceComponent: Component { Intake.InboxSettings { context: root; controller: root.intakeController } } }
                     AboutSettings { context: root; visible: root.section === "about"; Layout.fillWidth: true }
                     Loader {active:root.section==="notifications"&&root.liveController!==null;Layout.fillWidth:true;sourceComponent:Component {LiveSettings {context:root;live:root.liveController}}}
                     AppearanceSettings { context: root; visible: root.section === "appearance"; Layout.fillWidth: true }

@@ -31,7 +31,7 @@ ShellRoot {
 }
 QML
   # This never starts a second live desktop shell.
-  if ! env -u WAYLAND_DISPLAY XDG_RUNTIME_DIR="$scratch/runtime" XDG_STATE_HOME="$scratch/state" MIILO_HOME="$scratch/miilo" MIILO_CHAT_TEST_PEER="$target/debug/dictation-peer" \
+  if ! env -u WAYLAND_DISPLAY XDG_RUNTIME_DIR="$scratch/runtime" XDG_CONFIG_HOME="$scratch/config" XDG_STATE_HOME="$scratch/state" MIILO_HOME="$scratch/miilo" MIILO_CHAT_TEST_PEER="$target/debug/dictation-peer" \
       QT_QPA_PLATFORM=offscreen QT_QUICK_BACKEND=software \
       QT_QPA_PLATFORMTHEME=basic QT_QUICK_CONTROLS_STYLE=Basic \
       timeout 25s quickshell -p "$scratch/shell.qml" --no-color > "$scratch/result" 2>&1; then
